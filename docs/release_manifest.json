@@ -1,0 +1,133 @@
+{
+  "model_version": "1.0.0",
+  "files": [
+    {
+      "path": ".github/workflows/tests.yml",
+      "sha256": "4b3d7329e7cd64c8bee1c4c74f37a3db709008ea8f2ca4ae36d9f1a9b7cd977b"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "a11b17ccf2b9efcacf1749d60c5f8b4dcf79af17cece095b46075f4e631d6d7c"
+    },
+    {
+      "path": ".python-version",
+      "sha256": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d"
+    },
+    {
+      "path": ".streamlit/config.toml",
+      "sha256": "aff46639e20d00cb81bd908bebfdfd42efcefc1ee23f6e528ae07e40d288df3c"
+    },
+    {
+      "path": "README.md",
+      "sha256": "e06e5305b36f2275756424689a34813701edb9b7871d97f94a7200f983b357dc"
+    },
+    {
+      "path": "assets/road2zero.png",
+      "sha256": "222b51c352cadb3fc90112f0af7d36a62d5fb607512de66cb1b3d9d739df7866"
+    },
+    {
+      "path": "data/demo_syntetiskt.json",
+      "sha256": "71f6622b64810171aaf42a929f7a5bb6a01d0df211bcf533eaab44f829d9b86e"
+    },
+    {
+      "path": "data/jagersro_smt.json",
+      "sha256": "996dcf1c7088f97eb592ce76842190e0d786ea554a328e0f7218decddac24b57"
+    },
+    {
+      "path": "data/legacy_jagersro_parameters.csv",
+      "sha256": "12aac6c9f87de64b720a84014f6394e33adab31e6dc91fe7ef7e3bc0faa2c08d"
+    },
+    {
+      "path": "data/legacy_oceanhamnen_factors.csv",
+      "sha256": "ae65cd77f8ab14d464436b318ecdcac23f81a84c52d419c35e37857b3db9a402"
+    },
+    {
+      "path": "data/scenario_schema.json",
+      "sha256": "094e102a1551e5b9d5ca6a20e11a7de4dc8c246a6f6234f901c3c082ff444d05"
+    },
+    {
+      "path": "data/source_provenance.json",
+      "sha256": "d22b1c0d2d02a7b28c77a68d67e2d7b2aace898f3c2ea43e4ffa87d1fce73f14"
+    },
+    {
+      "path": "data/vagvis_importmall.csv",
+      "sha256": "6058000ea56ed71ffcaa1aade051b4764f4febde1e2e067933b9eb961d82efdb"
+    },
+    {
+      "path": "docs/FAKTORGRANSKNING.md",
+      "sha256": "aae36d2328ce471979b41fda0f15571d722ea8a275b4f2c0421045c1db03309e"
+    },
+    {
+      "path": "docs/VALIDERING.md",
+      "sha256": "2b5422047b9c989f139b8a081ec705528397673fd4a6ae3cb1f97941dee15c14"
+    },
+    {
+      "path": "docs/test_output.txt",
+      "sha256": "586563dea69229f93151451fc4a69d7f1ca79096d855f3cd5998b519e0db560a"
+    },
+    {
+      "path": "docs/test_results.json",
+      "sha256": "d39fc6e85947c9b4f6d2270794fbb28edb4c885f143fce3b0172ba2495512417"
+    },
+    {
+      "path": "requirements-dev.txt",
+      "sha256": "b2cf40cfde63ffcd654d233d12aebeb06ea2092d1cbd22aa25c34efacfcfd804"
+    },
+    {
+      "path": "requirements.txt",
+      "sha256": "9eca0e80503fce04a939e2a31631c370afaf2810d245b8ae33b35cb0a3d62afe"
+    },
+    {
+      "path": "road2zero/__init__.py",
+      "sha256": "f55d7663e2f9d653e9886f707b87bb2d7d7df54c10606542df0e3c9f784a8f85"
+    },
+    {
+      "path": "road2zero/__main__.py",
+      "sha256": "fe1627d2305425d2e0860e0372254c55886b8182b82a04dc6abfed32bfae1b68"
+    },
+    {
+      "path": "road2zero/engine.py",
+      "sha256": "411b962959271f19d453ed1fabb2bddc512b2f7c9b7d484b3c1a74fdbc8b8a87"
+    },
+    {
+      "path": "road2zero/io.py",
+      "sha256": "186d4d7e2bd89125dc3bbad826e621498a3f3360fc7f609578d264a3c442dd77"
+    },
+    {
+      "path": "road2zero/methods.py",
+      "sha256": "a3986ddc32d1ce1c9f17dfbf304dd4de1925064cbad4278ccba054d159a21b6d"
+    },
+    {
+      "path": "road2zero/schema.py",
+      "sha256": "fa3a1f1370b3a41ec431d7c39173c992c78a19493774e10e166259c3d19052ff"
+    },
+    {
+      "path": "road2zero/seeds.py",
+      "sha256": "bad1e9b53a18d29ea85df27842ddeb400ea7f1c3c8f2726dfda478a24b921c77"
+    },
+    {
+      "path": "road2zero/ui.py",
+      "sha256": "b04179eb73f9feee9a492a9ddb7b64b4b27405cf88434bfdef93a3acb80d02d8"
+    },
+    {
+      "path": "starta_mac_linux.sh",
+      "sha256": "0cc83b6b282e51f92b123579c3561f6b041bce1503f2ec9c22fef792aea166df"
+    },
+    {
+      "path": "starta_windows.bat",
+      "sha256": "ba3ae1376e0cb5a39bc71ff6aec77ece2937e0741bfec85a95234e5cfb1ef19d"
+    },
+    {
+      "path": "streamlit_app.py",
+      "sha256": "4a8e7ae4499732c1e143fb638d8ef63dbefa1737e370e92780343f41266b257d"
+    },
+    {
+      "path": "tests/test_engine.py",
+      "sha256": "f848738f006fdae1ca9f611062af4a00af2592643b8964782b5ca4fe4a8a3bf2"
+    },
+    {
+      "path": "tests/test_streamlit.py",
+      "sha256": "200dff6e9678bf2090ca923fc0440caf7ef5218c4d4f04b8b60f39666be2cecd"
+    }
+  ]
+}

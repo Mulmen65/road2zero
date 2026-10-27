@@ -1,0 +1,42 @@
+test_aggregate_programme_split_is_not_double_counted (test_engine.ModelTests.test_aggregate_programme_split_is_not_double_counted) ... ok
+test_changing_total_bta_scales_building_and_energy (test_engine.ModelTests.test_changing_total_bta_scales_building_and_energy) ... ok
+test_cohort_period_and_physical_population_are_separate (test_engine.ModelTests.test_cohort_period_and_physical_population_are_separate) ... ok
+test_construction_uses_start_year_factor (test_engine.ModelTests.test_construction_uses_start_year_factor) ... ok
+test_csv_import_zero_swedish_decimal_and_malformed (test_engine.ModelTests.test_csv_import_zero_swedish_decimal_and_malformed) ... ok
+test_duplicate_transport_aggregate_and_phase_rows (test_engine.ModelTests.test_duplicate_transport_aggregate_and_phase_rows) ... ok
+test_explicit_category_exclusion (test_engine.ModelTests.test_explicit_category_exclusion) ... ok
+test_factor_curve_interpolation_and_range (test_engine.ModelTests.test_factor_curve_interpolation_and_range) ... ok
+test_forest_growth_stops_at_carbon_capacity (test_engine.ModelTests.test_forest_growth_stops_at_carbon_capacity) ... ok
+test_forest_history_is_carried_into_reporting_window (test_engine.ModelTests.test_forest_history_is_carried_into_reporting_window) ... ok
+test_independent_complete_example (test_engine.ModelTests.test_independent_complete_example) ... ok
+test_invalid_programme_or_phase_balance_blocks_total (test_engine.ModelTests.test_invalid_programme_or_phase_balance_blocks_total) ... ok
+test_land_area_and_unique_ids (test_engine.ModelTests.test_land_area_and_unique_ids) ... ok
+test_linear_occupation_annual_midpoint (test_engine.ModelTests.test_linear_occupation_annual_midpoint) ... ok
+test_manual_construction_total_has_precedence (test_engine.ModelTests.test_manual_construction_total_has_precedence) ... ok
+test_missing_transport_year_is_blocking (test_engine.ModelTests.test_missing_transport_year_is_blocking) ... ok
+test_missing_value_is_not_zero (test_engine.ModelTests.test_missing_value_is_not_zero) ... ok
+test_phase_population_overrides_replace_project_estimate (test_engine.ModelTests.test_phase_population_overrides_replace_project_estimate) ... ok
+test_phase_split_preserves_total_construction_and_manual_total (test_engine.ModelTests.test_phase_split_preserves_total_construction_and_manual_total) ... ok
+test_piling_spont_in_infrastructure_only (test_engine.ModelTests.test_piling_spont_in_infrastructure_only) ... ok
+test_public_factor_requires_annual_person_method (test_engine.ModelTests.test_public_factor_requires_annual_person_method) ... ok
+test_reference_does_not_change_project_inventory (test_engine.ModelTests.test_reference_does_not_change_project_inventory) ... ok
+test_release_reverses_storage (test_engine.ModelTests.test_release_reverses_storage) ... ok
+test_removal_eligibility_and_epd_checks (test_engine.ModelTests.test_removal_eligibility_and_epd_checks) ... ok
+test_roundtrip_and_export_digest (test_engine.ModelTests.test_roundtrip_and_export_digest) ... ok
+test_schema_rejects_unknown_and_nonfinite_input (test_engine.ModelTests.test_schema_rejects_unknown_and_nonfinite_input) ... ok
+test_smt_is_aggregate_and_incomplete (test_engine.ModelTests.test_smt_is_aggregate_and_incomplete) ... ok
+test_solar_export_is_not_removal (test_engine.ModelTests.test_solar_export_is_not_removal) ... ok
+test_source_and_overlap_validation (test_engine.ModelTests.test_source_and_overlap_validation) ... ok
+test_timber_storage_not_automatic_removal (test_engine.ModelTests.test_timber_storage_not_automatic_removal) ... ok
+test_transport_perspectives_never_sum (test_engine.ModelTests.test_transport_perspectives_never_sum) ... ok
+test_wrong_unit_is_blocking (test_engine.ModelTests.test_wrong_unit_is_blocking) ... ok
+test_zero_bta_override_is_honoured (test_engine.ModelTests.test_zero_bta_override_is_honoured) ... ok
+test_zero_population_override_is_honoured (test_engine.ModelTests.test_zero_population_override_is_honoured) ... ok
+test_all_input_modules_render (test_streamlit.StreamlitTests.test_all_input_modules_render) ... skipped 'Streamlit/Plotly är inte installerade i denna miljö'
+test_edit_total_bta_changes_model (test_streamlit.StreamlitTests.test_edit_total_bta_changes_model) ... skipped 'Streamlit/Plotly är inte installerade i denna miljö'
+test_initial_smt_six_tabs_and_no_exceptions (test_streamlit.StreamlitTests.test_initial_smt_six_tabs_and_no_exceptions) ... skipped 'Streamlit/Plotly är inte installerade i denna miljö'
+
+----------------------------------------------------------------------
+Ran 37 tests in 0.041s
+
+OK (skipped=3)

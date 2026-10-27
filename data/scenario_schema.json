@@ -1,0 +1,1349 @@
+{
+  "$defs": {
+    "Activity": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "phase_id": {
+          "title": "Phase Id",
+          "type": "string"
+        },
+        "submodule": {
+          "default": "Ytbeläggning",
+          "title": "Submodule",
+          "type": "string"
+        },
+        "source_id": {
+          "default": "USER",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "land_id": {
+          "default": "",
+          "title": "Land Id",
+          "type": "string"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantity"
+        },
+        "unit": {
+          "default": "m2",
+          "enum": [
+            "m2",
+            "m3",
+            "tkm",
+            "m",
+            "t",
+            "st"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "factor_id": {
+          "default": "",
+          "title": "Factor Id",
+          "type": "string"
+        },
+        "total_kg": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Kg"
+        },
+        "note": {
+          "default": "",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "phase_id"
+      ],
+      "title": "Activity",
+      "type": "object"
+    },
+    "Consumption": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "Matkonsumtion",
+            "Övrig konsumtion",
+            "Offentliga investeringar"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "source_id": {
+          "default": "USER",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "mode": {
+          "default": "person",
+          "enum": [
+            "person",
+            "quantity",
+            "total"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantity"
+        },
+        "unit": {
+          "default": "person/year",
+          "enum": [
+            "person/year",
+            "kg",
+            "SEK",
+            "st",
+            "kWh"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "coverage": {
+          "default": 1,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Coverage",
+          "type": "number"
+        },
+        "factor_id": {
+          "default": "",
+          "title": "Factor Id",
+          "type": "string"
+        },
+        "overlaps_energy_transport": {
+          "default": false,
+          "title": "Overlaps Energy Transport",
+          "type": "boolean"
+        },
+        "note": {
+          "default": "",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "category"
+      ],
+      "title": "Consumption",
+      "type": "object"
+    },
+    "Curve": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "source_id": {
+          "default": "USER",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "tail": {
+          "default": "error",
+          "enum": [
+            "error",
+            "hold"
+          ],
+          "title": "Tail",
+          "type": "string"
+        },
+        "points": {
+          "items": {
+            "$ref": "#/$defs/CurvePoint"
+          },
+          "title": "Points",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "unit"
+      ],
+      "title": "Curve",
+      "type": "object"
+    },
+    "CurvePoint": {
+      "additionalProperties": false,
+      "properties": {
+        "year": {
+          "maximum": 2300,
+          "minimum": 1900,
+          "title": "Year",
+          "type": "integer"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "year",
+        "value"
+      ],
+      "title": "CurvePoint",
+      "type": "object"
+    },
+    "Factor": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "source_id": {
+          "default": "USER",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "locator": {
+          "default": "",
+          "title": "Locator",
+          "type": "string"
+        },
+        "quality": {
+          "default": "Ej verifierad",
+          "title": "Quality",
+          "type": "string"
+        },
+        "boundary": {
+          "default": "",
+          "title": "Boundary",
+          "type": "string"
+        },
+        "reference_year": {
+          "default": 2026,
+          "maximum": 2300,
+          "minimum": 1900,
+          "title": "Reference Year",
+          "type": "integer"
+        },
+        "annual_change": {
+          "default": 0,
+          "exclusiveMinimum": -1,
+          "maximum": 1,
+          "title": "Annual Change",
+          "type": "number"
+        },
+        "curve_id": {
+          "default": "",
+          "title": "Curve Id",
+          "type": "string"
+        },
+        "uncertainty_pct": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty Pct"
+        },
+        "note": {
+          "default": "",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "unit"
+      ],
+      "title": "Factor",
+      "type": "object"
+    },
+    "Land": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "source_id": {
+          "default": "USER",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "area_m2": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Area M2"
+        },
+        "before": {
+          "default": "Ej klassificerad",
+          "title": "Before",
+          "type": "string"
+        },
+        "after": {
+          "default": "Ej klassificerad",
+          "title": "After",
+          "type": "string"
+        },
+        "soil": {
+          "default": "Ej utrett",
+          "title": "Soil",
+          "type": "string"
+        },
+        "change_year": {
+          "default": 2029,
+          "maximum": 2300,
+          "minimum": 1900,
+          "title": "Change Year",
+          "type": "integer"
+        },
+        "release_years": {
+          "default": 1,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Release Years",
+          "type": "integer"
+        },
+        "soc_factor_id": {
+          "default": "",
+          "title": "Soc Factor Id",
+          "type": "string"
+        },
+        "dom_factor_id": {
+          "default": "",
+          "title": "Dom Factor Id",
+          "type": "string"
+        },
+        "biomass_factor_id": {
+          "default": "",
+          "title": "Biomass Factor Id",
+          "type": "string"
+        },
+        "keep_soc": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Keep Soc"
+        },
+        "keep_dom": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Keep Dom"
+        },
+        "keep_biomass": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Keep Biomass"
+        },
+        "after_flow_factor_id": {
+          "default": "",
+          "title": "After Flow Factor Id",
+          "type": "string"
+        },
+        "reference_flow_factor_id": {
+          "default": "",
+          "title": "Reference Flow Factor Id",
+          "type": "string"
+        },
+        "flow_mode": {
+          "default": "factor",
+          "enum": [
+            "factor",
+            "forest"
+          ],
+          "title": "Flow Mode",
+          "type": "string"
+        },
+        "growth_m3_ha_year": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Growth M3 Ha Year"
+        },
+        "expansion_factor_id": {
+          "default": "",
+          "title": "Expansion Factor Id",
+          "type": "string"
+        },
+        "wood_density_factor_id": {
+          "default": "",
+          "title": "Wood Density Factor Id",
+          "type": "string"
+        },
+        "carbon_fraction_factor_id": {
+          "default": "",
+          "title": "Carbon Fraction Factor Id",
+          "type": "string"
+        },
+        "biomass_capacity_factor_id": {
+          "default": "",
+          "title": "Biomass Capacity Factor Id",
+          "type": "string"
+        },
+        "note": {
+          "default": "",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Land",
+      "type": "object"
+    },
+    "Phase": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "start": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "title": "End",
+          "type": "integer"
+        },
+        "share": {
+          "default": 1,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Share",
+          "type": "number"
+        },
+        "population_override": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Population Override"
+        },
+        "source_id": {
+          "default": "USER",
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "start",
+        "end"
+      ],
+      "title": "Phase",
+      "type": "object"
+    },
+    "Programme": {
+      "additionalProperties": false,
+      "description": "Andel av projektets totala nybyggda BTA, inte en enskild byggnad.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "source_id": {
+          "default": "USER",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "share_bta": {
+          "default": 1,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Share Bta",
+          "type": "number"
+        },
+        "kind": {
+          "default": "Flerbostadshus",
+          "title": "Kind",
+          "type": "string"
+        },
+        "material": {
+          "default": "Ej valt",
+          "title": "Material",
+          "type": "string"
+        },
+        "residential": {
+          "default": true,
+          "title": "Residential",
+          "type": "boolean"
+        },
+        "construction_factor_id": {
+          "default": "",
+          "title": "Construction Factor Id",
+          "type": "string"
+        },
+        "construction_total_kg": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Construction Total Kg"
+        },
+        "energy_mode": {
+          "default": "area",
+          "enum": [
+            "area",
+            "annual",
+            "excluded"
+          ],
+          "title": "Energy Mode",
+          "type": "string"
+        },
+        "energy_class": {
+          "default": "Ej valt",
+          "title": "Energy Class",
+          "type": "string"
+        },
+        "atemp_m2": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Atemp M2"
+        },
+        "atemp_ratio_factor_id": {
+          "default": "",
+          "title": "Atemp Ratio Factor Id",
+          "type": "string"
+        },
+        "electricity_specific": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Electricity Specific"
+        },
+        "heat_specific": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heat Specific"
+        },
+        "electricity_annual": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Electricity Annual"
+        },
+        "heat_annual": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heat Annual"
+        },
+        "electricity_factor_id": {
+          "default": "",
+          "title": "Electricity Factor Id",
+          "type": "string"
+        },
+        "heat_factor_id": {
+          "default": "",
+          "title": "Heat Factor Id",
+          "type": "string"
+        },
+        "solar_kwh_year": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Solar Kwh Year"
+        },
+        "solar_self_use": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Solar Self Use"
+        },
+        "piling": {
+          "default": "unknown",
+          "enum": [
+            "unknown",
+            "yes",
+            "no"
+          ],
+          "title": "Piling",
+          "type": "string"
+        },
+        "piling_factor_id": {
+          "default": "legacy_piling",
+          "title": "Piling Factor Id",
+          "type": "string"
+        },
+        "sheet_piling": {
+          "default": "unknown",
+          "enum": [
+            "unknown",
+            "yes",
+            "no"
+          ],
+          "title": "Sheet Piling",
+          "type": "string"
+        },
+        "sheet_area_m2": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sheet Area M2"
+        },
+        "sheet_factor_id": {
+          "default": "legacy_sheet",
+          "title": "Sheet Factor Id",
+          "type": "string"
+        },
+        "note": {
+          "default": "",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Programme",
+      "type": "object"
+    },
+    "Project": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "default": "NYTT-01",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "default": "Nytt scenario",
+          "title": "Name",
+          "type": "string"
+        },
+        "source_id": {
+          "default": "USER",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "area_m2": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Area M2"
+        },
+        "homes": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Homes",
+          "type": "integer"
+        },
+        "total_bta_override": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Bta Override"
+        },
+        "bta_per_home_factor_id": {
+          "default": "bta_per_home",
+          "title": "Bta Per Home Factor Id",
+          "type": "string"
+        },
+        "population_level": {
+          "default": "project",
+          "enum": [
+            "project",
+            "phase"
+          ],
+          "title": "Population Level",
+          "type": "string"
+        },
+        "population_method": {
+          "default": "homes",
+          "enum": [
+            "homes",
+            "bta"
+          ],
+          "title": "Population Method",
+          "type": "string"
+        },
+        "population_override": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Population Override"
+        },
+        "people_per_home_factor_id": {
+          "default": "people_per_home",
+          "title": "People Per Home Factor Id",
+          "type": "string"
+        },
+        "bta_per_person_factor_id": {
+          "default": "",
+          "title": "Bta Per Person Factor Id",
+          "type": "string"
+        },
+        "start_year": {
+          "default": 2029,
+          "maximum": 2200,
+          "minimum": 1900,
+          "title": "Start Year",
+          "type": "integer"
+        },
+        "end_year": {
+          "default": 2078,
+          "maximum": 2300,
+          "minimum": 1900,
+          "title": "End Year",
+          "type": "integer"
+        },
+        "time_mode": {
+          "default": "calendar",
+          "enum": [
+            "calendar",
+            "cohort"
+          ],
+          "title": "Time Mode",
+          "type": "string"
+        },
+        "build_start_year": {
+          "default": 2029,
+          "maximum": 2200,
+          "minimum": 1900,
+          "title": "Build Start Year",
+          "type": "integer"
+        },
+        "build_end_year": {
+          "default": 2048,
+          "maximum": 2200,
+          "minimum": 1900,
+          "title": "Build End Year",
+          "type": "integer"
+        },
+        "phasing_enabled": {
+          "default": false,
+          "title": "Phasing Enabled",
+          "type": "boolean"
+        },
+        "operating_years": {
+          "default": 50,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Operating Years",
+          "type": "integer"
+        },
+        "occupation": {
+          "default": "linear",
+          "enum": [
+            "linear",
+            "after"
+          ],
+          "title": "Occupation",
+          "type": "string"
+        },
+        "land_mode": {
+          "default": "full",
+          "enum": [
+            "full",
+            "changed"
+          ],
+          "title": "Land Mode",
+          "type": "string"
+        },
+        "land_reference": {
+          "default": "Fortsatt markanvändning utan projektet",
+          "title": "Land Reference",
+          "type": "string"
+        },
+        "transport_scope": {
+          "default": "unset",
+          "enum": [
+            "unset",
+            "residents",
+            "all",
+            "excluded"
+          ],
+          "title": "Transport Scope",
+          "type": "string"
+        },
+        "note": {
+          "default": "",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "title": "Project",
+      "type": "object"
+    },
+    "Removal": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "kind": {
+          "default": "biochar",
+          "enum": [
+            "biochar",
+            "timber",
+            "trees",
+            "other"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "source_id": {
+          "default": "USER",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "year": {
+          "default": 2029,
+          "maximum": 2300,
+          "minimum": 1900,
+          "title": "Year",
+          "type": "integer"
+        },
+        "end_year": {
+          "anyOf": [
+            {
+              "maximum": 2300,
+              "minimum": 1900,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Year"
+        },
+        "release_year": {
+          "anyOf": [
+            {
+              "maximum": 2300,
+              "minimum": 1900,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Release Year"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantity"
+        },
+        "unit": {
+          "default": "t",
+          "enum": [
+            "t",
+            "kg",
+            "m3",
+            "st"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "factor_id": {
+          "default": "",
+          "title": "Factor Id",
+          "type": "string"
+        },
+        "lifecycle_kg": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lifecycle Kg"
+        },
+        "include_in_total": {
+          "default": false,
+          "title": "Include In Total",
+          "type": "boolean"
+        },
+        "eligibility_confirmed": {
+          "default": false,
+          "title": "Eligibility Confirmed",
+          "type": "boolean"
+        },
+        "epd_already_includes_storage": {
+          "default": false,
+          "title": "Epd Already Includes Storage",
+          "type": "boolean"
+        },
+        "land_id": {
+          "default": "",
+          "title": "Land Id",
+          "type": "string"
+        },
+        "note": {
+          "default": "",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Removal",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "author": {
+          "default": "",
+          "title": "Author",
+          "type": "string"
+        },
+        "year": {
+          "default": "",
+          "title": "Year",
+          "type": "string"
+        },
+        "url": {
+          "default": "",
+          "title": "Url",
+          "type": "string"
+        },
+        "locator": {
+          "default": "",
+          "title": "Locator",
+          "type": "string"
+        },
+        "kind": {
+          "default": "Projektunderlag",
+          "title": "Kind",
+          "type": "string"
+        },
+        "note": {
+          "default": "",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Transport": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "year": {
+          "maximum": 2300,
+          "minimum": 1900,
+          "title": "Year",
+          "type": "integer"
+        },
+        "perspective": {
+          "enum": [
+            "residents",
+            "all"
+          ],
+          "title": "Perspective",
+          "type": "string"
+        },
+        "phase_id": {
+          "default": "",
+          "title": "Phase Id",
+          "type": "string"
+        },
+        "tco2e": {
+          "minimum": 0,
+          "title": "Tco2E",
+          "type": "number"
+        },
+        "source_id": {
+          "default": "USER",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "boundary": {
+          "default": "",
+          "title": "Boundary",
+          "type": "string"
+        },
+        "includes_building_electricity": {
+          "default": false,
+          "title": "Includes Building Electricity",
+          "type": "boolean"
+        },
+        "includes_construction": {
+          "default": false,
+          "title": "Includes Construction",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "year",
+        "perspective",
+        "tco2e"
+      ],
+      "title": "Transport",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "project": {
+      "$ref": "#/$defs/Project"
+    },
+    "phases": {
+      "items": {
+        "$ref": "#/$defs/Phase"
+      },
+      "title": "Phases",
+      "type": "array"
+    },
+    "programme": {
+      "items": {
+        "$ref": "#/$defs/Programme"
+      },
+      "title": "Programme",
+      "type": "array"
+    },
+    "activities": {
+      "items": {
+        "$ref": "#/$defs/Activity"
+      },
+      "title": "Activities",
+      "type": "array"
+    },
+    "lands": {
+      "items": {
+        "$ref": "#/$defs/Land"
+      },
+      "title": "Lands",
+      "type": "array"
+    },
+    "consumption": {
+      "items": {
+        "$ref": "#/$defs/Consumption"
+      },
+      "title": "Consumption",
+      "type": "array"
+    },
+    "transport": {
+      "items": {
+        "$ref": "#/$defs/Transport"
+      },
+      "title": "Transport",
+      "type": "array"
+    },
+    "removals": {
+      "items": {
+        "$ref": "#/$defs/Removal"
+      },
+      "title": "Removals",
+      "type": "array"
+    },
+    "factors": {
+      "items": {
+        "$ref": "#/$defs/Factor"
+      },
+      "title": "Factors",
+      "type": "array"
+    },
+    "curves": {
+      "items": {
+        "$ref": "#/$defs/Curve"
+      },
+      "title": "Curves",
+      "type": "array"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "enabled": {
+      "additionalProperties": {
+        "type": "boolean"
+      },
+      "title": "Enabled",
+      "type": "object"
+    },
+    "parameter_sources": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Parameter Sources",
+      "type": "object"
+    }
+  },
+  "title": "Scenario",
+  "type": "object"
+}
