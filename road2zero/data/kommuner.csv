@@ -1,0 +1,5 @@
+kommun;bilar_per_hushall;km_per_bil;personer_per_hushall_scb;status;kalla
+Malmö;0.581;11892;2.114;Officiell statistik;SCB_TAB6589,SCB_TAB6568,RUS_KORSTRACKA
+Helsingborg;0.819;12917;2.147;Officiell statistik;SCB_TAB6589,SCB_TAB6568,RUS_KORSTRACKA
+Gävle;0.849;12521;2.036;Officiell statistik;SCB_TAB6589,SCB_TAB6568,RUS_KORSTRACKA
+Annan kommun;0.82;12753;2.1;"Riksmedel för körsträcka; ange kommunens bilinnehav";TRAFA_KM_2024,MODELLVAL

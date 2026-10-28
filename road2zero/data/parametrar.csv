@@ -1,0 +1,70 @@
+id;modul;namn;varde;enhet;status;kalla;kommentar
+allm.c_till_co2;Allmänt;Omräkning kol till koldioxid (44/12);3.666667;kg CO2/kg C;Härlett;MODELLVAL;Kvoten mellan molvikterna för CO2 och C
+allm.atemp_andel;Byggnader;Atemp som andel av BTA;0.9;Atemp/BTA;Branschschablon;MODELLVAL;Schablon för andelen uppvärmd yta
+allm.personer_per_hushall;Projekt;Personer per hushåll;2.1;personer;Officiell statistik;SCB_TAB6568;Malmö 2,11, Helsingborg 2,15 och Gävle 2,04 personer per hushåll år 2024
+allm.bta_per_hushall;Projekt;BTA per hushåll;110;m² BTA;Branschschablon;MODELLVAL;"Schablon; ange projektets lägenhetsfördelning när den finns"
+el.startvarde;Projekt;Elens klimatfaktor 2025, svensk elmix;37;g CO2e/kWh;Officiell statistik;BOVERKET_KLIMATDATA,KLIMATSTEGEN2023;Livscykelvärde. Gäller i hela modellen
+el.kurva;Projekt;Elens framskrivning;EU:s referensscenario (WEM);kurva;Officiellt scenario;EU_REF2020,EU_2025_8723;Framåtblickande faktor som EU:s ram för livscykel-GWP tillåter
+fjv.startvarde;Projekt;Fjärrvärmens klimatfaktor, ortens värde;83;g CO2e/kWh;Användarval;MODELLVAL;"Ange leverantörens värde; kurvform enligt EU:s referensscenario"
+sol.produktion;Byggnader;Solelproduktion per m² panel;150;kWh/m² och år;Branschschablon;MODELLVAL;
+sol.panel;Negativa utsläpp;Solpanelens klimatpåverkan per producerad kWh;30;g CO2e/kWh;Antagande;MODELLVAL;"Spann 7–44 g/kWh; används bara för undvikna utsläpp utanför nettot"
+bygg.paln;Byggnader;Pålning per m² BTA;0.026;t CO2e/m² BTA;Branschschablon;SBUF_SCHABLON;Schablon när jordart och jorddjup saknas
+bygg.spont;Byggnader;Spontning per m² spontyta (nytt material och arbete);0.2805;t CO2e/m²;Branschschablon;SBUF_SCHABLON;Användaren anger ytan, 0 m² som standard
+bygg.virke_m3_m2;Byggnader;Virke per m² BTA i trädelen av stommen;0.15;m³/m² BTA;Litteraturvärde;DODOO2026;
+bygg.virke.stomvirke;Negativa utsläpp;Kolinlagring i stomvirke;720.7;kg CO2/m³;Litteraturvärde;DODOO2026;
+bygg.virke.kl_tra;Negativa utsläpp;Kolinlagring i KL-trä;680.7;kg CO2/m³;Litteraturvärde;DODOO2026;
+bygg.virke.limtra;Negativa utsläpp;Kolinlagring i limträ;786;kg CO2/m³;Litteraturvärde;DODOO2026;
+anl.schakt;Anläggning;Schaktning per m³;0.015;t CO2e/m³;Branschschablon;SBUF_SCHABLON;
+anl.sanering;Anläggning;Marksanering per m³;0.075;t CO2e/m³;Branschschablon;SBUF_SCHABLON;
+anl.jorddensitet;Anläggning;Jorddensitet;1.6;t/m³;Branschschablon;SBUF_SCHABLON;
+anl.transport;Anläggning;Masstransport per ton och km;0.0000715;t CO2e/(t·km);Branschschablon;SBUF_SCHABLON;
+anl.betong_standard;Anläggning;Betong i anläggning, standard;0.3079;t CO2e/m³;Branschschablon;MODELLVAL;
+anl.betong_klimatforbattrad;Anläggning;Betong i anläggning, klimatförbättrad;0.21553;t CO2e/m³;Branschschablon;MODELLVAL;70 % av standard
+anl.ledning;Anläggning;Ledningar per meter;0.0391;t CO2e/m;Källa ska verifieras;MODELLVAL;Öppen fråga om källa
+neg.biokol_per_grop;Negativa utsläpp;Biokol per trädgrop;0.3;t CO2e/grop;Källa ska verifieras;MODELLVAL;Räknas bara med EBC C-sink-certifikat
+neg.trad_upptag;Negativa utsläpp;Upptag per stadsträd vid mognad;21.77;kg CO2/träd och år;Litteraturvärde;ITREE;Med tillväxtkurva
+mark.forgroning_start;Förändrad markanvändning;Markkolsinlagring vid förgröning, första året;0.07;kg CO2/m² och år;Källa ska verifieras;MODELLVAL;
+mark.forgroning_mattnad;Förändrad markanvändning;Inlagring vid mättnad, andel av första året;0.1;andel;Källa ska verifieras;MODELLVAL;
+mark.forgroning_ar;Förändrad markanvändning;År till mättnad;40;år;Källa ska verifieras;MODELLVAL;
+mark.horisont;Förändrad markanvändning;Tidshorisont för förlorat framtida skogsupptag;50;år;Lagstiftning;EU_2025_8723;Samma 50 år som EU:s referensperiod för livscykel-GWP
+mark.skog_andel_bio;Förändrad markanvändning;Skogens kolförråd: andel levande biomassa;0.30;andel;Härlett;SLU2025;44 av 146 t C/ha i skog på fastmark
+mark.skog_andel_dom;Förändrad markanvändning;Skogens kolförråd: andel död organisk materia;0.18;andel;Härlett;SLU2025;26 av 146 t C/ha
+mark.skog_andel_soc;Förändrad markanvändning;Skogens kolförråd: andel markkol;0.52;andel;Härlett;SLU2025;76 av 146 t C/ha
+mob.km_riket;Mobilitet och transport;Körsträcka per bil, riksmedel;12753;km/år;Officiell statistik;TRAFA_KM_2024,TRAFA_FORDON_2024;Privatägda bilar i årsslutsbeståndet
+mob.mix.petrol;Mobilitet och transport;Drivlinemix: bensin;0.389;andel av körsträckan;Officiell statistik;TRAFA_KM_2024;2024
+mob.mix.diesel;Mobilitet och transport;Drivlinemix: diesel;0.391;andel av körsträckan;Officiell statistik;TRAFA_KM_2024;2024
+mob.mix.hev;Mobilitet och transport;Drivlinemix: elhybrid;0.047;andel av körsträckan;Officiell statistik;TRAFA_KM_2024;2024
+mob.mix.bev;Mobilitet och transport;Drivlinemix: elbil;0.080;andel av körsträckan;Officiell statistik;TRAFA_KM_2024;2024
+mob.mix.phev;Mobilitet och transport;Drivlinemix: laddhybrid;0.083;andel av körsträckan;Officiell statistik;TRAFA_KM_2024;2024
+mob.mix.biogas;Mobilitet och transport;Drivlinemix: biogas;0.010;andel av körsträckan;Officiell statistik;TRAFA_KM_2024;2024
+mob.phev_eldrift;Mobilitet och transport;Laddhybridens eldriftsandel;0.35;andel;Litteraturvärde;PHEV_ICCT2022;
+mob.livslangd;Mobilitet och transport;Personbilens livslängd;240000;km;Litteraturvärde;ICCT2025;
+mob.kaross;Mobilitet och transport;Tillverkning exklusive batteri;7200;kg CO2e/bil;Litteraturvärde;ICCT2025;Elbil × 0,903, laddhybrid × 1,097
+mob.batteri_kwh;Mobilitet och transport;Batteristorlek elbil;53.4;kWh;Litteraturvärde;ICCT2025;Laddhybrid 13,3 kWh
+mob.batteri_ef;Mobilitet och transport;Batteritillverkning;72.8;kg CO2e/kWh;Litteraturvärde;ICCT2025;
+mob.underhall;Mobilitet och transport;Underhåll;5;g CO2e/km;Litteraturvärde;ICCT2025;Diesel × 1,4, elbil × 0,8
+mob.mj_per_km;Mobilitet och transport;Energianvändning bensinbil;2.512;MJ/km;Härlett;TV_UTSLAPP_2025,ICCT2025;Kalibrerad mot vägtrafikens utsläpp 2024. Diesel × 0,946, elhybrid × 0,768, laddhybrid × 1,10, biogas × 1,06
+mob.kwh_per_km;Mobilitet och transport;Elanvändning elbil;0.182;kWh/km;Litteraturvärde;ICCT2025;Tillsammans med laddverkningsgraden 20,2 kWh per 100 km inklusive laddförluster. Laddhybrid × 1,18
+mob.laddverkningsgrad;Mobilitet och transport;Laddverkningsgrad;0.9;andel;Litteraturvärde;ICCT2025;
+mob.ovrigt;Mobilitet och transport;Övriga direktutsläpp (smörjmedel m.m.);1;g CO2e/km;Modellantagande;MODELLVAL;
+mob.bensin.ttw;Mobilitet och transport;Bensin, förbränning;73.4;g CO2e/MJ;Lagstiftning;FQD2015;
+mob.bensin.wtt;Mobilitet och transport;Bensin, tidigare led;19.9;g CO2e/MJ;Lagstiftning;FQD2015;
+mob.bensin.fossil;Mobilitet och transport;Bensinblandning, fossil andel;0.92;andel;Modellantagande;MODELLVAL;Låginblandning av förnybart 2024
+mob.bensin.bio;Mobilitet och transport;Biobensin, livscykel;20;g CO2e/MJ;Modellantagande;MODELLVAL;Förnybar bensinkomponent, livscykel
+mob.diesel.ttw;Mobilitet och transport;Diesel, förbränning;73.2;g CO2e/MJ;Lagstiftning;FQD2015;
+mob.diesel.wtt;Mobilitet och transport;Diesel, tidigare led;21.9;g CO2e/MJ;Lagstiftning;FQD2015;
+mob.diesel.fossil;Mobilitet och transport;Dieselblandning, fossil andel;0.93;andel;Modellantagande;MODELLVAL;Låginblandning av förnybart 2024
+mob.diesel.bio;Mobilitet och transport;Biodiesel, livscykel;16;g CO2e/MJ;Officiell statistik;NV_KLIMATKLIVET_2025;HVO 59,0 g/kWh
+mob.biogas.ttw;Mobilitet och transport;Biogas, förbränning (fossil del);56.2;g CO2e/MJ;Modellantagande;MODELLVAL;Används bara för fossil gas
+mob.biogas.bio;Mobilitet och transport;Biogas, livscykel;1.3;g CO2e/MJ;Officiell statistik;NV_KLIMATKLIVET_2025;Biogas 4,7 g/kWh
+mob.elbilskurva;Mobilitet och transport;Elbilsandel över tid;Trafikverkets basprognos 2024;kurva;Officiellt scenario;TV_BASPROGNOS2024,TRAFA_KM_2024;8 % av körsträckan 2024, 94 % 2045 och 100 % 2065
+mat.dagar;Matkonsumtion;Dagar per år;365;dagar;Härlett;MODELLVAL;
+mat.kalibrering_mal;Matkonsumtion;Livsmedel i Konsumtionskompassen (för kalibrering);1.08;t CO2e per invånare och år;Officiell statistik;SEI2026;20 % av 5,39 t
+ovr.hushall_total;Övrig konsumtion;Hushållens konsumtionsbaserade utsläpp;5.392;t CO2e per invånare och år;Officiell statistik;SEI2026;År 2023
+flyg.per_inv;Flygresor;Flygresor, inrikes och utrikes;1.1;t CO2e per invånare och år;Litteraturvärde;KAMB2018;År 2017, med höghöjdseffekt
+off.konsumtion;Offentliga investeringar;Offentlig konsumtion;0.83;t CO2e per invånare och år;Officiell statistik;NV_KONSUMTION,SEI2026;År 2023
+off.investeringar;Offentliga investeringar;Investeringar, offentliga och privata;2.09;t CO2e per invånare och år;Officiell statistik;NV_KONSUMTION,SEI2026;År 2023
+off.andel;Offentliga investeringar;Offentlig andel av investeringarna;0.18;andel;Härlett;REGERINGEN2015;4,2 % av BNP av totalt 23,1 % år 2014
+budget.e0;Klimatbudget;Globala CO2-utsläpp 2025;43.0;Gt CO2;Litteraturvärde;FORSTER2026;38,9 fossilt och industri plus 4,1 markanvändning
+budget.k;Klimatbudget;Påslag för andra växthusgaser (alla gaser / CO2, 2024);1.314815;kvot;Litteraturvärde;FORSTER2026;56,8 / 43,2
+mob.effektivisering;Mobilitet och transport;Årlig minskning av förbränningsbilarnas utsläpp per km;0;andel per år;Antagande;MODELLVAL;"0 % som standard; ange egen takt för effektivare förbränningsbilar"

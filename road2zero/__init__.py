@@ -1,3 +1,3 @@
-"""Road2Zero – transparenta scenarioberäkningar utan karta."""
+"""Road2Zero: klimatberäkning för stadsdelar utan karta, med klimatbudget enligt Forster m.fl. (2026)."""
 
-__version__ = "1.0.0"
+__version__ = "0.3.1"

@@ -1,0 +1,7 @@
+profil;namn;andel_standard;kg_co2e_per_dag;kalla;status
+vegan;Vegan;0.037;2.47;SCARBOROUGH2023;Litteraturvärde, ska kontrolleras
+vegetarian;Vegetarian;0.284;4.16;SCARBOROUGH2023;Litteraturvärde, ska kontrolleras
+fisk;Fiskätare;0.146;2.74;SCARBOROUGH2023;Litteraturvärde, ska kontrolleras
+kott_lag;Köttätare, låg konsumtion;0.168;5.37;SCARBOROUGH2023;Litteraturvärde, ska kontrolleras
+kott_medel;Köttätare, medel;0.216;7.04;SCARBOROUGH2023;Litteraturvärde, ska kontrolleras
+kott_hog;Köttätare, hög konsumtion;0.149;10.24;SCARBOROUGH2023;Litteraturvärde, ska kontrolleras
