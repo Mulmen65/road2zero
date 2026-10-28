@@ -2,18 +2,18 @@
 
 # Klimatkategorier i redovisningsordning: (namn, redovisningsnivå, färg)
 KATEGORIER = [
-    # Färgerna följer en validerad kategoripalett (åtta kulörer, ordningen klarar CVD- och normalseende-kontrollen för
-    # intilliggande staplar) plus två neutrala toner för Övrig konsumtion och Offentliga investeringar.
-    ("Byggnad", 1, "#2a78d6"),
-    ("Energi", 1, "#eb6834"),
-    ("Anläggning", 1, "#1baf7a"),
-    ("Förändrad markanvändning", 1, "#eda100"),
-    ("Mobilitet och transport", 2, "#e87ba4"),
-    ("Flygresor", 2, "#6250d6"),
-    ("Matkonsumtion", 2, "#e34948"),
-    ("Övrig konsumtion", 2, "#52514e"),
-    ("Offentliga investeringar", 3, "#a8a69e"),
-    ("Negativa utsläpp", 1, "#008300"),
+    # Dov skala i petrol, turkos, blått och grönt. Ljushet växlar mellan intilliggande kategorier så att staplade staplar
+    # går att skilja åt även vid färgblindhet (ΔE ≥ 15 i OKLab för protanopi, deuteranopi och normalseende).
+    ("Byggnad", 1, "#1f5a6e"),
+    ("Energi", 1, "#4fa8a0"),
+    ("Anläggning", 1, "#2c6e9e"),
+    ("Förändrad markanvändning", 1, "#a3c27a"),
+    ("Mobilitet och transport", 2, "#5a86b8"),
+    ("Flygresor", 2, "#1d4e74"),
+    ("Matkonsumtion", 2, "#7aa65a"),
+    ("Övrig konsumtion", 2, "#bcd3db"),
+    ("Offentliga investeringar", 3, "#7d939d"),
+    ("Negativa utsläpp", 1, "#2f6b3f"),
 ]
 KATEGORI_NAMN = [k[0] for k in KATEGORIER]
 NIVA = {k[0]: k[1] for k in KATEGORIER}

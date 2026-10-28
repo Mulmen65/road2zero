@@ -110,7 +110,7 @@ def tabeller():
     elif val == "reduktionskurvor":
         t = f.reduktion.copy(); t["ar"] = t["ar"].astype(int); t["faktor"] = t["faktor"].astype(float)
         g = st.selectbox("Byggnadskategori", sorted(t["kategori"].unique()), key=k("f_red"))
-        farg = {"betong": "#2a78d6", "stal": "#eb6834", "tra": "#1baf7a"}
+        farg = {"betong": "#5a86b8", "stal": "#1f5a6e", "tra": "#7aa65a"}
         fig = go.Figure()
         for st_ in STOMMAR:
             d = t[(t["kategori"] == g) & (t["stomme"] == st_)]
@@ -146,7 +146,7 @@ def tabeller():
         d = t[t["kurva"] == kur]
         st.caption("Källa: " + kalla_text(d["kalla"].iloc[0]))
         fig = go.Figure(go.Scatter(x=d["ar"], y=d["varde"], mode="lines+markers" if len(d) < 8 else "lines",
-                                   line=dict(color="#2a78d6", width=2), marker=dict(size=8)))
+                                   line=dict(color="#2c6e9e", width=2), marker=dict(size=8)))
         fig.update_layout(height=320, yaxis_title=d["enhet"].iloc[0], margin=dict(l=10, r=10, t=10, b=10), separators=", ")
         st.plotly_chart(fig, width="stretch")
         st.caption("El- och fjärrvärmekurvorna är underlag för standardtakten i fliken Emissionsfaktorer över tid. "
@@ -154,7 +154,7 @@ def tabeller():
     elif val == "skogskol_kurvbibliotek":
         kur = st.selectbox("Kurva", sorted(f.skog["kurva"].unique()), key=k("f_skog"))
         d = f.skog[f.skog["kurva"] == kur]
-        fig = go.Figure(go.Scatter(x=d["ar"], y=d["netto_kumulativt_tCO2_ha"], mode="lines", line=dict(color="#008300", width=2)))
+        fig = go.Figure(go.Scatter(x=d["ar"], y=d["netto_kumulativt_tCO2_ha"], mode="lines", line=dict(color="#2f6b3f", width=2)))
         fig.update_layout(height=320, xaxis_title="År", yaxis_title="Kumulativt nettoupptag (t CO2/ha)", margin=dict(l=10, r=10, t=10, b=10), separators=", ")
         st.plotly_chart(fig, width="stretch")
         st.dataframe(d, hide_index=True, width="stretch", height=240)

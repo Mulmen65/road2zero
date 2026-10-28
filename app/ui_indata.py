@@ -614,7 +614,7 @@ def mark():
             d = fb().skogskurva(namn)
             st.markdown(f"##### Kurva för ny skog: {o['tradslag']}, {o['skotsel'].lower()}")
             st.line_chart(d.rename(columns={"ar": "År efter plantering", "netto_kumulativt_tCO2_ha": "Kumulativt upptag (t CO2/ha)"}),
-                          x="År efter plantering", y="Kumulativt upptag (t CO2/ha)", height=200, color="#2E9E6E")
+                          x="År efter plantering", y="Kumulativt upptag (t CO2/ha)", height=200, color="#2f6b3f")
             kalla("Förberäknad med " + kalla_text("SKOGSKOL104") + ".")
     st.markdown("##### Modulens bidrag")
     bidrag("3 ")
@@ -744,7 +744,9 @@ def ovrig():
     with c2:
         st.markdown("##### Flygresor (egen klimatkategori)")
         num("Inrikes och utrikes flyg (t CO2e per invånare och år)", ("flyg", "per_inv"), min_value=0.0, step=0.05, format="%.2f")
-        kalla(f"Standard 1,1 t: {param_info('flyg.per_inv')}, år 2017 med höghöjdseffekt. Konsumtionskompassen visar att flygresandet 2023 var drygt 25 % lägre än före pandemin. "
+        kalla(f"Standard 1,1 t: {param_info('flyg.per_inv')}, år 2017 med höghöjdseffekt (170 g CO2e per personkilometer mot 90 g CO2 från bränslet). "
+              "Resultatet delas i två delposter, koldioxid från bränslet och höghöjdseffekt, och höghöjdseffekten kan väljas bort i fliken Resultat. "
+              "Konsumtionskompassen visar att flygresandet 2023 var drygt 25 % lägre än före pandemin. "
               "Utvecklingen över tid (globalt snitt för flygbränsle) anges i fliken Emissionsfaktorer över tid.")
     st.markdown("##### Modulens bidrag")
     bidrag("6 ")

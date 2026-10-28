@@ -11,11 +11,11 @@ from road2zero.utveckling import BASAR, KOPPLINGAR, PERIODNAMN, PROCENTENHETER, 
 from road2zero.utveckling import standard as utveckling_standard
 
 from .common import editor, eget_param, fb, k, kalla_kort, kalla_text, ny_version, param_info, senare, ss
+from .diagram import CONF, GRID, INK, INK2, LINJE as AXEL, MELLANBLA, MOSSA, PETROL, SKIFFER, SURF, TURKOS
 
 COL = st.column_config
-INK = "#0b0b0b"; INK2 = "#52514e"; GRID = "#e6e5e1"; SURF = "#fcfcfb"
-BLA, ORANGE, AQUA, NEUTRAL = "#2a78d6", "#eb6834", "#1baf7a", "#52514e"
-CONF = {"displaylogo": False, "locale": "sv", "toImageButtonOptions": {"format": "png", "scale": 2}}
+# Betong blå, stål petrol, trä mossgrön; övriga linjer i samma dova skala
+BLA, ORANGE, AQUA, NEUTRAL = MELLANBLA, PETROL, MOSSA, SKIFFER
 GRUPPER = ["Byggpåverkan", "Energi", "Mobilitet", "Konsumtion och offentlig sektor"]
 NYCKELAR = [2030, 2035, 2040, 2050, 2070, 2100]
 # Stommarna: material ger kulör, BAU heldragen och BÄST streckad linje
@@ -25,7 +25,7 @@ STOMLINJE = {
     "bygg.tra_bau": (AQUA, "solid"), "bygg.tra_bast": (AQUA, "dash"),
     "anl": (NEUTRAL, "dot"),
 }
-LINJE = {"el": (BLA, "solid"), "fjv": (ORANGE, "solid"),
+LINJE = {"el": (BLA, "solid"), "fjv": (TURKOS, "solid"),
          "bilprod": (BLA, "solid"), "forbranning": (ORANGE, "solid"), "bilar_hh": (AQUA, "solid"), "km_bil": (NEUTRAL, "solid"),
          "mat": (AQUA, "solid"), "ovrig": (BLA, "solid"), "flyg": (ORANGE, "solid"), "offentlig": (NEUTRAL, "solid")}
 
@@ -112,7 +112,7 @@ def _figur(titel: str, undertitel: str, serier: list[tuple[str, list[int], list[
     )
     if legend_hoger:
         fig.update_layout(legend=dict(orientation="v", yanchor="top", y=1, x=1.02, xanchor="left"), margin=dict(l=10, r=10, t=64, b=10))
-    fig.update_xaxes(showgrid=False, linecolor=GRID, tickcolor=GRID, range=[BASAR, SLUTAR])
+    fig.update_xaxes(showgrid=False, linecolor=AXEL, tickcolor=AXEL, range=[BASAR, SLUTAR])
     fig.update_yaxes(gridcolor=GRID, zerolinecolor=INK2, title=yt, rangemode="tozero")
     return fig
 

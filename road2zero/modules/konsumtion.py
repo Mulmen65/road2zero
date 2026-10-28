@@ -29,6 +29,8 @@ def berakna(k: Kontext, invanare: dict[int, float]):
     k.anvanda.update({"ovr.hushall_total", "flyg.per_inv", "off.konsumtion", "off.investeringar", "off.andel"})
     namn = {r.kategori: r.namn for r in k.fb.ovrig.itertuples()}
     summa = {"mat": 0.0, "ovrig": 0.0, "flyg": 0.0, "off": 0.0}
+    hoghojd = k.p("flyg.hoghojd_faktor")
+    bransle = 1 / hoghojd if hoghojd > 0 else 1.0     # andel av flygets klimatpåverkan som är koldioxid från bränslet
     for y in k.ar:
         n = invanare.get(y, 0.0)
         if n <= 0:
@@ -40,7 +42,8 @@ def berakna(k: Kontext, invanare: dict[int, float]):
             v = n * float(t) * fo
             k.add("Övrig konsumtion", namn.get(kat, kat), "6 Övrig konsumtion och flygresor", y, v); summa["ovrig"] += v
         v = n * float(fl["per_inv"]) * k.index("flyg", y)
-        k.add("Flygresor", "Inrikes och utrikes flyg", "6 Övrig konsumtion och flygresor", y, v); summa["flyg"] += v
+        k.add("Flygresor", "Koldioxid från flygbränslet", "6 Övrig konsumtion och flygresor", y, v * bransle)
+        k.add("Flygresor", "Höghöjdseffekt", "6 Övrig konsumtion och flygresor", y, v * (1 - bransle)); summa["flyg"] += v
         foff = k.index("offentlig", y)
         v1 = n * float(off["konsumtion"]) * foff
         v2 = n * float(off["investeringar"]) * float(off["andel"]) * foff
@@ -53,7 +56,13 @@ def berakna(k: Kontext, invanare: dict[int, float]):
     k.steg("5 Matkonsumtion", "Matkonsumtion totalt", round(summa["mat"], 1), "t CO2e", f"{personar:,.1f} personår".replace(",", " "))
     k.steg("6 Övrig konsumtion och flygresor", "Övrig konsumtion per invånare", round(sum(float(t) for t in ovr["varden"].values()), 3), "t CO2e/år")
     k.steg("6 Övrig konsumtion och flygresor", "Övrig konsumtion totalt", round(summa["ovrig"], 1), "t CO2e")
-    k.steg("6 Övrig konsumtion och flygresor", "Flygresor totalt", round(summa["flyg"], 1), "t CO2e", f"{float(fl['per_inv'])} t per invånare och år")
+    k.steg("6 Övrig konsumtion och flygresor", "Flygresor per invånare", float(fl["per_inv"]), "t CO2e/år",
+           "Kamb och Larsson 2018: svenska befolkningens flygresor år 2017, med höghöjdseffekt")
+    k.steg("6 Övrig konsumtion och flygresor", "Flygresor, koldioxid från bränslet", round(summa["flyg"] * bransle, 1), "t CO2e",
+           f"andel 1/{hoghojd:g} = {bransle:.0%}".replace(".", ","))
+    k.steg("6 Övrig konsumtion och flygresor", "Flygresor, höghöjdseffekt", round(summa["flyg"] * (1 - bransle), 1), "t CO2e",
+           f"andel 1 − 1/{hoghojd:g} = {1 - bransle:.0%}; vetenskapligt osäker".replace(".", ","))
+    k.steg("6 Övrig konsumtion och flygresor", "Flygresor totalt", round(summa["flyg"], 1), "t CO2e", f"{float(fl['per_inv'])} t per invånare och år".replace(".", ","))
     k.steg("7 Offentlig sektor", "Offentlig sektor per invånare", round(float(off["konsumtion"]) + float(off["investeringar"]) * float(off["andel"]), 3),
            "t CO2e/år", f"{off['konsumtion']} + {off['investeringar']} × {float(off['andel']):.0%}")
     k.steg("7 Offentlig sektor", "Offentliga investeringar totalt", round(summa["off"], 1), "t CO2e")

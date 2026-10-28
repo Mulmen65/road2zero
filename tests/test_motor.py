@@ -32,6 +32,19 @@ def test_kategorier(res):
         assert abs(t[k] - v) <= max(10, abs(v) * 0.001), (k, t[k], v)
 
 
+def test_flyg_delas_i_bransle_och_hoghojdseffekt(res):
+    """Flyget redovisas som koldioxid från bränslet och höghöjdseffekt; summan är invånare × per_inv × index."""
+    fb = ladda()
+    d = res.lang[res.lang["kategori"] == "Flygresor"].groupby("delpost")["t"].sum()
+    assert set(d.index) == {"Koldioxid från flygbränslet", "Höghöjdseffekt"}
+    h = fb.param("flyg.hoghojd_faktor")
+    assert abs(h - 170 / 90) < 0.01
+    assert abs(d["Höghöjdseffekt"] / d.sum() - (1 - 1 / h)) < 1e-9
+    utv = Utveckling(fb, res.scen)
+    vantat = sum(n * fb.param("flyg.per_inv") * utv.index("flyg", y) for y, n in res.invanare.items())
+    assert abs(d.sum() - vantat) < 1e-6
+
+
 def test_niva1_och_nyckeltal(res):
     assert abs(res.netto(1) - 27434) <= 3
     nk = res.nyckeltal()

@@ -139,10 +139,17 @@ ALGORITMER = [
     {
         "modul": "6 Övrig konsumtion och flygresor",
         "kod": "road2zero/modules/konsumtion.py",
-        "text": "Sju hushållskategorier ur Konsumtionskompassen 2.1 (30 % av 5,39 t). Flygresor är en egen klimatkategori med riksgenomsnitt per invånare.",
-        "formler": [r"E_{\mathrm{övrig}}(t) = N(t) \cdot \sum_k o_k \cdot I_{\mathrm{övrig}}(t)", r"E_{\mathrm{flyg}}(t) = N(t) \cdot 1{,}1 \cdot I_{\mathrm{flyg}}(t)"],
-        "steg": ["Varje kategori kan ändras.", "Flygresor redovisas på nivå 2."],
-        "parametrar": ["ovr.hushall_total", "flyg.per_inv"],
+        "text": "Sju hushållskategorier ur Konsumtionskompassen 2.1 (30 % av 5,39 t). Flygresor är en egen klimatkategori med riksgenomsnitt per invånare "
+                "(Kamb och Larsson 2018): svenska befolkningens inrikes och utrikes flygresor år 2017, cirka 10 Mt CO2e, delat på invånarna. "
+                "Värdet räknar med höghöjdseffekt: 170 g CO2e per personkilometer mot 90 g CO2 från bränslet. Flyget redovisas därför i två delposter.",
+        "formler": [r"E_{\mathrm{övrig}}(t) = N(t) \cdot \sum_k o_k \cdot I_{\mathrm{övrig}}(t)",
+                    r"E_{\mathrm{flyg}}(t) = N(t) \cdot f_{\mathrm{flyg}} \cdot I_{\mathrm{flyg}}(t)",
+                    r"E_{\mathrm{flyg,\,bränsle}}(t) = E_{\mathrm{flyg}}(t) / h, \qquad E_{\mathrm{flyg,\,höghöjd}}(t) = E_{\mathrm{flyg}}(t) \cdot (1 - 1/h)"],
+        "steg": ["Varje kategori kan ändras.",
+                 "f_flyg är flygresor per invånare och år (standard 1,1 t CO2e, år 2017). Flygandet var 2023 drygt 25 % lägre än före pandemin enligt Konsumtionskompassen; ange ett eget värde vid behov.",
+                 "h är höghöjdsfaktorn 170/90 ≈ 1,89. Höghöjdseffekten är vetenskapligt osäker och redovisas som egen delpost, så att den kan väljas bort i resultatet.",
+                 "Flygresor redovisas på nivå 2."],
+        "parametrar": ["ovr.hushall_total", "flyg.per_inv", "flyg.hoghojd_faktor"],
         "tabeller": ["ovrig_konsumtion", "utveckling"],
     },
     {

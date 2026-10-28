@@ -59,7 +59,8 @@ mob.biogas.bio;Mobilitet och transport;Biogas, livscykel;1.3;g CO2e/MJ;Officiell
 mat.dagar;Matkonsumtion;Dagar per år;365;dagar;Härlett;MODELLVAL;
 mat.kalibrering_mal;Matkonsumtion;Livsmedel i Konsumtionskompassen (för kalibrering);1.08;t CO2e per invånare och år;Officiell statistik;SEI2026;20 % av 5,39 t
 ovr.hushall_total;Övrig konsumtion;Hushållens konsumtionsbaserade utsläpp;5.392;t CO2e per invånare och år;Officiell statistik;SEI2026;År 2023
-flyg.per_inv;Flygresor;Flygresor, inrikes och utrikes;1.1;t CO2e per invånare och år;Litteraturvärde;KAMB2018;År 2017, med höghöjdseffekt
+flyg.per_inv;Flygresor;Flygresor, inrikes och utrikes;1.1;t CO2e per invånare och år;Litteraturvärde;KAMB2018;"År 2017, med höghöjdseffekt: svenska befolkningens flygresor cirka 10 Mt CO2e delat på invånarna. Flygandet var 2023 drygt 25 % lägre än före pandemin"
+flyg.hoghojd_faktor;Flygresor;Höghöjdseffekt, faktor på koldioxiden från bränslet;1.89;CO2e/CO2;Litteraturvärde;KAMB2018;"170 g CO2e per personkilometer med höghöjdseffekt mot 90 g CO2 utan, år 2017. Vetenskapligt osäker; används bara för att dela upp flyget i två delposter"
 off.konsumtion;Offentliga investeringar;Offentlig konsumtion;0.83;t CO2e per invånare och år;Officiell statistik;NV_KONSUMTION,SEI2026;År 2023
 off.investeringar;Offentliga investeringar;Investeringar, offentliga och privata;2.09;t CO2e per invånare och år;Officiell statistik;NV_KONSUMTION,SEI2026;År 2023
 off.andel;Offentliga investeringar;Offentlig andel av investeringarna;0.18;andel;Härlett;REGERINGEN2015;4,2 % av BNP av totalt 23,1 % år 2014

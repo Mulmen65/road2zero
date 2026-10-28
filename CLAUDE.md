@@ -38,7 +38,8 @@ Efter en ändring i gränssnittet: starta appen, öppna den i webbläsaren och t
 4. **Allt indata som påverkar resultatet har ett förifyllt värde med källa** som användaren kan ändra.
 5. **Svenskt talformat** i gränssnittet: mellanslag som tusentalsavgränsare och decimalkomma (`fmt()`).
 6. **Indataflikar som visar resultat** använder `senare()` så att tabeller och diagram fylls efter att alla indata lästs.
-7. **Diagram**: följ paletten i `app/ui_illustration.py` och `app/ui_utveckling.py`; aldrig två y-axlar.
+7. **Diagram**: använd den dova färgskalan i `road2zero/konstanter.py` (kategorier) och `app/diagram.py` (layout och övriga linjer);
+   aldrig två y-axlar.
 8. **Sparade indata** ska fortsätta gå att öppna. Ändras datamodellen: lägg migrering i `scenario.fran_json()` och ett test.
 
 ## Modellbeslut (ändras bara om användaren ber om det)
@@ -65,7 +66,8 @@ Efter en ändring i gränssnittet: starta appen, öppna den i webbläsaren och t
   Drivlinemix 2025 (Trafikanalys). Bilproduktionen följer den globala elens klimatfaktor (IEA).
 - **Mat:** kostprofiler med andelar ur EPIC-Oxford-kohorten (Scarborough m.fl. 2023); utveckling enligt FAO:s globala utsläppsintensitet.
 - **Övrig konsumtion:** sju kategorier ur Konsumtionskompassen 2.1, ändringsbara; följer bilproduktionens kurva (globalt elsnitt).
-- **Flygresor:** egen kategori, 1,1 t per invånare (Kamb och Larsson 2018); utveckling enligt globalt snitt för flygbränsle (IATA).
+- **Flygresor:** egen kategori, 1,1 t per invånare (Kamb och Larsson 2018, år 2017 med höghöjdseffekt); redovisas som två delposter,
+  koldioxid från bränslet och höghöjdseffekt (faktor 170/90 ≈ 1,89). Utveckling enligt globalt snitt för flygbränsle (IATA).
 - **Offentlig sektor:** offentlig konsumtion plus bara den offentliga andelen av investeringarna; följer EU:s klimatmål
   (−55 % 2030, −90 % 2040 jämfört med 1990).
 - **Mark:** Skogskolmodellen 10.4 för skog; åker, gräsmark och urban grönyta med kolförråd per pool som användaren kan ändra.
