@@ -32,9 +32,22 @@ def fb() -> Faktabibliotek:
 
 # ---------- tillstånd ----------
 def init():
+    ss["_senare"] = []
     if "scen" not in ss:
         ss.scen = tomt(fb())
         ss.v = 0
+
+
+def senare(fn):
+    """Reserverar en plats på sidan som fylls när alla indata är lästa och resultatet är beräknat.
+    Då visar tabeller och diagram i indataflikarna alltid aktuella värden, även när indata ändras i en annan flik."""
+    ss.setdefault("_senare", []).append((st.container(), fn))
+
+
+def kor_senare(res):
+    for plats, fn in ss.pop("_senare", []):
+        with plats:
+            fn(res)
 
 
 def ny_version():

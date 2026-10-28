@@ -11,20 +11,23 @@ from ..kontext import Kontext
 from ..konstanter import DRIVLINOR
 
 MODUL = "4 Mobilitet och transport"
-BASAR = 2024  # basår för drivlinemix och körsträcka (Trafikanalys)
+BASAR = 2025  # år för drivlinemix och körsträcka (Trafikanalys); används som utgångsläge 2026
 
 
 def mix_for_ar(k: Kontext, y: int) -> dict:
+    """Drivlinemix (andel av körsträckan) år y. Elbilar och laddhybrider ökar med procentenheter per år enligt
+    fliken Emissionsfaktorer över tid, tillsammans högst 100 %; övriga drivlinor minskar i proportion."""
     m = dict(k.scen["mobilitet"]["mix"])
-    if k.scen["mobilitet"].get("elbilsandel", "kurva") != "kurva":
-        return m
-    k.tabell("kurvor")
-    mal = k.fb.kurva("elbilsandel_trafikverket")(y) / 100
-    bev = m.get("bev", 0.0)
-    flytt = max(0.0, mal - bev)
-    icke = 1 - bev
-    out = {d: (v * (1 - flytt / icke) if icke else v) for d, v in m.items() if d != "bev"}
-    out["bev"] = bev + flytt
+    k.tabell("utveckling")
+    bev0, phev0 = m.get("bev", 0.0), m.get("phev", 0.0)
+    bev = min(1.0, max(0.0, bev0 + k.utv.tillskott("bev", y)))
+    phev = min(1.0 - bev, max(0.0, phev0 + k.utv.tillskott("phev", y)))
+    ovriga = {d: v for d, v in m.items() if d not in ("bev", "phev")}
+    rest0 = sum(ovriga.values())
+    rest = max(0.0, 1.0 - bev - phev)
+    out = {d: (v / rest0 * rest if rest0 else 0.0) for d, v in ovriga.items()}
+    out["bev"] = bev
+    out["phev"] = phev
     return out
 
 
@@ -43,9 +46,8 @@ def faktorer(k: Kontext, y: int) -> dict[str, dict[str, float]]:
     eta, ovr = k.p("mob.laddverkningsgrad"), k.p("mob.ovrigt")
     liv, kaross = k.p("mob.livslangd"), k.p("mob.kaross")
     bat_kwh, bat_ef, underhall = k.p("mob.batteri_kwh"), k.p("mob.batteri_ef"), k.p("mob.underhall")
-    eff = float(mob.get("effektivisering", 0))
-    k.anvanda.add("mob.effektivisering")
-    eff_f = (1 - eff) ** max(0, y - BASAR)
+    eff_f = k.index("forbranning", y)       # förbränningsbilarnas utsläpp per km
+    prod_f = k.index("bilprod", y)          # bilproduktion: globalt elsnitt
     phev_el = float(mob["phev_eldrift"])
     ut = {}
     for d in DRIVLINOR:
@@ -59,9 +61,9 @@ def faktorer(k: Kontext, y: int) -> dict[str, dict[str, float]]:
             up = mj * (f["fossil"] * f["wtt"] + (1 - f["fossil"]) * f["bio"]) * eff_f
         el = el_andel * kwh0 * r["kwh"].get(d, 1.0) / eta * k.el(y)
         kropp = kaross * r["body"].get(d, 1.0)
-        fordon = kropp * 1000 / liv
+        fordon = kropp * 1000 / liv * prod_f
         kap = r["battery"].get(d, bat_kwh if d == "bev" else 0.0)
-        batteri = kap * bat_ef * 1000 / liv
+        batteri = kap * bat_ef * 1000 / liv * prod_f
         uh = underhall * r["maint"].get(d, 1.0)
         ut[d] = {"bransle": ttw + up, "el": el, "fordon": fordon + batteri, "underhall": uh}
         ut[d]["total"] = sum(ut[d].values())
@@ -78,7 +80,7 @@ def berakna(k: Kontext, invanare: dict[int, float]):
         n = invanare.get(y, 0.0)
         if n <= 0:
             continue
-        fkm = n / pph * bph * km
+        fkm = n / pph * bph * k.index("bilar_hh", y) * km * k.index("km_bil", y)
         mix = mix_for_ar(k, y)
         f = faktorer(k, y)
         for delpost, nyckel in (("Bränsle och avgaser", "bransle"), ("El till laddning", "el"),
@@ -91,5 +93,6 @@ def berakna(k: Kontext, invanare: dict[int, float]):
         k.steg(MODUL, f"Livscykelfaktor {namn} {k.ar[0]}", round(f0[d]["total"], 1), "g CO2e/fkm",
                f"bränsle {f0[d]['bransle']:.1f}, el {f0[d]['el']:.1f}, fordon {f0[d]['fordon']:.1f}, underhåll {f0[d]['underhall']:.1f}")
     k.steg(MODUL, "Bilar per hushåll och körsträcka", f"{bph:.3f} · {km:,.0f}".replace(",", " "), "bilar · km/år")
-    k.steg(MODUL, "Elbilsandel 2030 / 2050", f"{mix_for_ar(k, 2030)['bev']:.0%} / {mix_for_ar(k, 2050)['bev']:.0%}", "av körsträckan")
+    m30, m50 = mix_for_ar(k, 2030), mix_for_ar(k, 2050)
+    k.steg(MODUL, "Elbilar och laddhybrider 2030 / 2050", f"{m30['bev']:.0%} + {m30['phev']:.0%} / {m50['bev']:.0%} + {m50['phev']:.0%}", "av körsträckan")
     k.steg(MODUL, "Mobilitet och transport totalt", round(tot, 1), "t CO2e")

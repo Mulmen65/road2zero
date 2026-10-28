@@ -1,4 +1,6 @@
-"""Modul 5–7: matkonsumtion (kostprofiler), övrig konsumtion, flygresor och offentlig sektor, per invånare och år."""
+"""Modul 5–7: matkonsumtion (kostprofiler), övrig konsumtion, flygresor och offentlig sektor, per invånare och år.
+
+Alla värden är nivå 2026 och följer sina index i fliken Emissionsfaktorer över tid."""
 from __future__ import annotations
 
 from ..kontext import Kontext
@@ -17,7 +19,7 @@ def mat_per_inv(k: Kontext, y: int) -> float:
     if m.get("kalibrering"):
         bas = sum(float(m["andelar"][p]) * float(m["avtryck"][p]) for p in andel) * dagar / 1000
         t *= k.p("mat.kalibrering_mal") / bas if bas else 1
-    return t * (1 + float(m.get("forandring", 0))) ** (y - k.ar[0])
+    return t * k.index("mat", y)
 
 
 def berakna(k: Kontext, invanare: dict[int, float]):
@@ -31,16 +33,15 @@ def berakna(k: Kontext, invanare: dict[int, float]):
         n = invanare.get(y, 0.0)
         if n <= 0:
             continue
-        dt = y - k.ar[0]
         v = n * mat_per_inv(k, y)
         k.add("Matkonsumtion", "Kost", "5 Matkonsumtion", y, v); summa["mat"] += v
-        fo = (1 + float(ovr.get("forandring", 0))) ** dt
+        fo = k.index("ovrig", y)
         for kat, t in ovr["varden"].items():
             v = n * float(t) * fo
             k.add("Övrig konsumtion", namn.get(kat, kat), "6 Övrig konsumtion och flygresor", y, v); summa["ovrig"] += v
-        v = n * float(fl["per_inv"]) * (1 + float(fl.get("forandring", 0))) ** dt
+        v = n * float(fl["per_inv"]) * k.index("flyg", y)
         k.add("Flygresor", "Inrikes och utrikes flyg", "6 Övrig konsumtion och flygresor", y, v); summa["flyg"] += v
-        foff = (1 + float(off.get("forandring", 0))) ** dt
+        foff = k.index("offentlig", y)
         v1 = n * float(off["konsumtion"]) * foff
         v2 = n * float(off["investeringar"]) * float(off["andel"]) * foff
         k.add("Offentliga investeringar", "Offentlig konsumtion", "7 Offentlig sektor", y, v1)

@@ -33,7 +33,6 @@ KURVNAMN = {
     "el_eu_referens": "El: EU:s referensscenario",
     "el_eu_wam": "El: EU:s scenario med ytterligare åtgärder",
     "fjarrvarme_eu_referens": "Fjärrvärme: EU:s referensscenario",
-    "elbilsandel_trafikverket": "Elbilarnas andel av körsträckan: Trafikverkets basprognos 2024",
     "tradtillvaxt": "Stadsträdens tillväxt efter plantering",
 }
 
@@ -88,26 +87,55 @@ def tabeller():
     val = st.selectbox("Tabell", list(TABELLKALLOR), format_func=lambda t: TABELLKALLOR[t][0], key=k("f_tab"))
     st.caption("Källa: " + kalla_text(TABELLKALLOR[val][1]))
     if val == "byggschabloner":
-        t = f.byggschabloner.copy(); t["kg_co2e_m2"] = t["kg_co2e_m2"].astype(float)
+        t = f.byggschabloner.copy()
+        t["kg_co2e_m2"] = t["kg_co2e_m2"].astype(float)
         t = t[t["byggnadstyp"].isin(BYGGNADSTYPER)]
         pv = t.pivot(index="byggnadstyp", columns="stomme", values="kg_co2e_m2")
-        pv = pv[[c for c in STOMMAR if c in pv.columns]]
-        pv.index = [BYGGNADSTYPER.get(i, (i,))[0] for i in pv.index]; pv.columns = [STOMMAR.get(c, c) for c in pv.columns]
-        st.dataframe(pv, width="stretch")
-        st.caption("kg CO2e per m² BTA, moduler A1–A5, nivå 2025. Reduceras med reduktionskurvan för året då BTA:n blir klar.")
-        with st.expander("Anmärkning per byggnadstyp"):
-            an = t[t["stomme"] == "generisk"][["byggnadstyp", "anmarkning", "kalla"]].copy()
+        pv = pv[[c for c in STOMMAR if c != "generisk"]]
+        pv.columns = [STOMMAR[c] for c in pv.columns]
+        info = t[t["stomme"] == "generisk"].set_index("byggnadstyp")[["kategori", "startankare"]]
+        pv.insert(0, "Startankare", info["startankare"].astype(float))
+        pv.insert(0, "SBUF-kategori/proxy", info["kategori"])
+        pv.index = [BYGGNADSTYPER.get(i, (i,))[0] for i in pv.index]
+        pv = pv.loc[[BYGGNADSTYPER[k_][0] for k_ in BYGGNADSTYPER if BYGGNADSTYPER[k_][0] in pv.index]]
+        st.dataframe(pv, width="stretch", column_config={c: st.column_config.NumberColumn(format="%.1f") for c in pv.columns if c != "SBUF-kategori/proxy"})
+        st.caption("kg CO2e per m² BTA, moduler A1–A5. BAU = SBUF 14381 Insteg, BÄST = SBUF 14381 Färdplan. Generisk = Betong BAU. "
+                   "Lokaler och underjordisk parkering saknas i Tabell A utökad och använder kontorets värden. Startvärdet gäller 2026 och "
+                   "följer stommens index i fliken Emissionsfaktorer över tid.")
+        with st.expander("Anmärkning och datakvalitet per byggnadstyp"):
+            an = t[t["stomme"] == "generisk"][["byggnadstyp", "datakvalitet", "anmarkning", "kalla"]].copy()
             an["byggnadstyp"] = an["byggnadstyp"].map(lambda i: BYGGNADSTYPER[i][0]); an["kalla"] = an["kalla"].map(kalla_kort)
-            st.dataframe(an.rename(columns={"byggnadstyp": "Byggnadstyp", "anmarkning": "Anmärkning", "kalla": "Källa"}), hide_index=True, width="stretch")
+            st.dataframe(an.rename(columns={"byggnadstyp": "Byggnadstyp", "datakvalitet": "Datakvalitet", "anmarkning": "Anmärkning", "kalla": "Källa"}),
+                         hide_index=True, width="stretch")
     elif val == "reduktionskurvor":
         t = f.reduktion.copy(); t["ar"] = t["ar"].astype(int); t["faktor"] = t["faktor"].astype(float)
-        g = st.selectbox("Byggnadsgrupp", sorted(t["grupp"].unique()), key=k("f_red"))
+        g = st.selectbox("Byggnadskategori", sorted(t["kategori"].unique()), key=k("f_red"))
+        farg = {"betong": "#2a78d6", "stal": "#eb6834", "tra": "#1baf7a"}
         fig = go.Figure()
-        for st_, d in t[t["grupp"] == g].groupby("stomme"):
-            fig.add_scatter(x=d["ar"], y=d["faktor"], name=STOMMAR.get(st_, st_), mode="lines+markers")
-        fig.update_layout(height=360, yaxis_title="Andel av 2025 års schablon", margin=dict(l=10, r=10, t=10, b=10), separators=", ")
+        for st_ in STOMMAR:
+            d = t[(t["kategori"] == g) & (t["stomme"] == st_)]
+            if d.empty or st_ == "generisk":
+                continue
+            bas, niva = st_.split("_")
+            fig.add_scatter(x=d["ar"], y=d["faktor"], name=STOMMAR[st_], mode="lines+markers",
+                            line=dict(color=farg[bas], width=2, dash="dash" if niva == "bast" else "solid"), marker=dict(size=5))
+        fig.update_layout(height=380, yaxis_title="Faktor relativt 2025", margin=dict(l=10, r=10, t=10, b=10), separators=", ",
+                          legend=dict(orientation="h", y=-0.15))
         st.plotly_chart(fig, width="stretch")
-        st.caption("Värdet efter 2045 hålls konstant. LFM30 följer kurvan för klimatförbättrad betong.")
+        st.caption("Tabell A utökad: SBUF 14381 Insteg (BAU, heldragen) och Färdplan (BÄST, streckad) 2025–2035, därefter försiktig "
+                   "extrapolering till 2070. Ingen CCS för cement; försiktig extra reduktion för Stål BÄST efter 2030. "
+                   "Modellen använder kurvorna som standardtakt per stomme i fliken Emissionsfaktorer över tid.")
+    elif val == "utveckling":
+        u = f.utveckling.copy()
+        from road2zero.utveckling import PERIODKOL, PERIODNAMN
+        u = u.rename(columns=dict(zip(PERIODKOL, PERIODNAMN)))
+        for c in PERIODNAMN:
+            u[c] = u[c].astype(float)
+        u["kalla"] = u["kalla"].map(kalla_kort)
+        st.dataframe(u[["grupp", "namn", "enhet"] + PERIODNAMN + ["status", "kalla", "kommentar"]].rename(
+            columns={"grupp": "Grupp", "namn": "Faktor", "enhet": "Enhet", "status": "Status", "kalla": "Källa", "kommentar": "Kommentar"}),
+            hide_index=True, width="stretch", column_config={c: st.column_config.NumberColumn(format="%.2f") for c in PERIODNAMN})
+        st.caption("Standardvärden för årlig förändring per period. Värdena med dina ändringar visas i fliken Emissionsfaktorer över tid.")
     elif val == "ytschabloner":
         t = f.ytschabloner.copy(); t["kg"] = t["t_co2e_m2"].astype(float) * 1000
         pv = t.pivot(index="anlaggningstyp", columns="utforande", values="kg"); pv.index = [ANLAGGNINGSTYPER.get(i, i) for i in pv.index]
@@ -121,8 +149,8 @@ def tabeller():
                                    line=dict(color="#2a78d6", width=2), marker=dict(size=8)))
         fig.update_layout(height=320, yaxis_title=d["enhet"].iloc[0], margin=dict(l=10, r=10, t=10, b=10), separators=", ")
         st.plotly_chart(fig, width="stretch")
-        st.caption("Elkurvan i beräkningen skalas så att den börjar på Boverkets 37 g; fjärrvärmen så att den börjar på ortens värde. "
-                   "Elbilsandelen interpoleras linjärt mellan åren i tabellen. Trädtillväxt anges per år efter plantering.")
+        st.caption("El- och fjärrvärmekurvorna är underlag för standardtakten i fliken Emissionsfaktorer över tid. "
+                   "Trädtillväxt anges per år efter plantering.")
     elif val == "skogskol_kurvbibliotek":
         kur = st.selectbox("Kurva", sorted(f.skog["kurva"].unique()), key=k("f_skog"))
         d = f.skog[f.skog["kurva"] == kur]
@@ -154,7 +182,7 @@ def visa(res):
     with t2:
         tabeller()
         kx = Kontext(fb(), ss.scen)
-        st.markdown("##### Tidskurvor som de används med dina indata")
+        st.markdown("##### El och fjärrvärme som de används med dina indata")
         ar = res.ar()
         st.dataframe(pd.DataFrame({"År": ar, "El (g/kWh)": [round(kx.el(y), 2) for y in ar], "Fjärrvärme (g/kWh)": [round(kx.fjv(y), 2) for y in ar]}).set_index("År").T,
                      width="stretch")

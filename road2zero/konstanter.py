@@ -27,6 +27,7 @@ NIVA_INNEHALL = {
 
 MODULER = [
     ("0", "Projekt och inställningar"),
+    ("U", "Emissionsfaktorer över tid"),
     ("1", "Byggnader"),
     ("2", "Anläggning"),
     ("3", "Förändrad markanvändning"),
@@ -44,9 +45,9 @@ BYGGNADSTYPER = {
     "småhus": ("Småhus", True, "smahus"),
     "kontor": ("Kontor", False, "flerbostad_kontor_skola"),
     "lokaler": ("Lokaler", False, "flerbostad_kontor_skola"),
-    "handel": ("Handel", False, "logistik"),
+    "handel": ("Handelshus", False, "logistik"),
     "skola": ("Skola", False, "flerbostad_kontor_skola"),
-    "vård": ("Vård", False, "flerbostad_kontor_skola"),
+    "vård": ("Vårdbyggnad", False, "ovriga"),
     "industribyggnad": ("Industribyggnad", False, "logistik"),
     "mobilitetshus": ("Mobilitetshus", False, "logistik"),
     "underjordisk_parkering": ("Underjordisk parkering", False, "ovriga"),
@@ -68,24 +69,29 @@ ENERGIKATEGORI_NAMN = {"flerbostadshus": "Flerbostadshus (BBR)", "småhus": "Sm�
 STANDARDKLASS = {"industribyggnad": "Uppvärmt", "övriga_byggnader": "Uppvärmt", "mobilitetshus": "Ouppvärmt",
                  "underjordisk_parkering": "Ouppvärmt"}
 OUPPVARMDA_KLASSER = {"Uppvärmt", "Ouppvärmt"}   # el för belysning, ventilation och eventuell temperering, ingen fjärrvärme
-TRASTOMMAR = {"trä", "klimatförbättrat_trä"}
+TRASTOMMAR = {"tra_bau", "tra_bast"}
 
 STOMMAR = {
-    "generisk": "Generisk",
-    "betong": "Betong",
-    "stål": "Stål",
-    "trä": "Trä",
-    "klimatförbättrad_generisk": "Klimatförbättrad generisk",
-    "klimatförbättrad_betong": "Klimatförbättrad betong",
-    "klimatförbättrat_stål": "Klimatförbättrat stål",
-    "klimatförbättrat_trä": "Klimatförbättrat trä",
-    "lfm30": "LFM30",
+    "generisk": "Generisk (= Betong BAU)",
+    "betong_bau": "Betong BAU",
+    "betong_bast": "Betong BÄST",
+    "stal_bau": "Stål BAU",
+    "stal_bast": "Stål BÄST",
+    "tra_bau": "Trä BAU",
+    "tra_bast": "Trä BÄST",
 }
 STOMME_FRAN_NAMN = {v: k for k, v in STOMMAR.items()}
-# LFM30 saknar egen reduktionskurva; den följer klimatförbättrad betong (modellval).
-REDUKTIONSKURVA_FOR_STOMME = {"lfm30": "klimatförbättrad_betong"}
+# Äldre stomnycklar i sparade indata -> nya. LFM30 och klimatförbättrad generisk finns inte i Tabell A utökad.
+STOMME_MIGRERING = {
+    "betong": "betong_bau", "klimatförbättrad_betong": "betong_bast", "stål": "stal_bau", "klimatförbättrat_stål": "stal_bast",
+    "trä": "tra_bau", "klimatförbättrat_trä": "tra_bast", "klimatförbättrad_generisk": "betong_bast", "lfm30": "betong_bast",
+}
+# Generisk är Betong BAU (samma startvärde och samma utveckling över tid). BAU = SBUF 14381 Insteg, BÄST = SBUF 14381 Färdplan.
 
-VIRKESPRODUKTER = {"Stomvirke": "bygg.virke.stomvirke", "KL-trä": "bygg.virke.kl_tra", "Limträ": "bygg.virke.limtra"}
+# Kolinlagring i trästomme: bundet kol per m³ enligt EN 16449. "Använd schablon" ger stomvirke för Trä BAU och limträ för Trä BÄST.
+VIRKESPRODUKTER = {"Stomvirke": "bygg.virke.stomvirke", "Limträ/glulam": "bygg.virke.limtra", "KL-trä": "bygg.virke.kl_tra"}
+SCHABLON_PRODUKT = "Använd schablon"
+STANDARD_VIRKESPRODUKT = {"tra_bau": "Stomvirke", "tra_bast": "Limträ/glulam"}
 
 ANLAGGNINGSTYPER = {
     "huvudgata": "Huvudgata", "lokalgata": "Lokalgata", "gc_vag": "GC-väg", "torg": "Torg",
@@ -106,22 +112,7 @@ FORGRONING_TILL = {"Park", "Kvartersmark gård", "Avhårdgjord yta"}
 
 DRIVLINOR = {"petrol": "Bensin", "diesel": "Diesel", "hev": "Elhybrid", "bev": "Elbil", "phev": "Laddhybrid", "biogas": "Biogas"}
 
-EL_KURVOR = {
-    "boverket_eu_referens": "Boverket 37 g, EU:s referensscenario (standard)",
-    "boverket_konstant": "Boverket 37 g, konstant",
-    "boverket_eu_wam": "Boverket 37 g, EU:s scenario med ytterligare åtgärder",
-    "egen": "Egen kurva (start, mål och målår)",
-}
-FJV_KURVOR = {
-    "eu_referens": "Ortens värde med EU:s referensscenario (standard)",
-    "konstant": "Ortens värde, konstant",
-}
-
-# Uppvärmning per andel av byggbeståndet
-UPPVARMNING = {
-    "fjärrvärme": "Fjärrvärme",
-    "el": "Eluppvärmd (värmepump)",
-}
+# Fastighetsvärme: andel fjärrvärme anges per andel av byggbeståndet; resten är el till värmepump.
 
 STATUS_FARG = {
     "Officiell statistik": "#1D6B45", "Lagstiftning": "#1D6B45", "Officiellt scenario": "#1F4E7A",

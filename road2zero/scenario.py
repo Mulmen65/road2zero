@@ -10,8 +10,9 @@ import json
 
 from . import __version__
 from .factlib import Faktabibliotek, ladda
-from .konstanter import (BYGGNADSTYPER, MARKTYPER, OUPPVARMDA_KLASSER, STANDARDKLASS, STOMMAR, TILL_MARK, TRASTOMMAR,
-                         UPPVARMNING)
+from .konstanter import (BYGGNADSTYPER, MARKTYPER, OUPPVARMDA_KLASSER, SCHABLON_PRODUKT, STANDARD_VIRKESPRODUKT, STANDARDKLASS,
+                         STOMME_MIGRERING, STOMMAR, TILL_MARK, TRASTOMMAR, VIRKESPRODUKTER)
+from .utveckling import standard as utveckling_standard
 
 
 def standard_mat(fb: Faktabibliotek) -> dict:
@@ -23,14 +24,12 @@ def standard_mat(fb: Faktabibliotek) -> dict:
         "omstallning": False,
         "mal_andelar": {r.profil: float(r.andel_standard) for r in kp.itertuples()},
         "malar": 2045,
-        "forandring": 0.0,
     }
 
 
 def standard_ovrig(fb: Faktabibliotek) -> dict:
     tot = fb.param("ovr.hushall_total")
-    return {"varden": {r.kategori: round(float(r.andel_av_hushall) * tot, 4) for r in fb.ovrig.itertuples()},
-            "forandring": 0.0}
+    return {"varden": {r.kategori: round(float(r.andel_av_hushall) * tot, 4) for r in fb.ovrig.itertuples()}}
 
 
 def standard_mobilitet(fb: Faktabibliotek, kommun: str) -> dict:
@@ -42,10 +41,8 @@ def standard_mobilitet(fb: Faktabibliotek, kommun: str) -> dict:
         "kommunvarden": True,
         "bilar_per_hushall": float(k["bilar_per_hushall"]),
         "km_per_bil": float(k["km_per_bil"]),
-        "elbilsandel": "kurva",
         "mix": {d: fb.param(f"mob.mix.{d}") for d in ["petrol", "diesel", "hev", "bev", "phev", "biogas"]},
         "phev_eldrift": fb.param("mob.phev_eldrift"),
-        "effektivisering": fb.param("mob.effektivisering"),
         "bensin_fossil": fb.param("mob.bensin.fossil"),
         "diesel_fossil": fb.param("mob.diesel.fossil"),
     }
@@ -55,8 +52,9 @@ def standardklass(typ: str) -> str:
     return STANDARDKLASS.get(typ, "C")
 
 
-def standard_uppvarmning(klass: str) -> str:
-    return "el" if klass in OUPPVARMDA_KLASSER else "fjärrvärme"
+def standard_fjv_andel(klass: str) -> float:
+    """Förvald andel fjärrvärme (%) för fastighetsvärmen: 100 % för uppvärmda klasser A–G, 0 % för garage och liknande."""
+    return 0.0 if klass in OUPPVARMDA_KLASSER else 100.0
 
 
 def ny_andel(typ: str = "flerbostadshus", stomme: str = "generisk", bta: float = 10000.0, ar: int = 2028, **kw) -> dict:
@@ -66,10 +64,10 @@ def ny_andel(typ: str = "flerbostadshus", stomme: str = "generisk", bta: float =
         "namn": "", "typ": typ, "stomme": stomme, "bta": float(bta),
         "forsta_ar": int(ar), "sista_ar": int(ar), "fordelning": "jämn", "takt": {},
         "manuellt_kg_m2": None,
-        "energiklass": klass, "uppvarmning": standard_uppvarmning(klass), "egen_fjv_kwh": None, "egen_el_kwh": None,
+        "energiklass": klass, "fjv_andel": standard_fjv_andel(klass), "egen_fjv_kwh": None, "egen_el_kwh": None,
         "sol_m2": 0.0,
         "palning": False, "paln_andel": 100.0, "spont_m2": 0.0,
-        "virke_m3_m2": None, "virkesprodukt": "Stomvirke", "ccf_andel": 0.0,
+        "virke_m3_m2": None, "virkesprodukt": SCHABLON_PRODUKT,
     }
     b.update(kw)
     return b
@@ -79,7 +77,7 @@ def etikett(b: dict) -> str:
     """Visningsnamn för en andel: eget namn eller typ och stomme."""
     if b.get("namn"):
         return str(b["namn"])
-    return f"{BYGGNADSTYPER.get(b['typ'], (b['typ'],))[0]}, {STOMMAR.get(b.get('stomme') or 'generisk', b.get('stomme')).lower()}"
+    return f"{BYGGNADSTYPER.get(b['typ'], (b['typ'],))[0]}, {STOMMAR.get(b.get('stomme') or 'generisk', b.get('stomme'))}"
 
 
 def ar_tra(b: dict) -> bool:
@@ -92,6 +90,16 @@ def virke_m3_m2(b: dict, fb: Faktabibliotek) -> float:
     if v not in (None, "") and not (isinstance(v, float) and v != v):
         return float(v)
     return fb.param("bygg.virke_m3_m2") if ar_tra(b) else 0.0
+
+
+def virkesprodukt(b: dict) -> str:
+    """Träprodukt för kolinlagringen: valt värde, annars schablonen för stommen (stomvirke för Trä BAU, limträ för Trä BÄST)."""
+    p = b.get("virkesprodukt") or SCHABLON_PRODUKT
+    if p == "Limträ":
+        p = "Limträ/glulam"
+    if p in VIRKESPRODUKTER:
+        return p
+    return STANDARD_VIRKESPRODUKT.get(b.get("stomme"), "Stomvirke")
 
 
 def migrera_byggnad(b: dict) -> list[dict]:
@@ -108,9 +116,9 @@ def migrera_byggnad(b: dict) -> list[dict]:
         n.update(stomme=st, bta=float(b.get("bta", 0)) * andel, sol_m2=float(b.get("sol_m2") or 0) * andel,
                  spont_m2=float(b.get("spont_m2") or 0) * andel,
                  takt={a: float(v) * andel for a, v in (b.get("takt") or {}).items()},
-                 uppvarmning="fjärrvärme" if float(b.get("fjv_andel", 1.0)) >= 0.5 else "el",
+                 fjv_andel=float(b.get("fjv_andel", 1.0)) * 100,
                  namn="" if len(delar) > 1 else b.get("namn", ""))
-        if not (st in TRASTOMMAR):
+        if STOMME_MIGRERING.get(st, st) not in TRASTOMMAR:
             n["virke_m3_m2"] = None
         out.append(ny_andel(**{**n}))
     return out
@@ -122,8 +130,8 @@ def tomt(fb: Faktabibliotek | None = None) -> dict:
     return {
         "modellversion": __version__,
         "projekt": {"namn": "Nytt projekt", "kommun": "Annan kommun", "fas": "Detaljplan, samråd", "startar": 2026, "slutar": 2076},
-        "el": {"kurva": "boverket_eu_referens", "egen_start": fb.param("el.startvarde"), "egen_mal": 10.0, "egen_malar": 2050},
-        "fjarrvarme": {"kurva": "eu_referens", "startvarde": fb.param("fjv.startvarde")},
+        "fjarrvarme": {"startvarde": fb.param("fjv.startvarde")},
+        "utveckling": utveckling_standard(fb),
         "hushall": {"personer_per_hushall": fb.param("allm.personer_per_hushall"),
                     "bta_per_hushall": fb.param("allm.bta_per_hushall")},
         "byggnader": [],
@@ -132,9 +140,9 @@ def tomt(fb: Faktabibliotek | None = None) -> dict:
         "mobilitet": standard_mobilitet(fb, "Annan kommun"),
         "mat": standard_mat(fb),
         "ovrig": standard_ovrig(fb),
-        "flyg": {"per_inv": fb.param("flyg.per_inv"), "forandring": 0.0},
+        "flyg": {"per_inv": fb.param("flyg.per_inv")},
         "offentlig": {"konsumtion": fb.param("off.konsumtion"), "investeringar": fb.param("off.investeringar"),
-                      "andel": fb.param("off.andel"), "forandring": 0.0},
+                      "andel": fb.param("off.andel")},
         "negativa": {"biokol": [], "trad": []},
         "budget": {"temperatur": "1,5", "sannolikhet": 50, "niva": 3},
         "parametrar": {},
@@ -148,10 +156,10 @@ def exempel(fb: Faktabibliotek | None = None) -> dict:
     s["projekt"].update(namn="Testfall", kommun="Helsingborg")
     s["mobilitet"] = standard_mobilitet(fb, "Helsingborg")
     s["byggnader"] = [
-        ny_andel("flerbostadshus", "trä", 36000, 2027, sista_ar=2031, energiklass="B", sol_m2=1200, palning=True, ccf_andel=100),
-        ny_andel("flerbostadshus", "klimatförbättrad_betong", 24000, 2027, sista_ar=2031, energiklass="B", sol_m2=800, palning=True),
+        ny_andel("flerbostadshus", "tra_bau", 36000, 2027, sista_ar=2031, energiklass="B", sol_m2=1200, palning=True),
+        ny_andel("flerbostadshus", "betong_bast", 24000, 2027, sista_ar=2031, energiklass="B", sol_m2=800, palning=True),
         ny_andel("kontor", "generisk", 15000, 2030, energiklass="C", palning=True),
-        ny_andel("skola", "trä", 6000, 2029, energiklass="B", sol_m2=600, ccf_andel=100),
+        ny_andel("skola", "tra_bau", 6000, 2029, energiklass="B", sol_m2=600),
     ]
     s["anlaggning"]["ytor"] = [
         {"typ": t, "utforande": "standard", "yta_m2": a, "forsta_ar": 2027, "sista_ar": 2031}
@@ -213,12 +221,19 @@ def validera(s: dict, fb: Faktabibliotek | None = None) -> list[tuple[str, str, 
         klasser = fb.energiklasser_for(b["typ"])
         if b.get("energiklass") not in klasser:
             fel.append(("fel", "Byggnader", f"{namn}: energiklass {b.get('energiklass')} finns inte för typen; välj bland {', '.join(klasser)}."))
-        if b.get("uppvarmning") not in UPPVARMNING:
-            fel.append(("fel", "Byggnader", f"{namn}: okänd uppvärmning {b.get('uppvarmning')}."))
-        elif b.get("energiklass") in OUPPVARMDA_KLASSER and b.get("uppvarmning") == "fjärrvärme":
-            fel.append(("varning", "Byggnader", f"{namn}: klassen {b['energiklass']} har ingen fjärrvärme; andelen räknas som eluppvärmd."))
+        try:
+            fa = float(b.get("fjv_andel", 100))
+        except (TypeError, ValueError):
+            fa = -1
+        if not 0 <= fa <= 100:
+            fel.append(("fel", "Byggnader", f"{namn}: andelen fjärrvärme ska ligga mellan 0 och 100 %."))
+        elif b.get("energiklass") in OUPPVARMDA_KLASSER and fa > 0:
+            fel.append(("varning", "Byggnader", f"{namn}: klassen {b['energiklass']} har ingen fjärrvärme; all värme räknas som el."))
+        for falt, text in (("egen_el_kwh", "köpt el"), ("egen_fjv_kwh", "köpt fjärrvärme")):
+            if b.get(falt) not in (None, "") and float(b[falt]) < 0:
+                fel.append(("fel", "Byggnader", f"{namn}: egen {text} per m² BTA kan inte vara negativ."))
         if float(b.get("virke_m3_m2") or 0) > 0 and not ar_tra(b):
-            fel.append(("varning", "Byggnader", f"{namn}: virke anges men stommen är inte av trä; virket räknas ändå."))
+            fel.append(("varning", "Byggnader", f"{namn}: virke anges men stommen är inte Trä BAU eller Trä BÄST; kolinlagringen räknas inte."))
     for o in s["mark"]["overgangar"]:
         if o["fran"] not in MARKTYPER or o["till"] not in TILL_MARK:
             fel.append(("fel", "Markanvändning", f"Okänd övergång {o['fran']} → {o['till']}."))
@@ -249,10 +264,28 @@ def fran_json(text: str, fb: Faktabibliotek | None = None) -> dict:
         for k, v in b.items():
             if k not in d:
                 d[k] = copy.deepcopy(v)
-            elif isinstance(v, dict) and isinstance(d[k], dict) and k not in ("takt", "pooler", "bevarande", "parametrar"):
+            elif isinstance(v, dict) and isinstance(d[k], dict) and k not in ("takt", "pooler", "bevarande", "parametrar", "utveckling"):
                 fyll(d[k], v)
     fyll(data, bas)
     data["projekt"].pop("scenario", None)
-    data["byggnader"] = [ny_andel(**{k: v for k, v in a.items()}) for b in data["byggnader"] for a in migrera_byggnad(b)]
+    data.pop("el", None)
+    for nyckel in ("mat", "ovrig", "flyg", "offentlig"):
+        data[nyckel].pop("forandring", None)
+    for nyckel in ("elbilsandel", "effektivisering"):
+        data["mobilitet"].pop(nyckel, None)
+    data["fjarrvarme"].pop("kurva", None)
+    andelar = []
+    for b in data["byggnader"]:
+        for a in migrera_byggnad(b):
+            if "uppvarmning" in a:     # äldre: fjärrvärme eller el som val
+                a["fjv_andel"] = 100.0 if a.pop("uppvarmning") == "fjärrvärme" else 0.0
+            a["stomme"] = STOMME_MIGRERING.get(a.get("stomme"), a.get("stomme"))
+            if a.get("stomme") not in STOMMAR:
+                a["stomme"] = "generisk"
+            a.pop("ccf_andel", None)               # kolinlagringen kräver inte längre CCF-certifikat
+            if a.get("virkesprodukt") == "Limträ":
+                a["virkesprodukt"] = "Limträ/glulam"
+            andelar.append(ny_andel(**a))
+    data["byggnader"] = andelar
     data["modellversion"] = __version__
     return data

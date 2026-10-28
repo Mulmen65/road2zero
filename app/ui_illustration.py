@@ -134,15 +134,15 @@ def sankey(res, niva):
 def sammanhang(res):
     kx = Kontext(fb(), ss.scen)
     ar = res.ar()
-    fig = make_subplots(rows=1, cols=3, subplot_titles=("Elens klimatfaktor (g CO2e/kWh)", "Elbilsandel av körsträckan (%)", "Invånare"))
+    fig = make_subplots(rows=1, cols=3, subplot_titles=("Elens klimatfaktor (g CO2e/kWh)", "Elbilar och laddhybrider, andel av körsträckan (%)", "Invånare"))
     fig.add_scatter(x=ar, y=[kx.el(y) for y in ar], mode="lines", line=dict(color="#2a78d6", width=2), row=1, col=1,
                     hovertemplate="%{x}: %{y:.1f} g/kWh<extra></extra>")
-    fig.add_scatter(x=ar, y=[mix_for_ar(kx, y)["bev"] * 100 for y in ar], mode="lines", line=dict(color="#e87ba4", width=2), row=1, col=2,
-                    hovertemplate="%{x}: %{y:.0f} %<extra></extra>")
+    fig.add_scatter(x=ar, y=[(lambda m: (m["bev"] + m["phev"]) * 100)(mix_for_ar(kx, y)) for y in ar], mode="lines",
+                    line=dict(color="#e87ba4", width=2), row=1, col=2, hovertemplate="%{x}: %{y:.0f} %<extra></extra>")
     fig.add_scatter(x=ar, y=[res.invanare.get(y, 0) for y in ar], mode="lines", line=dict(color=INK, width=2), row=1, col=3,
                     hovertemplate="%{x}: %{y:,.0f} invånare<extra></extra>")
     fig.update_layout(showlegend=False)
-    fig = _layout(fig, "Förutsättningar över tid", "Elens klimatfaktor, elbilarnas andel (Trafikverkets basprognos 2024) och antalet invånare", 300, yt=None)
+    fig = _layout(fig, "Förutsättningar över tid", "Elens klimatfaktor, laddbara bilars andel och antalet invånare enligt fliken Emissionsfaktorer över tid", 300, yt=None)
     fig.update_yaxes(tickformat=",.0f")
     return fig
 

@@ -1,4 +1,4 @@
-"""Modul 8 Negativa utsläpp: biokol och stadsträd. Inbyggt virke kommer från Byggnader och ny skog och förgröning från Markanvändning."""
+"""Modul 8 Negativa utsläpp: biokol och stadsträd. Kolinlagring i trästomme kommer från Byggnader och ny skog och förgröning från Markanvändning."""
 from __future__ import annotations
 
 from ..kontext import Kontext

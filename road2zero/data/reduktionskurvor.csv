@@ -1,417 +1,358 @@
-grupp;stomme;ar;faktor
-flerbostad_kontor_skola;betong;2025;1
-flerbostad_kontor_skola;betong;2026;0.9576
-flerbostad_kontor_skola;betong;2027;0.9152
-flerbostad_kontor_skola;betong;2028;0.8727
-flerbostad_kontor_skola;betong;2029;0.8303
-flerbostad_kontor_skola;betong;2030;0.7879
-flerbostad_kontor_skola;betong;2031;0.7455
-flerbostad_kontor_skola;betong;2032;0.703
-flerbostad_kontor_skola;betong;2033;0.6606
-flerbostad_kontor_skola;betong;2034;0.6182
-flerbostad_kontor_skola;betong;2035;0.5758
-flerbostad_kontor_skola;betong;2040;0.3636
-flerbostad_kontor_skola;betong;2045;0.167
-flerbostad_kontor_skola;generisk;2025;1
-flerbostad_kontor_skola;generisk;2026;0.9576
-flerbostad_kontor_skola;generisk;2027;0.9152
-flerbostad_kontor_skola;generisk;2028;0.8727
-flerbostad_kontor_skola;generisk;2029;0.8303
-flerbostad_kontor_skola;generisk;2030;0.7879
-flerbostad_kontor_skola;generisk;2031;0.7455
-flerbostad_kontor_skola;generisk;2032;0.703
-flerbostad_kontor_skola;generisk;2033;0.6606
-flerbostad_kontor_skola;generisk;2034;0.6182
-flerbostad_kontor_skola;generisk;2035;0.5758
-flerbostad_kontor_skola;generisk;2040;0.3636
-flerbostad_kontor_skola;generisk;2045;0.167
-flerbostad_kontor_skola;klimatförbättrad_betong;2025;1
-flerbostad_kontor_skola;klimatförbättrad_betong;2026;0.9333
-flerbostad_kontor_skola;klimatförbättrad_betong;2027;0.8667
-flerbostad_kontor_skola;klimatförbättrad_betong;2028;0.8
-flerbostad_kontor_skola;klimatförbättrad_betong;2029;0.7333
-flerbostad_kontor_skola;klimatförbättrad_betong;2030;0.6667
-flerbostad_kontor_skola;klimatförbättrad_betong;2031;0.6333
-flerbostad_kontor_skola;klimatförbättrad_betong;2032;0.6
-flerbostad_kontor_skola;klimatförbättrad_betong;2033;0.5667
-flerbostad_kontor_skola;klimatförbättrad_betong;2034;0.5333
-flerbostad_kontor_skola;klimatförbättrad_betong;2035;0.5
-flerbostad_kontor_skola;klimatförbättrad_betong;2040;0.3333
-flerbostad_kontor_skola;klimatförbättrad_betong;2045;0.1667
-flerbostad_kontor_skola;klimatförbättrad_generisk;2025;1
-flerbostad_kontor_skola;klimatförbättrad_generisk;2026;0.9333
-flerbostad_kontor_skola;klimatförbättrad_generisk;2027;0.8667
-flerbostad_kontor_skola;klimatförbättrad_generisk;2028;0.8
-flerbostad_kontor_skola;klimatförbättrad_generisk;2029;0.7333
-flerbostad_kontor_skola;klimatförbättrad_generisk;2030;0.6667
-flerbostad_kontor_skola;klimatförbättrad_generisk;2031;0.6333
-flerbostad_kontor_skola;klimatförbättrad_generisk;2032;0.6
-flerbostad_kontor_skola;klimatförbättrad_generisk;2033;0.5667
-flerbostad_kontor_skola;klimatförbättrad_generisk;2034;0.5333
-flerbostad_kontor_skola;klimatförbättrad_generisk;2035;0.5
-flerbostad_kontor_skola;klimatförbättrad_generisk;2040;0.3333
-flerbostad_kontor_skola;klimatförbättrad_generisk;2045;0.1667
-flerbostad_kontor_skola;klimatförbättrat_stål;2025;1
-flerbostad_kontor_skola;klimatförbättrat_stål;2026;0.9333
-flerbostad_kontor_skola;klimatförbättrat_stål;2027;0.8667
-flerbostad_kontor_skola;klimatförbättrat_stål;2028;0.8
-flerbostad_kontor_skola;klimatförbättrat_stål;2029;0.7333
-flerbostad_kontor_skola;klimatförbättrat_stål;2030;0.6667
-flerbostad_kontor_skola;klimatförbättrat_stål;2031;0.6333
-flerbostad_kontor_skola;klimatförbättrat_stål;2032;0.6
-flerbostad_kontor_skola;klimatförbättrat_stål;2033;0.5667
-flerbostad_kontor_skola;klimatförbättrat_stål;2034;0.5333
-flerbostad_kontor_skola;klimatförbättrat_stål;2035;0.5
-flerbostad_kontor_skola;klimatförbättrat_stål;2040;0.3333
-flerbostad_kontor_skola;klimatförbättrat_stål;2045;0.1667
-flerbostad_kontor_skola;klimatförbättrat_trä;2025;1
-flerbostad_kontor_skola;klimatförbättrat_trä;2026;0.9333
-flerbostad_kontor_skola;klimatförbättrat_trä;2027;0.8667
-flerbostad_kontor_skola;klimatförbättrat_trä;2028;0.8
-flerbostad_kontor_skola;klimatförbättrat_trä;2029;0.7333
-flerbostad_kontor_skola;klimatförbättrat_trä;2030;0.6667
-flerbostad_kontor_skola;klimatförbättrat_trä;2031;0.6333
-flerbostad_kontor_skola;klimatförbättrat_trä;2032;0.6
-flerbostad_kontor_skola;klimatförbättrat_trä;2033;0.5667
-flerbostad_kontor_skola;klimatförbättrat_trä;2034;0.5333
-flerbostad_kontor_skola;klimatförbättrat_trä;2035;0.5
-flerbostad_kontor_skola;klimatförbättrat_trä;2040;0.3333
-flerbostad_kontor_skola;klimatförbättrat_trä;2045;0.1667
-flerbostad_kontor_skola;stål;2025;1
-flerbostad_kontor_skola;stål;2026;0.9576
-flerbostad_kontor_skola;stål;2027;0.9152
-flerbostad_kontor_skola;stål;2028;0.8727
-flerbostad_kontor_skola;stål;2029;0.8303
-flerbostad_kontor_skola;stål;2030;0.7879
-flerbostad_kontor_skola;stål;2031;0.7455
-flerbostad_kontor_skola;stål;2032;0.703
-flerbostad_kontor_skola;stål;2033;0.6606
-flerbostad_kontor_skola;stål;2034;0.6182
-flerbostad_kontor_skola;stål;2035;0.5758
-flerbostad_kontor_skola;stål;2040;0.3636
-flerbostad_kontor_skola;stål;2045;0.167
-flerbostad_kontor_skola;trä;2025;1
-flerbostad_kontor_skola;trä;2026;0.9576
-flerbostad_kontor_skola;trä;2027;0.9152
-flerbostad_kontor_skola;trä;2028;0.8727
-flerbostad_kontor_skola;trä;2029;0.8303
-flerbostad_kontor_skola;trä;2030;0.7879
-flerbostad_kontor_skola;trä;2031;0.7455
-flerbostad_kontor_skola;trä;2032;0.703
-flerbostad_kontor_skola;trä;2033;0.6606
-flerbostad_kontor_skola;trä;2034;0.6182
-flerbostad_kontor_skola;trä;2035;0.5758
-flerbostad_kontor_skola;trä;2040;0.3636
-flerbostad_kontor_skola;trä;2045;0.167
-smahus;betong;2025;1
-smahus;betong;2026;0.9778
-smahus;betong;2027;0.9556
-smahus;betong;2028;0.9333
-smahus;betong;2029;0.9111
-smahus;betong;2030;0.8889
-smahus;betong;2031;0.8667
-smahus;betong;2032;0.8444
-smahus;betong;2033;0.8222
-smahus;betong;2034;0.8
-smahus;betong;2035;0.7778
-smahus;betong;2040;0.6389
-smahus;betong;2045;0.5
-smahus;generisk;2025;1
-smahus;generisk;2026;0.9778
-smahus;generisk;2027;0.9556
-smahus;generisk;2028;0.9333
-smahus;generisk;2029;0.9111
-smahus;generisk;2030;0.8889
-smahus;generisk;2031;0.8667
-smahus;generisk;2032;0.8444
-smahus;generisk;2033;0.8222
-smahus;generisk;2034;0.8
-smahus;generisk;2035;0.7778
-smahus;generisk;2040;0.6389
-smahus;generisk;2045;0.5
-smahus;klimatförbättrad_betong;2025;1
-smahus;klimatförbättrad_betong;2026;0.9647
-smahus;klimatförbättrad_betong;2027;0.9294
-smahus;klimatförbättrad_betong;2028;0.8941
-smahus;klimatförbättrad_betong;2029;0.8588
-smahus;klimatförbättrad_betong;2030;0.8235
-smahus;klimatförbättrad_betong;2031;0.7882
-smahus;klimatförbättrad_betong;2032;0.7529
-smahus;klimatförbättrad_betong;2033;0.7176
-smahus;klimatförbättrad_betong;2034;0.6824
-smahus;klimatförbättrad_betong;2035;0.6424
-smahus;klimatförbättrad_betong;2040;0.4659
-smahus;klimatförbättrad_betong;2045;0.2894
-smahus;klimatförbättrad_generisk;2025;1
-smahus;klimatförbättrad_generisk;2026;0.9647
-smahus;klimatförbättrad_generisk;2027;0.9294
-smahus;klimatförbättrad_generisk;2028;0.8941
-smahus;klimatförbättrad_generisk;2029;0.8588
-smahus;klimatförbättrad_generisk;2030;0.8235
-smahus;klimatförbättrad_generisk;2031;0.7882
-smahus;klimatförbättrad_generisk;2032;0.7529
-smahus;klimatförbättrad_generisk;2033;0.7176
-smahus;klimatförbättrad_generisk;2034;0.6824
-smahus;klimatförbättrad_generisk;2035;0.6424
-smahus;klimatförbättrad_generisk;2040;0.46
-smahus;klimatförbättrad_generisk;2045;0.43
-smahus;klimatförbättrat_stål;2025;1
-smahus;klimatförbättrat_stål;2026;0.9647
-smahus;klimatförbättrat_stål;2027;0.9294
-smahus;klimatförbättrat_stål;2028;0.8941
-smahus;klimatförbättrat_stål;2029;0.8588
-smahus;klimatförbättrat_stål;2030;0.8235
-smahus;klimatförbättrat_stål;2031;0.7882
-smahus;klimatförbättrat_stål;2032;0.7529
-smahus;klimatförbättrat_stål;2033;0.7176
-smahus;klimatförbättrat_stål;2034;0.6824
-smahus;klimatförbättrat_stål;2035;0.6424
-smahus;klimatförbättrat_stål;2040;0.4659
-smahus;klimatförbättrat_stål;2045;0.2894
-smahus;klimatförbättrat_trä;2025;1
-smahus;klimatförbättrat_trä;2026;0.9647
-smahus;klimatförbättrat_trä;2027;0.9294
-smahus;klimatförbättrat_trä;2028;0.8941
-smahus;klimatförbättrat_trä;2029;0.8588
-smahus;klimatförbättrat_trä;2030;0.8235
-smahus;klimatförbättrat_trä;2031;0.7882
-smahus;klimatförbättrat_trä;2032;0.7529
-smahus;klimatförbättrat_trä;2033;0.7176
-smahus;klimatförbättrat_trä;2034;0.6824
-smahus;klimatförbättrat_trä;2035;0.6424
-smahus;klimatförbättrat_trä;2040;0.46
-smahus;klimatförbättrat_trä;2045;0.43
-smahus;stål;2025;1
-smahus;stål;2026;0.9778
-smahus;stål;2027;0.9556
-smahus;stål;2028;0.9333
-smahus;stål;2029;0.9111
-smahus;stål;2030;0.8889
-smahus;stål;2031;0.8667
-smahus;stål;2032;0.8444
-smahus;stål;2033;0.8222
-smahus;stål;2034;0.8
-smahus;stål;2035;0.7778
-smahus;stål;2040;0.6389
-smahus;stål;2045;0.5
-smahus;trä;2025;1
-smahus;trä;2026;0.9778
-smahus;trä;2027;0.9556
-smahus;trä;2028;0.9333
-smahus;trä;2029;0.9111
-smahus;trä;2030;0.8889
-smahus;trä;2031;0.8667
-smahus;trä;2032;0.8444
-smahus;trä;2033;0.8222
-smahus;trä;2034;0.8
-smahus;trä;2035;0.7778
-smahus;trä;2040;0.6389
-smahus;trä;2045;0.5
-logistik;betong;2025;1
-logistik;betong;2026;0.9576
-logistik;betong;2027;0.9152
-logistik;betong;2028;0.8727
-logistik;betong;2029;0.8303
-logistik;betong;2030;0.7879
-logistik;betong;2031;0.7455
-logistik;betong;2032;0.703
-logistik;betong;2033;0.6606
-logistik;betong;2034;0.6182
-logistik;betong;2035;0.5758
-logistik;betong;2040;0.3636
-logistik;betong;2045;0.1515
-logistik;generisk;2025;1
-logistik;generisk;2026;0.9576
-logistik;generisk;2027;0.9152
-logistik;generisk;2028;0.8727
-logistik;generisk;2029;0.8303
-logistik;generisk;2030;0.7879
-logistik;generisk;2031;0.7455
-logistik;generisk;2032;0.703
-logistik;generisk;2033;0.6606
-logistik;generisk;2034;0.6182
-logistik;generisk;2035;0.5758
-logistik;generisk;2040;0.3636
-logistik;generisk;2045;0.1515
-logistik;klimatförbättrad_betong;2025;1
-logistik;klimatförbättrad_betong;2026;0.9333
-logistik;klimatförbättrad_betong;2027;0.8667
-logistik;klimatförbättrad_betong;2028;0.8
-logistik;klimatförbättrad_betong;2029;0.7333
-logistik;klimatförbättrad_betong;2030;0.6667
-logistik;klimatförbättrad_betong;2031;0.6333
-logistik;klimatförbättrad_betong;2032;0.6
-logistik;klimatförbättrad_betong;2033;0.5667
-logistik;klimatförbättrad_betong;2034;0.5333
-logistik;klimatförbättrad_betong;2035;0.5
-logistik;klimatförbättrad_betong;2040;0.3333
-logistik;klimatförbättrad_betong;2045;0.1667
-logistik;klimatförbättrad_generisk;2025;1
-logistik;klimatförbättrad_generisk;2026;0.9333
-logistik;klimatförbättrad_generisk;2027;0.8667
-logistik;klimatförbättrad_generisk;2028;0.8
-logistik;klimatförbättrad_generisk;2029;0.7333
-logistik;klimatförbättrad_generisk;2030;0.6667
-logistik;klimatförbättrad_generisk;2031;0.6333
-logistik;klimatförbättrad_generisk;2032;0.6
-logistik;klimatförbättrad_generisk;2033;0.5667
-logistik;klimatförbättrad_generisk;2034;0.5333
-logistik;klimatförbättrad_generisk;2035;0.5
-logistik;klimatförbättrad_generisk;2040;0.3333
-logistik;klimatförbättrad_generisk;2045;0.1667
-logistik;klimatförbättrat_stål;2025;1
-logistik;klimatförbättrat_stål;2026;0.9333
-logistik;klimatförbättrat_stål;2027;0.8667
-logistik;klimatförbättrat_stål;2028;0.8
-logistik;klimatförbättrat_stål;2029;0.7333
-logistik;klimatförbättrat_stål;2030;0.6667
-logistik;klimatförbättrat_stål;2031;0.6333
-logistik;klimatförbättrat_stål;2032;0.6
-logistik;klimatförbättrat_stål;2033;0.5667
-logistik;klimatförbättrat_stål;2034;0.5333
-logistik;klimatförbättrat_stål;2035;0.5
-logistik;klimatförbättrat_stål;2040;0.3333
-logistik;klimatförbättrat_stål;2045;0.1667
-logistik;klimatförbättrat_trä;2025;1
-logistik;klimatförbättrat_trä;2026;0.9333
-logistik;klimatförbättrat_trä;2027;0.8667
-logistik;klimatförbättrat_trä;2028;0.8
-logistik;klimatförbättrat_trä;2029;0.7333
-logistik;klimatförbättrat_trä;2030;0.6667
-logistik;klimatförbättrat_trä;2031;0.6333
-logistik;klimatförbättrat_trä;2032;0.6
-logistik;klimatförbättrat_trä;2033;0.5667
-logistik;klimatförbättrat_trä;2034;0.5333
-logistik;klimatförbättrat_trä;2035;0.5
-logistik;klimatförbättrat_trä;2040;0.3333
-logistik;klimatförbättrat_trä;2045;0.1667
-logistik;stål;2025;1
-logistik;stål;2026;0.9576
-logistik;stål;2027;0.9152
-logistik;stål;2028;0.8727
-logistik;stål;2029;0.8303
-logistik;stål;2030;0.7879
-logistik;stål;2031;0.7455
-logistik;stål;2032;0.703
-logistik;stål;2033;0.6606
-logistik;stål;2034;0.6182
-logistik;stål;2035;0.5758
-logistik;stål;2040;0.3636
-logistik;stål;2045;0.1515
-logistik;trä;2025;1
-logistik;trä;2026;0.9576
-logistik;trä;2027;0.9152
-logistik;trä;2028;0.8727
-logistik;trä;2029;0.8303
-logistik;trä;2030;0.7879
-logistik;trä;2031;0.7455
-logistik;trä;2032;0.703
-logistik;trä;2033;0.6606
-logistik;trä;2034;0.6182
-logistik;trä;2035;0.5758
-logistik;trä;2040;0.3636
-logistik;trä;2045;0.1515
-ovriga;betong;2025;1
-ovriga;betong;2026;0.9576
-ovriga;betong;2027;0.9152
-ovriga;betong;2028;0.8727
-ovriga;betong;2029;0.8303
-ovriga;betong;2030;0.7879
-ovriga;betong;2031;0.7455
-ovriga;betong;2032;0.703
-ovriga;betong;2033;0.6606
-ovriga;betong;2034;0.6182
-ovriga;betong;2035;0.5758
-ovriga;betong;2040;0.3636
-ovriga;betong;2045;0.1515
-ovriga;generisk;2025;1
-ovriga;generisk;2026;0.9576
-ovriga;generisk;2027;0.9152
-ovriga;generisk;2028;0.8727
-ovriga;generisk;2029;0.8303
-ovriga;generisk;2030;0.7879
-ovriga;generisk;2031;0.7455
-ovriga;generisk;2032;0.703
-ovriga;generisk;2033;0.6606
-ovriga;generisk;2034;0.6182
-ovriga;generisk;2035;0.5758
-ovriga;generisk;2040;0.3636
-ovriga;generisk;2045;0.1515
-ovriga;klimatförbättrad_betong;2025;1
-ovriga;klimatförbättrad_betong;2026;0.9333
-ovriga;klimatförbättrad_betong;2027;0.8667
-ovriga;klimatförbättrad_betong;2028;0.8
-ovriga;klimatförbättrad_betong;2029;0.7333
-ovriga;klimatförbättrad_betong;2030;0.6667
-ovriga;klimatförbättrad_betong;2031;0.6333
-ovriga;klimatförbättrad_betong;2032;0.6
-ovriga;klimatförbättrad_betong;2033;0.5667
-ovriga;klimatförbättrad_betong;2034;0.5333
-ovriga;klimatförbättrad_betong;2035;0.5
-ovriga;klimatförbättrad_betong;2040;0.3333
-ovriga;klimatförbättrad_betong;2045;0.1667
-ovriga;klimatförbättrad_generisk;2025;1
-ovriga;klimatförbättrad_generisk;2026;0.9333
-ovriga;klimatförbättrad_generisk;2027;0.8667
-ovriga;klimatförbättrad_generisk;2028;0.8
-ovriga;klimatförbättrad_generisk;2029;0.7333
-ovriga;klimatförbättrad_generisk;2030;0.6667
-ovriga;klimatförbättrad_generisk;2031;0.6333
-ovriga;klimatförbättrad_generisk;2032;0.6
-ovriga;klimatförbättrad_generisk;2033;0.5667
-ovriga;klimatförbättrad_generisk;2034;0.5333
-ovriga;klimatförbättrad_generisk;2035;0.5
-ovriga;klimatförbättrad_generisk;2040;0.3333
-ovriga;klimatförbättrad_generisk;2045;0.1667
-ovriga;klimatförbättrat_stål;2025;1
-ovriga;klimatförbättrat_stål;2026;0.9333
-ovriga;klimatförbättrat_stål;2027;0.8667
-ovriga;klimatförbättrat_stål;2028;0.8
-ovriga;klimatförbättrat_stål;2029;0.7333
-ovriga;klimatförbättrat_stål;2030;0.6667
-ovriga;klimatförbättrat_stål;2031;0.6333
-ovriga;klimatförbättrat_stål;2032;0.6
-ovriga;klimatförbättrat_stål;2033;0.5667
-ovriga;klimatförbättrat_stål;2034;0.5333
-ovriga;klimatförbättrat_stål;2035;0.5
-ovriga;klimatförbättrat_stål;2040;0.3333
-ovriga;klimatförbättrat_stål;2045;0.1667
-ovriga;klimatförbättrat_trä;2025;1
-ovriga;klimatförbättrat_trä;2026;0.9333
-ovriga;klimatförbättrat_trä;2027;0.8667
-ovriga;klimatförbättrat_trä;2028;0.8
-ovriga;klimatförbättrat_trä;2029;0.7333
-ovriga;klimatförbättrat_trä;2030;0.6667
-ovriga;klimatförbättrat_trä;2031;0.6333
-ovriga;klimatförbättrat_trä;2032;0.6
-ovriga;klimatförbättrat_trä;2033;0.5667
-ovriga;klimatförbättrat_trä;2034;0.5333
-ovriga;klimatförbättrat_trä;2035;0.5
-ovriga;klimatförbättrat_trä;2040;0.3333
-ovriga;klimatförbättrat_trä;2045;0.1667
-ovriga;stål;2025;1
-ovriga;stål;2026;0.9576
-ovriga;stål;2027;0.9152
-ovriga;stål;2028;0.8727
-ovriga;stål;2029;0.8303
-ovriga;stål;2030;0.7879
-ovriga;stål;2031;0.7455
-ovriga;stål;2032;0.703
-ovriga;stål;2033;0.6606
-ovriga;stål;2034;0.6182
-ovriga;stål;2035;0.5758
-ovriga;stål;2040;0.3636
-ovriga;stål;2045;0.1515
-ovriga;trä;2025;1
-ovriga;trä;2026;0.9576
-ovriga;trä;2027;0.9152
-ovriga;trä;2028;0.8727
-ovriga;trä;2029;0.8303
-ovriga;trä;2030;0.7879
-ovriga;trä;2031;0.7455
-ovriga;trä;2032;0.703
-ovriga;trä;2033;0.6606
-ovriga;trä;2034;0.6182
-ovriga;trä;2035;0.5758
-ovriga;trä;2040;0.3636
-ovriga;trä;2045;0.1515
+kategori;stomme;ar;faktor
+Flerbostad/kontor/skola m.fl.;betong_bau;2025;1.0
+Flerbostad/kontor/skola m.fl.;betong_bast;2025;1.0
+Flerbostad/kontor/skola m.fl.;stal_bau;2025;1.0
+Flerbostad/kontor/skola m.fl.;stal_bast;2025;1.0
+Flerbostad/kontor/skola m.fl.;tra_bau;2025;1.0
+Flerbostad/kontor/skola m.fl.;tra_bast;2025;1.0
+Flerbostad/kontor/skola m.fl.;generisk;2025;1.0
+Flerbostad/kontor/skola m.fl.;betong_bau;2026;0.951613
+Flerbostad/kontor/skola m.fl.;betong_bast;2026;0.946429
+Flerbostad/kontor/skola m.fl.;stal_bau;2026;0.951613
+Flerbostad/kontor/skola m.fl.;stal_bast;2026;0.946429
+Flerbostad/kontor/skola m.fl.;tra_bau;2026;0.951613
+Flerbostad/kontor/skola m.fl.;tra_bast;2026;0.946429
+Flerbostad/kontor/skola m.fl.;generisk;2026;0.951613
+Flerbostad/kontor/skola m.fl.;betong_bau;2027;0.919355
+Flerbostad/kontor/skola m.fl.;betong_bast;2027;0.875
+Flerbostad/kontor/skola m.fl.;stal_bau;2027;0.919355
+Flerbostad/kontor/skola m.fl.;stal_bast;2027;0.875
+Flerbostad/kontor/skola m.fl.;tra_bau;2027;0.919355
+Flerbostad/kontor/skola m.fl.;tra_bast;2027;0.875
+Flerbostad/kontor/skola m.fl.;generisk;2027;0.919355
+Flerbostad/kontor/skola m.fl.;betong_bau;2028;0.870968
+Flerbostad/kontor/skola m.fl.;betong_bast;2028;0.803571
+Flerbostad/kontor/skola m.fl.;stal_bau;2028;0.870968
+Flerbostad/kontor/skola m.fl.;stal_bast;2028;0.803571
+Flerbostad/kontor/skola m.fl.;tra_bau;2028;0.870968
+Flerbostad/kontor/skola m.fl.;tra_bast;2028;0.803571
+Flerbostad/kontor/skola m.fl.;generisk;2028;0.870968
+Flerbostad/kontor/skola m.fl.;betong_bau;2029;0.822581
+Flerbostad/kontor/skola m.fl.;betong_bast;2029;0.732143
+Flerbostad/kontor/skola m.fl.;stal_bau;2029;0.822581
+Flerbostad/kontor/skola m.fl.;stal_bast;2029;0.732143
+Flerbostad/kontor/skola m.fl.;tra_bau;2029;0.822581
+Flerbostad/kontor/skola m.fl.;tra_bast;2029;0.732143
+Flerbostad/kontor/skola m.fl.;generisk;2029;0.822581
+Flerbostad/kontor/skola m.fl.;betong_bau;2030;0.790323
+Flerbostad/kontor/skola m.fl.;betong_bast;2030;0.678571
+Flerbostad/kontor/skola m.fl.;stal_bau;2030;0.790323
+Flerbostad/kontor/skola m.fl.;stal_bast;2030;0.678571
+Flerbostad/kontor/skola m.fl.;tra_bau;2030;0.790323
+Flerbostad/kontor/skola m.fl.;tra_bast;2030;0.678571
+Flerbostad/kontor/skola m.fl.;generisk;2030;0.790323
+Flerbostad/kontor/skola m.fl.;betong_bau;2031;0.741935
+Flerbostad/kontor/skola m.fl.;betong_bast;2031;0.642857
+Flerbostad/kontor/skola m.fl.;stal_bau;2031;0.741935
+Flerbostad/kontor/skola m.fl.;stal_bast;2031;0.642857
+Flerbostad/kontor/skola m.fl.;tra_bau;2031;0.741935
+Flerbostad/kontor/skola m.fl.;tra_bast;2031;0.642857
+Flerbostad/kontor/skola m.fl.;generisk;2031;0.741935
+Flerbostad/kontor/skola m.fl.;betong_bau;2032;0.693548
+Flerbostad/kontor/skola m.fl.;betong_bast;2032;0.607143
+Flerbostad/kontor/skola m.fl.;stal_bau;2032;0.693548
+Flerbostad/kontor/skola m.fl.;stal_bast;2032;0.607143
+Flerbostad/kontor/skola m.fl.;tra_bau;2032;0.693548
+Flerbostad/kontor/skola m.fl.;tra_bast;2032;0.607143
+Flerbostad/kontor/skola m.fl.;generisk;2032;0.693548
+Flerbostad/kontor/skola m.fl.;betong_bau;2033;0.66129
+Flerbostad/kontor/skola m.fl.;betong_bast;2033;0.571429
+Flerbostad/kontor/skola m.fl.;stal_bau;2033;0.66129
+Flerbostad/kontor/skola m.fl.;stal_bast;2033;0.571429
+Flerbostad/kontor/skola m.fl.;tra_bau;2033;0.66129
+Flerbostad/kontor/skola m.fl.;tra_bast;2033;0.571429
+Flerbostad/kontor/skola m.fl.;generisk;2033;0.66129
+Flerbostad/kontor/skola m.fl.;betong_bau;2034;0.612903
+Flerbostad/kontor/skola m.fl.;betong_bast;2034;0.535714
+Flerbostad/kontor/skola m.fl.;stal_bau;2034;0.612903
+Flerbostad/kontor/skola m.fl.;stal_bast;2034;0.535714
+Flerbostad/kontor/skola m.fl.;tra_bau;2034;0.612903
+Flerbostad/kontor/skola m.fl.;tra_bast;2034;0.535714
+Flerbostad/kontor/skola m.fl.;generisk;2034;0.612903
+Flerbostad/kontor/skola m.fl.;betong_bau;2035;0.580645
+Flerbostad/kontor/skola m.fl.;betong_bast;2035;0.5
+Flerbostad/kontor/skola m.fl.;stal_bau;2035;0.580645
+Flerbostad/kontor/skola m.fl.;stal_bast;2035;0.5
+Flerbostad/kontor/skola m.fl.;tra_bau;2035;0.580645
+Flerbostad/kontor/skola m.fl.;tra_bast;2035;0.5
+Flerbostad/kontor/skola m.fl.;generisk;2035;0.580645
+Flerbostad/kontor/skola m.fl.;betong_bau;2040;0.54
+Flerbostad/kontor/skola m.fl.;betong_bast;2040;0.46
+Flerbostad/kontor/skola m.fl.;stal_bau;2040;0.52
+Flerbostad/kontor/skola m.fl.;stal_bast;2040;0.4
+Flerbostad/kontor/skola m.fl.;tra_bau;2040;0.55
+Flerbostad/kontor/skola m.fl.;tra_bast;2040;0.46
+Flerbostad/kontor/skola m.fl.;generisk;2040;0.54
+Flerbostad/kontor/skola m.fl.;betong_bau;2045;0.5
+Flerbostad/kontor/skola m.fl.;betong_bast;2045;0.42
+Flerbostad/kontor/skola m.fl.;stal_bau;2045;0.47
+Flerbostad/kontor/skola m.fl.;stal_bast;2045;0.34
+Flerbostad/kontor/skola m.fl.;tra_bau;2045;0.52
+Flerbostad/kontor/skola m.fl.;tra_bast;2045;0.43
+Flerbostad/kontor/skola m.fl.;generisk;2045;0.5
+Flerbostad/kontor/skola m.fl.;betong_bau;2050;0.47
+Flerbostad/kontor/skola m.fl.;betong_bast;2050;0.4
+Flerbostad/kontor/skola m.fl.;stal_bau;2050;0.43
+Flerbostad/kontor/skola m.fl.;stal_bast;2050;0.3
+Flerbostad/kontor/skola m.fl.;tra_bau;2050;0.5
+Flerbostad/kontor/skola m.fl.;tra_bast;2050;0.4
+Flerbostad/kontor/skola m.fl.;generisk;2050;0.47
+Flerbostad/kontor/skola m.fl.;betong_bau;2055;0.45
+Flerbostad/kontor/skola m.fl.;betong_bast;2055;0.38
+Flerbostad/kontor/skola m.fl.;stal_bau;2055;0.4
+Flerbostad/kontor/skola m.fl.;stal_bast;2055;0.28
+Flerbostad/kontor/skola m.fl.;tra_bau;2055;0.49
+Flerbostad/kontor/skola m.fl.;tra_bast;2055;0.39
+Flerbostad/kontor/skola m.fl.;generisk;2055;0.45
+Flerbostad/kontor/skola m.fl.;betong_bau;2060;0.43
+Flerbostad/kontor/skola m.fl.;betong_bast;2060;0.36
+Flerbostad/kontor/skola m.fl.;stal_bau;2060;0.38
+Flerbostad/kontor/skola m.fl.;stal_bast;2060;0.26
+Flerbostad/kontor/skola m.fl.;tra_bau;2060;0.48
+Flerbostad/kontor/skola m.fl.;tra_bast;2060;0.38
+Flerbostad/kontor/skola m.fl.;generisk;2060;0.43
+Flerbostad/kontor/skola m.fl.;betong_bau;2065;0.41
+Flerbostad/kontor/skola m.fl.;betong_bast;2065;0.34
+Flerbostad/kontor/skola m.fl.;stal_bau;2065;0.36
+Flerbostad/kontor/skola m.fl.;stal_bast;2065;0.25
+Flerbostad/kontor/skola m.fl.;tra_bau;2065;0.47
+Flerbostad/kontor/skola m.fl.;tra_bast;2065;0.37
+Flerbostad/kontor/skola m.fl.;generisk;2065;0.41
+Flerbostad/kontor/skola m.fl.;betong_bau;2070;0.4
+Flerbostad/kontor/skola m.fl.;betong_bast;2070;0.33
+Flerbostad/kontor/skola m.fl.;stal_bau;2070;0.35
+Flerbostad/kontor/skola m.fl.;stal_bast;2070;0.25
+Flerbostad/kontor/skola m.fl.;tra_bau;2070;0.46
+Flerbostad/kontor/skola m.fl.;tra_bast;2070;0.36
+Flerbostad/kontor/skola m.fl.;generisk;2070;0.4
+Småhus;betong_bau;2025;1.0
+Småhus;betong_bast;2025;1.0
+Småhus;stal_bau;2025;1.0
+Småhus;stal_bast;2025;1.0
+Småhus;tra_bau;2025;1.0
+Småhus;tra_bast;2025;1.0
+Småhus;generisk;2025;1.0
+Småhus;betong_bau;2026;0.933333
+Småhus;betong_bast;2026;0.925926
+Småhus;stal_bau;2026;0.933333
+Småhus;stal_bast;2026;0.925926
+Småhus;tra_bau;2026;0.933333
+Småhus;tra_bast;2026;0.925926
+Småhus;generisk;2026;0.933333
+Småhus;betong_bau;2027;0.9
+Småhus;betong_bast;2027;0.851852
+Småhus;stal_bau;2027;0.9
+Småhus;stal_bast;2027;0.851852
+Småhus;tra_bau;2027;0.9
+Småhus;tra_bast;2027;0.851852
+Småhus;generisk;2027;0.9
+Småhus;betong_bau;2028;0.866667
+Småhus;betong_bast;2028;0.814815
+Småhus;stal_bau;2028;0.866667
+Småhus;stal_bast;2028;0.814815
+Småhus;tra_bau;2028;0.866667
+Småhus;tra_bast;2028;0.814815
+Småhus;generisk;2028;0.866667
+Småhus;betong_bau;2029;0.833333
+Småhus;betong_bast;2029;0.740741
+Småhus;stal_bau;2029;0.833333
+Småhus;stal_bast;2029;0.740741
+Småhus;tra_bau;2029;0.833333
+Småhus;tra_bast;2029;0.740741
+Småhus;generisk;2029;0.833333
+Småhus;betong_bau;2030;0.766667
+Småhus;betong_bast;2030;0.666667
+Småhus;stal_bau;2030;0.766667
+Småhus;stal_bast;2030;0.666667
+Småhus;tra_bau;2030;0.766667
+Småhus;tra_bast;2030;0.666667
+Småhus;generisk;2030;0.766667
+Småhus;betong_bau;2031;0.733333
+Småhus;betong_bast;2031;0.62963
+Småhus;stal_bau;2031;0.733333
+Småhus;stal_bast;2031;0.62963
+Småhus;tra_bau;2031;0.733333
+Småhus;tra_bast;2031;0.62963
+Småhus;generisk;2031;0.733333
+Småhus;betong_bau;2032;0.7
+Småhus;betong_bast;2032;0.592593
+Småhus;stal_bau;2032;0.7
+Småhus;stal_bast;2032;0.592593
+Småhus;tra_bau;2032;0.7
+Småhus;tra_bast;2032;0.592593
+Småhus;generisk;2032;0.7
+Småhus;betong_bau;2033;0.666667
+Småhus;betong_bast;2033;0.555556
+Småhus;stal_bau;2033;0.666667
+Småhus;stal_bast;2033;0.555556
+Småhus;tra_bau;2033;0.666667
+Småhus;tra_bast;2033;0.555556
+Småhus;generisk;2033;0.666667
+Småhus;betong_bau;2034;0.6
+Småhus;betong_bast;2034;0.518519
+Småhus;stal_bau;2034;0.6
+Småhus;stal_bast;2034;0.518519
+Småhus;tra_bau;2034;0.6
+Småhus;tra_bast;2034;0.518519
+Småhus;generisk;2034;0.6
+Småhus;betong_bau;2035;0.566667
+Småhus;betong_bast;2035;0.518519
+Småhus;stal_bau;2035;0.566667
+Småhus;stal_bast;2035;0.518519
+Småhus;tra_bau;2035;0.566667
+Småhus;tra_bast;2035;0.518519
+Småhus;generisk;2035;0.566667
+Logistikbyggnader;betong_bau;2025;1.0
+Logistikbyggnader;betong_bast;2025;1.0
+Logistikbyggnader;stal_bau;2025;1.0
+Logistikbyggnader;stal_bast;2025;1.0
+Logistikbyggnader;tra_bau;2025;1.0
+Logistikbyggnader;tra_bast;2025;1.0
+Logistikbyggnader;generisk;2025;1.0
+Logistikbyggnader;betong_bau;2026;0.958333
+Logistikbyggnader;betong_bast;2026;0.931818
+Logistikbyggnader;stal_bau;2026;0.958333
+Logistikbyggnader;stal_bast;2026;0.931818
+Logistikbyggnader;tra_bau;2026;0.958333
+Logistikbyggnader;tra_bast;2026;0.931818
+Logistikbyggnader;generisk;2026;0.958333
+Logistikbyggnader;betong_bau;2027;0.916667
+Logistikbyggnader;betong_bast;2027;0.863636
+Logistikbyggnader;stal_bau;2027;0.916667
+Logistikbyggnader;stal_bast;2027;0.863636
+Logistikbyggnader;tra_bau;2027;0.916667
+Logistikbyggnader;tra_bast;2027;0.863636
+Logistikbyggnader;generisk;2027;0.916667
+Logistikbyggnader;betong_bau;2028;0.875
+Logistikbyggnader;betong_bast;2028;0.795455
+Logistikbyggnader;stal_bau;2028;0.875
+Logistikbyggnader;stal_bast;2028;0.795455
+Logistikbyggnader;tra_bau;2028;0.875
+Logistikbyggnader;tra_bast;2028;0.795455
+Logistikbyggnader;generisk;2028;0.875
+Logistikbyggnader;betong_bau;2029;0.833333
+Logistikbyggnader;betong_bast;2029;0.727273
+Logistikbyggnader;stal_bau;2029;0.833333
+Logistikbyggnader;stal_bast;2029;0.727273
+Logistikbyggnader;tra_bau;2029;0.833333
+Logistikbyggnader;tra_bast;2029;0.727273
+Logistikbyggnader;generisk;2029;0.833333
+Logistikbyggnader;betong_bau;2030;0.791667
+Logistikbyggnader;betong_bast;2030;0.659091
+Logistikbyggnader;stal_bau;2030;0.791667
+Logistikbyggnader;stal_bast;2030;0.659091
+Logistikbyggnader;tra_bau;2030;0.791667
+Logistikbyggnader;tra_bast;2030;0.659091
+Logistikbyggnader;generisk;2030;0.791667
+Logistikbyggnader;betong_bau;2031;0.75
+Logistikbyggnader;betong_bast;2031;0.636364
+Logistikbyggnader;stal_bau;2031;0.75
+Logistikbyggnader;stal_bast;2031;0.636364
+Logistikbyggnader;tra_bau;2031;0.75
+Logistikbyggnader;tra_bast;2031;0.636364
+Logistikbyggnader;generisk;2031;0.75
+Logistikbyggnader;betong_bau;2032;0.708333
+Logistikbyggnader;betong_bast;2032;0.590909
+Logistikbyggnader;stal_bau;2032;0.708333
+Logistikbyggnader;stal_bast;2032;0.590909
+Logistikbyggnader;tra_bau;2032;0.708333
+Logistikbyggnader;tra_bast;2032;0.590909
+Logistikbyggnader;generisk;2032;0.708333
+Logistikbyggnader;betong_bau;2033;0.666667
+Logistikbyggnader;betong_bast;2033;0.568182
+Logistikbyggnader;stal_bau;2033;0.666667
+Logistikbyggnader;stal_bast;2033;0.568182
+Logistikbyggnader;tra_bau;2033;0.666667
+Logistikbyggnader;tra_bast;2033;0.568182
+Logistikbyggnader;generisk;2033;0.666667
+Logistikbyggnader;betong_bau;2034;0.625
+Logistikbyggnader;betong_bast;2034;0.522727
+Logistikbyggnader;stal_bau;2034;0.625
+Logistikbyggnader;stal_bast;2034;0.522727
+Logistikbyggnader;tra_bau;2034;0.625
+Logistikbyggnader;tra_bast;2034;0.522727
+Logistikbyggnader;generisk;2034;0.625
+Logistikbyggnader;betong_bau;2035;0.583333
+Logistikbyggnader;betong_bast;2035;0.5
+Logistikbyggnader;stal_bau;2035;0.583333
+Logistikbyggnader;stal_bast;2035;0.5
+Logistikbyggnader;tra_bau;2035;0.583333
+Logistikbyggnader;tra_bast;2035;0.5
+Logistikbyggnader;generisk;2035;0.583333
+Övriga byggnader;betong_bau;2025;1.0
+Övriga byggnader;betong_bast;2025;1.0
+Övriga byggnader;stal_bau;2025;1.0
+Övriga byggnader;stal_bast;2025;1.0
+Övriga byggnader;tra_bau;2025;1.0
+Övriga byggnader;tra_bast;2025;1.0
+Övriga byggnader;generisk;2025;1.0
+Övriga byggnader;betong_bau;2026;0.960526
+Övriga byggnader;betong_bast;2026;0.927536
+Övriga byggnader;stal_bau;2026;0.960526
+Övriga byggnader;stal_bast;2026;0.927536
+Övriga byggnader;tra_bau;2026;0.960526
+Övriga byggnader;tra_bast;2026;0.927536
+Övriga byggnader;generisk;2026;0.960526
+Övriga byggnader;betong_bau;2027;0.907895
+Övriga byggnader;betong_bast;2027;0.869565
+Övriga byggnader;stal_bau;2027;0.907895
+Övriga byggnader;stal_bast;2027;0.869565
+Övriga byggnader;tra_bau;2027;0.907895
+Övriga byggnader;tra_bast;2027;0.869565
+Övriga byggnader;generisk;2027;0.907895
+Övriga byggnader;betong_bau;2028;0.868421
+Övriga byggnader;betong_bast;2028;0.797101
+Övriga byggnader;stal_bau;2028;0.868421
+Övriga byggnader;stal_bast;2028;0.797101
+Övriga byggnader;tra_bau;2028;0.868421
+Övriga byggnader;tra_bast;2028;0.797101
+Övriga byggnader;generisk;2028;0.868421
+Övriga byggnader;betong_bau;2029;0.828947
+Övriga byggnader;betong_bast;2029;0.73913
+Övriga byggnader;stal_bau;2029;0.828947
+Övriga byggnader;stal_bast;2029;0.73913
+Övriga byggnader;tra_bau;2029;0.828947
+Övriga byggnader;tra_bast;2029;0.73913
+Övriga byggnader;generisk;2029;0.828947
+Övriga byggnader;betong_bau;2030;0.789474
+Övriga byggnader;betong_bast;2030;0.666667
+Övriga byggnader;stal_bau;2030;0.789474
+Övriga byggnader;stal_bast;2030;0.666667
+Övriga byggnader;tra_bau;2030;0.789474
+Övriga byggnader;tra_bast;2030;0.666667
+Övriga byggnader;generisk;2030;0.789474
+Övriga byggnader;betong_bau;2031;0.75
+Övriga byggnader;betong_bast;2031;0.637681
+Övriga byggnader;stal_bau;2031;0.75
+Övriga byggnader;stal_bast;2031;0.637681
+Övriga byggnader;tra_bau;2031;0.75
+Övriga byggnader;tra_bast;2031;0.637681
+Övriga byggnader;generisk;2031;0.75
+Övriga byggnader;betong_bau;2032;0.697368
+Övriga byggnader;betong_bast;2032;0.594203
+Övriga byggnader;stal_bau;2032;0.697368
+Övriga byggnader;stal_bast;2032;0.594203
+Övriga byggnader;tra_bau;2032;0.697368
+Övriga byggnader;tra_bast;2032;0.594203
+Övriga byggnader;generisk;2032;0.697368
+Övriga byggnader;betong_bau;2033;0.657895
+Övriga byggnader;betong_bast;2033;0.565217
+Övriga byggnader;stal_bau;2033;0.657895
+Övriga byggnader;stal_bast;2033;0.565217
+Övriga byggnader;tra_bau;2033;0.657895
+Övriga byggnader;tra_bast;2033;0.565217
+Övriga byggnader;generisk;2033;0.657895
+Övriga byggnader;betong_bau;2034;0.618421
+Övriga byggnader;betong_bast;2034;0.536232
+Övriga byggnader;stal_bau;2034;0.618421
+Övriga byggnader;stal_bast;2034;0.536232
+Övriga byggnader;tra_bau;2034;0.618421
+Övriga byggnader;tra_bast;2034;0.536232
+Övriga byggnader;generisk;2034;0.618421
+Övriga byggnader;betong_bau;2035;0.578947
+Övriga byggnader;betong_bast;2035;0.507246
+Övriga byggnader;stal_bau;2035;0.578947
+Övriga byggnader;stal_bast;2035;0.507246
+Övriga byggnader;tra_bau;2035;0.578947
+Övriga byggnader;tra_bast;2035;0.507246
+Övriga byggnader;generisk;2035;0.578947

@@ -13,11 +13,11 @@
   "kwh": 0.182,
   "other": 1,
   "mix": {
-   "petrol": 0.389,
-   "diesel": 0.391,
-   "hev": 0.047,
-   "bev": 0.08,
-   "phev": 0.083,
+   "petrol": 0.37,
+   "diesel": 0.36,
+   "hev": 0.05,
+   "bev": 0.11,
+   "phev": 0.1,
    "biogas": 0.01
   },
   "rules": {
@@ -91,5 +91,5 @@
  "batteri_kg_per_kwh": 72.8,
  "laddverkningsgrad": 0.9,
  "laddhybrid_eldrift": 0.35,
- "kallor": "ICCT2025,FQD2015,PHEV_ICCT2022,TRAFA_KM_2024"
+ "kallor": "ICCT2025,FQD2015,PHEV_ICCT2022,TRAFA_KM_2025"
 }

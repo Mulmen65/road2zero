@@ -58,6 +58,7 @@ class Faktabibliotek:
     kommuner: pd.DataFrame
     skog: pd.DataFrame
     personbil: dict
+    utveckling: pd.DataFrame
     _kurvcache: dict = field(default_factory=dict, repr=False)
 
     # ---------- skalära parametrar ----------
@@ -81,14 +82,12 @@ class Faktabibliotek:
             self._kurvcache[namn] = Kurva({float(a): float(v) for a, v in zip(d["ar"], d["varde"])})
         return self._kurvcache[namn]
 
-    def reduktionskurva(self, grupp: str, stomme: str) -> Kurva:
-        key = ("red", grupp, stomme)
+    def reduktionskurva(self, kategori: str, stomme: str) -> Kurva:
+        """Tabell A utökad: faktor relativt 2025 per byggnadskategori och stomme (för redovisning)."""
+        key = ("red", kategori, stomme)
         if key not in self._kurvcache:
-            d = self.reduktion[(self.reduktion["grupp"] == grupp) & (self.reduktion["stomme"] == stomme)]
-            if d.empty:
-                self._kurvcache[key] = Kurva({2025.0: 1.0})
-            else:
-                self._kurvcache[key] = Kurva({float(a): float(v) for a, v in zip(d["ar"], d["faktor"])})
+            d = self.reduktion[(self.reduktion["kategori"] == kategori) & (self.reduktion["stomme"] == stomme)]
+            self._kurvcache[key] = Kurva({float(a): float(v) for a, v in zip(d["ar"], d["faktor"])}) if not d.empty else Kurva({2025.0: 1.0})
         return self._kurvcache[key]
 
     def skogskurva(self, namn: str) -> pd.DataFrame:
@@ -158,4 +157,5 @@ def ladda() -> Faktabibliotek:
         kommuner=_csv("kommuner.csv"),
         skog=pd.read_csv(DATA / "skogskol_kurvbibliotek.csv", sep=";"),
         personbil=json.loads((DATA / "personbil_livscykel.json").read_text(encoding="utf-8")),
+        utveckling=_csv("utveckling.csv"),
     )

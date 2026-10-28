@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .factlib import Faktabibliotek, Kurva
+from .factlib import Faktabibliotek
+from .utveckling import Utveckling
 
 
 @dataclass
@@ -21,6 +22,7 @@ class Kontext:
     def __post_init__(self):
         p = self.scen["projekt"]
         self.ar = list(range(int(p["startar"]), int(p["slutar"]) + 1))
+        self.utv = Utveckling(self.fb, self.scen)
         self._el = self._bygg_elkurva()
         self._fjv = self._bygg_fjvkurva()
 
@@ -36,38 +38,25 @@ class Kontext:
         self.anvanda_tabeller.add(namn)
 
     # ---------- tidskurvor ----------
-    def _bygg_elkurva(self) -> Kurva:
-        e = self.scen["el"]
-        start = self.p("el.startvarde")
-        self.anvanda.add("el.kurva")
-        if e["kurva"] == "boverket_konstant":
-            return Kurva({2025.0: start})
-        if e["kurva"] == "egen":
-            return Kurva({2025.0: float(e["egen_start"]), float(e["egen_malar"]): float(e["egen_mal"])})
-        namn = "el_eu_wam" if e["kurva"] == "boverket_eu_wam" else "el_eu_referens"
-        k = self.fb.kurva(namn)
-        bas = k(2025)
-        self.tabell("kurvor")
-        return Kurva({x: start * y / bas for x, y in zip(k.x, k.y)})
+    def _bygg_elkurva(self):
+        self.tabell("utveckling")
+        return self.p("el.startvarde")
 
-    def _bygg_fjvkurva(self) -> Kurva:
-        f = self.scen["fjarrvarme"]
-        start = float(f["startvarde"])
+    def _bygg_fjvkurva(self):
         self.anvanda.add("fjv.startvarde")
-        if f["kurva"] == "konstant":
-            return Kurva({2025.0: start})
-        k = self.fb.kurva("fjarrvarme_eu_referens")
-        self.tabell("kurvor")
-        bas = k(2025)
-        return Kurva({x: start * y / bas for x, y in zip(k.x, k.y)})
+        return float(self.scen["fjarrvarme"]["startvarde"])
 
     def el(self, y: int) -> float:
-        """Elens klimatfaktor, g CO2e/kWh."""
-        return self._el(y)
+        """Elens klimatfaktor, g CO2e/kWh: startvärdet 2026 gånger index för el."""
+        return self._el * self.utv.index("el", y)
 
     def fjv(self, y: int) -> float:
-        """Fjärrvärmens klimatfaktor, g CO2e/kWh."""
-        return self._fjv(y)
+        """Fjärrvärmens klimatfaktor, g CO2e/kWh: ortens startvärde gånger index för fjärrvärme."""
+        return self._fjv * self.utv.index("fjv", y)
+
+    def index(self, faktor: str, y: int) -> float:
+        """Index relativt 2026 för en emissionsfaktor (fliken Emissionsfaktorer över tid)."""
+        return self.utv.index(faktor, y)
 
     # ---------- resultat ----------
     def add(self, kategori: str, delpost: str, modul: str, y: int, t: float):

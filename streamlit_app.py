@@ -6,8 +6,8 @@ import streamlit as st
 
 st.set_page_config(page_title="Road2Zero", page_icon="app/logo.svg", layout="wide", initial_sidebar_state="expanded")
 
-from app import ui_berakningar, ui_faktorer, ui_illustration, ui_indata, ui_referenser, ui_resultat  # noqa: E402
-from app.common import init, resultat, sidopanel  # noqa: E402
+from app import ui_berakningar, ui_faktorer, ui_illustration, ui_indata, ui_referenser, ui_resultat, ui_utveckling  # noqa: E402
+from app.common import init, kor_senare, resultat, sidopanel  # noqa: E402
 
 st.markdown("""
 <style>
@@ -23,19 +23,22 @@ st.title("Road2Zero")
 st.caption("Klimatberäkning för stadsdelar utan karta: aggregerade indata, tio klimatkategorier år för år och jämförelse med en "
            "vetenskapligt baserad koldioxidbudget.")
 
-flikar = st.tabs(["Indata", "Resultat", "Illustration", "Beräkningar", "Faktorer och parametrar", "Referenser"])
+flikar = st.tabs(["Indata", "Emissionsfaktorer över tid", "Resultat", "Illustration", "Beräkningar", "Faktorer och parametrar", "Referenser"])
 with flikar[0]:
-    ui_indata.visa()          # indata först, så att resultatet nedan bygger på dem
-
-res = resultat()
-sidopanel(res)
+    ui_indata.visa()          # alla indata läses först ...
 with flikar[1]:
-    ui_resultat.visa(res)
+    ui_utveckling.visa()
+
+res = resultat()              # ... sedan beräknas resultatet en gång
+kor_senare(res)               # och tabeller och diagram i indataflikarna fylls med aktuella värden
+sidopanel(res)
 with flikar[2]:
-    ui_illustration.visa(res)
+    ui_resultat.visa(res)
 with flikar[3]:
-    ui_berakningar.visa(res)
+    ui_illustration.visa(res)
 with flikar[4]:
-    ui_faktorer.visa(res)
+    ui_berakningar.visa(res)
 with flikar[5]:
+    ui_faktorer.visa(res)
+with flikar[6]:
     ui_referenser.visa(res)
