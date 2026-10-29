@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import copy
 import json
+from pathlib import Path
 
 from . import __version__
 from .factlib import Faktabibliotek, ladda
@@ -147,6 +148,14 @@ def tomt(fb: Faktabibliotek | None = None) -> dict:
         "budget": {"temperatur": "1,5", "sannolikhet": 50, "niva": 3},
         "parametrar": {},
     }
+
+
+STANDARDPROJEKT = Path(__file__).parent / "data" / "standardprojekt_jagersro.json"
+
+
+def standardprojekt(fb: Faktabibliotek | None = None) -> dict:
+    """Projektet som appen startar med (byggs av verktyg/jagersro.py). Alla värden går att ändra i appen."""
+    return fran_json(STANDARDPROJEKT.read_text(encoding="utf-8"), fb)
 
 
 def exempel(fb: Faktabibliotek | None = None) -> dict:

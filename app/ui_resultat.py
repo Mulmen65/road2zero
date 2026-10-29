@@ -17,6 +17,7 @@ from plotly.subplots import make_subplots
 from road2zero.algoritmer import ALGORITMER
 from road2zero.kontext import Kontext
 from road2zero.konstanter import FARG, KATEGORI_NAMN, NIVA, NIVA_INNEHALL, NIVA_NAMN
+from road2zero.modules.budget import andel_per_person, global_gt
 from road2zero.modules.mobilitet import mix_for_ar
 from road2zero.scenario import till_json
 
@@ -24,7 +25,7 @@ from .common import fb, fmt, k, ss
 from .diagram import BUDGET, CONF, GRID, INK, INK2, MELLANBLA, PETROL, SURF, VARNING, layout, rgba
 from .ui_berakningar import visa_modul
 
-SNITT = (2027, 2050)           # period för snittet per person och år
+SNITT = (2027, 2050)           # förvald analysperiod för snittet per person och år
 HOGHOJD = "Höghöjdseffekt"     # flygets delpost som kan väljas bort
 ENHETER = {"t": "t CO2e", "person": "t CO2e per person och år", "m2": "kg CO2e per m² BTA"}
 # Vilka moduler i fliken Beräkningar som räknar fram varje klimatkategori
@@ -42,6 +43,7 @@ class Urval:
     hoghojd: bool
     lang: pd.DataFrame          # res.lang för urvalet
     egen: bool                  # urvalet skiljer sig från nivåns kategorier
+    period: tuple[int, int]     # analysperiod för snittet per person och år
 
 
 # ---------- urval och sammanställningar ----------
@@ -63,10 +65,14 @@ def valj(res) -> Urval:
                             help="Flygets värde per invånare räknar med höghöjdseffekt (faktor 1,89 enligt Kamb och Larsson 2018), "
                                  "som är vetenskapligt osäker. Utan den räknas bara koldioxiden från bränslet.")
     c2.caption(NIVA_INNEHALL[niva] if kat == std else f"Eget urval: {len(kat)} av {len(KATEGORI_NAMN)} kategorier.")
+    a0, a1 = res.ar()[0], res.ar()[-1]
+    std_p = (min(max(SNITT[0], a0), a1), max(min(SNITT[1], a1), a0))
+    period = c1.slider("Analysperiod för snitt per person", a0, a1, std_p, 1, key=k(f"res_period_{a0}_{a1}"),
+                       help="Snittet per person och år och jämförelsen med budgetutrymmet räknas över de här åren (år med invånare).")         if a1 > a0 else (a0, a1)
     d = res.lang[res.lang["kategori"].isin(kat)]
     if not hoghojd:
         d = d[~((d["kategori"] == "Flygresor") & (d["delpost"] == HOGHOJD))]
-    return Urval(niva, kat, hoghojd, d, kat != std or not hoghojd)
+    return Urval(niva, kat, hoghojd, d, kat != std or not hoghojd, (int(period[0]), int(period[1])))
 
 
 def per_ar(res, u: Urval) -> pd.DataFrame:
@@ -88,10 +94,10 @@ def per_person(res, u: Urval) -> pd.DataFrame:
 
 
 def person_matt(res, u: Urval) -> dict:
-    """Per person: per år, ackumulerat över perioden och snitt 2027–2050, med budgetandelen för samma år."""
+    """Per person: per år, ackumulerat över perioden och snitt för analysperioden, med budgetandelen för samma år."""
     pp = per_person(res, u).sum(axis=1)
     bud = res.budget["tabell"].set_index("ar")["andel_per_person_t"].reindex(pp.index).fillna(0.0)
-    i_snitt = [y for y in pp.index if SNITT[0] <= y <= SNITT[1]]
+    i_snitt = [y for y in pp.index if u.period[0] <= y <= u.period[1]]
     return {
         "per_ar": pp, "kum": pp.cumsum(), "budget_per_ar": bud, "budget_kum": bud.cumsum(),
         "snitt": float(pp.loc[i_snitt].mean()) if i_snitt else None, "snitt_budget": float(bud.loc[i_snitt].mean()) if i_snitt else None,
@@ -120,10 +126,13 @@ def stapel_per_kategori(res, u: Urval):
     tot = per_ar(res, u).sum()
     tot = tot[tot.abs() > 0].sort_values()
     pos = tot[tot > 0].sum()
-    text = [f"{fmt(v)} t" + (f" · {fmt(v / pos * 100)} %" if v > 0 and pos else "") for v in tot.values]
+    # positiva staplar får etiketten utanför stapelns ände; negativa får den till höger om nollinjen, som de andra
+    text = [f"{fmt(v)} t" + (f" · {fmt(v / pos * 100)} %" if pos else "") if v > 0 else "" for v in tot.values]
     fig = go.Figure(go.Bar(y=tot.index, x=tot.values, orientation="h", marker=dict(color=[FARG[c] for c in tot.index], line=dict(color=SURF, width=2)),
                            text=text, textposition="outside", cliponaxis=False, textfont=dict(color=INK, size=12),
                            hovertemplate="%{y}: %{x:,.0f} t CO2e<extra></extra>"))
+    for kat, v in tot[tot < 0].items():
+        fig.add_annotation(x=0, y=kat, text=f"{fmt(v)} t", showarrow=False, xanchor="left", xshift=6, font=dict(color=INK, size=12))
     fig = layout(fig, "Summa per klimatkategori", _undertitel(res, u) + " · andel av bruttoutsläppen", 46 * len(tot) + 150, yt=None)
     fig.update_xaxes(gridcolor=GRID, zerolinecolor=INK2, tickformat=",.0f", title="t CO2e", showgrid=True)
     fig.update_yaxes(gridcolor="rgba(0,0,0,0)", title=None)
@@ -287,6 +296,117 @@ def mot_budget(res, u: Urval):
                   f"{b['temperatur']} °C och {b['sannolikhet']} % sannolikhet · Forster m.fl. (2026), lika per person, faktiska invånare", 460)
 
 
+# ---------- utsläpp per person mot budgetutrymmet ----------
+SANNOLIKHETER = [10, 17, 33, 50, 67, 83, 90]
+
+
+def _gron_skala(n: int) -> list[str]:
+    """Sekventiell grön skala, ljus till mörk (högre sannolikhet ger mindre budget och mörkare linje)."""
+    a, b = (0xb9, 0xd6, 0xa8), (0x1d, 0x4a, 0x2a)
+    return ["#%02x%02x%02x" % tuple(round(x + (y - x) * i / max(1, n - 1)) for x, y in zip(a, b)) for i in range(n)]
+
+
+def budget_snitt(res, u: Urval, temp: str, sann: int) -> tuple[float | None, float]:
+    """Budgetutrymmet per person och år (t CO2e, med andra växthusgaser) i snitt över analysperioden, för år med invånare,
+    samt påslaget k. Samma bana och fördelning som modulen Klimatbudget."""
+    kx = Kontext(fb(), ss.scen)
+    kf = kx.p("budget.k")
+    andel, _ = andel_per_person(fb(), global_gt(fb(), temp, sann), kx.p("budget.e0"), kf, res.ar())
+    inv = invanare(res)
+    ar = [y for y in res.ar() if u.period[0] <= y <= u.period[1] and inv.get(y, 0) > 0]
+    return (sum(andel.get(y, 0.0) for y in ar) / len(ar) if ar else None), kf
+
+
+def snitt_per_kategori(res, u: Urval) -> pd.Series:
+    pp = per_person(res, u)
+    pp = pp[(pp.index >= u.period[0]) & (pp.index <= u.period[1])]
+    return pp.mean() if len(pp) else pd.Series(0.0, index=u.kat)
+
+
+def person_mot_budget(res, u: Urval, temp: str, sann: int):
+    kat = snitt_per_kategori(res, u)
+    bud, kf = budget_snitt(res, u, temp, sann)
+    if bud is None:
+        return None
+    co2 = bud / kf
+    rad_u, rad_b = "Utsläpp, urvalet", "Budgetutrymme"
+    fig = go.Figure()
+    for c in u.kat:
+        if c in kat and abs(kat[c]) > 1e-9:
+            fig.add_bar(y=[rad_u], x=[kat[c]], name=c, orientation="h", marker=dict(color=FARG[c], line=dict(color=SURF, width=2)),
+                        hovertemplate=f"{c}: %{{x:,.2f}} t per person och år<extra></extra>")
+    # budgeten är genomskinlig med mörk kant så att den inte förväxlas med negativa utsläpp, som är heltäckande gröna
+    fig.add_bar(y=[rad_b], x=[co2], name="Budget, koldioxid", orientation="h", marker=dict(color=rgba(BUDGET, 0.55), line=dict(color=BUDGET, width=1.5)),
+                hovertemplate="Koldioxid: %{x:,.2f} t per person och år<extra></extra>")
+    fig.add_bar(y=[rad_b], x=[bud - co2], name="Budget, andra växthusgaser", orientation="h",
+                marker=dict(color=rgba(BUDGET, 0.18), line=dict(color=BUDGET, width=1.5)),
+                hovertemplate="Andra växthusgaser: %{x:,.2f} t per person och år<extra></extra>")
+    summa = float(kat.sum())
+    for y, v in ((rad_u, summa), (rad_b, bud)):
+        fig.add_annotation(x=max(v, float(kat[kat > 0].sum()) if y == rad_u else v), y=y, text=f"<b>{fmt(v, 2)} t</b>", showarrow=False,
+                           xanchor="left", xshift=8, font=dict(color=INK, size=13))
+    fig.update_layout(barmode="relative", bargap=0.35, legend=dict(traceorder="normal"))
+    fig = layout(fig, "Utsläpp per person mot budgetutrymmet",
+                 f"Snitt {u.period[0]}–{u.period[1]}, t CO2e per person och år · budget {temp} °C, {sann} % sannolikhet (Forster m.fl. 2026), "
+                 "inklusive andra växthusgaser", 420, yt=None)
+    fig.update_xaxes(gridcolor=GRID, showgrid=True, zerolinecolor=INK2, tickformat=",.1f", title=None)   # enheten står i undertiteln
+    fig.update_yaxes(autorange="reversed", title=None)
+    fig.add_vline(x=0, line=dict(color=INK2, width=1))
+    # förklaringen längst ned i figuren, under talen på x-axeln
+    fig.update_layout(margin=dict(l=10, r=80, t=72, b=110), legend=dict(yref="container", y=0.01, yanchor="bottom"))
+    return fig
+
+
+def budget_per_temperatur(res, u: Urval, temp: str, sann: int):
+    temps = list(dict.fromkeys(fb().budget["temperatur"]))
+    x = [float(t.replace(",", ".")) for t in temps]
+    snitt = float(snitt_per_kategori(res, u).sum())
+    fig = go.Figure()
+    for farg, p in zip(_gron_skala(len(SANNOLIKHETER)), SANNOLIKHETER):
+        y = [budget_snitt(res, u, t, p)[0] for t in temps]
+        valt = p == int(sann)
+        fig.add_scatter(x=x, y=y, name=f"{p} %", mode="lines+markers", line=dict(color=farg, width=3 if valt else 1.8),
+                        marker=dict(size=8 if valt else 6, color=farg, line=dict(color=SURF, width=1)),
+                        hovertemplate=f"{p} % sannolikhet, %{{x:.1f}} °C: %{{y:,.2f}} t per person och år<extra></extra>")
+    vx = float(str(temp).replace(",", "."))
+    vy = budget_snitt(res, u, temp, sann)[0]
+    fig.add_scatter(x=[vx], y=[vy], mode="markers", name="Valt", showlegend=False, hoverinfo="skip",
+                    marker=dict(size=15, color="rgba(0,0,0,0)", line=dict(color=INK, width=2)))
+    fig.add_hline(y=snitt, line=dict(color=INK, width=2, dash="dot"), annotation_text=f"Urvalet: {fmt(snitt, 2)} t",
+                  annotation_position="top left", annotation_font=dict(color=INK, size=12))
+    fig = layout(fig, "Budgetutrymme per person och år för alla temperaturgränser",
+                 f"Snitt {u.period[0]}–{u.period[1]} · en linje per sannolikhet att hålla gränsen · ringen är valet ovan · prickad linje: urvalets utsläpp",
+                 430, yt="t CO2e per person och år")
+    fig.update_xaxes(tickvals=x, ticktext=[f"{t} °C" for t in temps], title="Temperaturgräns")
+    fig.update_yaxes(tickformat=",.1f", rangemode="tozero")
+    fig.update_layout(legend=dict(title=dict(text="Sannolikhet "), y=-0.25))
+    return fig
+
+
+def visa_person_mot_budget(res, u: Urval):
+    b = ss.scen["budget"]
+    temps = list(dict.fromkeys(fb().budget["temperatur"]))
+    c1, c2, c3 = st.columns([1.3, 1.6, 1.4], vertical_alignment="bottom")
+    temp = c1.select_slider("Temperaturgräns", temps, value=str(b["temperatur"]), format_func=lambda t: f"{t} °C", key=k("pb_temp"))
+    sann = c2.select_slider("Sannolikhet att hålla gränsen", SANNOLIKHETER, value=int(b["sannolikhet"]), format_func=lambda p: f"{p} %",
+                            key=k("pb_sann"))
+    bud, kf = budget_snitt(res, u, temp, sann)
+    snitt = float(snitt_per_kategori(res, u).sum())
+    if bud:
+        c3.metric("Utsläpp i förhållande till budgeten", f"{fmt(snitt / bud, 1)} gånger",
+                  help=f"Urvalets snitt {fmt(snitt, 2)} t delat med budgetutrymmet {fmt(bud, 2)} t per person och år, {u.period[0]}–{u.period[1]}.")
+    fig = person_mot_budget(res, u, temp, sann)
+    if fig is None:
+        st.info("Inga invånare under analysperioden, så det finns inget att jämföra per person.")
+        return
+    _visa(fig)
+    _visa(budget_per_temperatur(res, u, temp, sann))
+    st.caption(f"Budgetutrymmet är den globala kvarvarande koldioxidbudgeten från 2026 (Forster m.fl. 2026) som en jämnt minskande bana, "
+               f"räknad upp med {fmt(kf, 3)} (56,8/43,2) för andra växthusgaser och delad lika per person med världsbefolkningen år för år "
+               "(UN WPP 2024). Snittet tas över analysperiodens år med invånare, för både utsläppen och budgeten. Utsläppen följer "
+               "kategorierna du valt överst. Reglagen här ändrar inte projektets budgetval under Indata.")
+
+
 def sankey(res, u: Urval):
     d = u.lang[u.lang["t"] > 0].groupby(["modul", "kategori"], as_index=False)["t"].sum()
     if d.empty:
@@ -332,20 +452,20 @@ def tabell_kategori(res, u: Urval, m: dict) -> pd.DataFrame:
     tot = p.sum()
     brutto = tot[tot > 0].sum()
     personar = res.personar()
-    i_snitt = [y for y in pp.index if SNITT[0] <= y <= SNITT[1]]
+    i_snitt = [y for y in pp.index if u.period[0] <= y <= u.period[1]]
     bta = res.bta_totalt()
     rader = [{"Klimatkategori": c, "Nivå": NIVA[c], "t CO2e": round(float(tot[c])),
               "Andel av brutto": tot[c] / brutto if tot[c] > 0 and brutto else None,
               "kg CO2e per m² BTA": tot[c] * 1000 / bta if bta else None,
               "t per person och år, hela perioden": tot[c] / personar if personar else None,
-              f"t per person och år, snitt {SNITT[0]}–{SNITT[1]}": float(pp.loc[i_snitt, c].mean()) if i_snitt else None,
+              f"t per person och år, snitt {u.period[0]}–{u.period[1]}": float(pp.loc[i_snitt, c].mean()) if i_snitt else None,
               "t per person, ackumulerat": float(pp[c].sum()) if len(pp) else None} for c in u.kat]
     rader.append({"Klimatkategori": "Summa för urvalet", "Nivå": None, "t CO2e": round(float(tot.sum())), "Andel av brutto": None,
                   "kg CO2e per m² BTA": tot.sum() * 1000 / bta if bta else None,
                   "t per person och år, hela perioden": tot.sum() / personar if personar else None,
-                  f"t per person och år, snitt {SNITT[0]}–{SNITT[1]}": m["snitt"], "t per person, ackumulerat": m["ackumulerat"]})
+                  f"t per person och år, snitt {u.period[0]}–{u.period[1]}": m["snitt"], "t per person, ackumulerat": m["ackumulerat"]})
     rader.append({"Klimatkategori": "Budgetandel per person", "t per person och år, hela perioden": None,
-                  f"t per person och år, snitt {SNITT[0]}–{SNITT[1]}": m["snitt_budget"], "t per person, ackumulerat": m["ackumulerat_budget"]})
+                  f"t per person och år, snitt {u.period[0]}–{u.period[1]}": m["snitt_budget"], "t per person, ackumulerat": m["ackumulerat_budget"]})
     return pd.DataFrame(rader)
 
 
@@ -397,7 +517,7 @@ def nyckeltal(res, u: Urval, m: dict):
     slut = res.budget["slutar"][u.niva]
     c = st.columns([1, 1.35, 1.2, 0.95, 0.9])
     c[0].metric("Summa, t CO2e", fmt(tot.sum()), help=f"t CO2e för de valda kategorierna {res.ar()[0]}–{res.ar()[-1]}")
-    snitt_namn = f"{m['snitt_ar'][0]}–{m['snitt_ar'][1]}" if m["snitt_ar"] else f"{SNITT[0]}–{SNITT[1]}"
+    snitt_namn = f"{m['snitt_ar'][0]}–{m['snitt_ar'][1]}" if m["snitt_ar"] else f"{u.period[0]}–{u.period[1]}"
     c[1].metric(f"Snitt {snitt_namn}", f"{fmt(m['snitt'], 2)} t/person, år",
                 help=f"Medelvärdet av t CO2e per invånare och år {snitt_namn}. Budgetandelen för samma år: {fmt(m['snitt_budget'], 2)} t per person och år.")
     c[2].metric("Ackumulerat", f"{fmt(m['ackumulerat'], 1)} t/person",
@@ -449,7 +569,7 @@ def visa(res):
         _visa(forutsattningar(res))
     with flikar[2]:
         c = st.columns(3)
-        snitt_namn = f"{m['snitt_ar'][0]}–{m['snitt_ar'][1]}" if m["snitt_ar"] else f"{SNITT[0]}–{SNITT[1]}"
+        snitt_namn = f"{m['snitt_ar'][0]}–{m['snitt_ar'][1]}" if m["snitt_ar"] else f"{u.period[0]}–{u.period[1]}"
         c[0].metric(f"Snitt {snitt_namn}", f"{fmt(m['snitt'], 2)} t per person och år",
                     delta=f"budgetandel {fmt(m['snitt_budget'], 2)} t", delta_color="off")
         c[1].metric(f"Ackumulerat {res.ar()[0]}–{res.ar()[-1]}", f"{fmt(m['ackumulerat'], 1)} t per person",
@@ -463,6 +583,8 @@ def visa(res):
                    "Byggskedet slås ut på dem som bor i området samma år och ger höga värden de första åren; välj bort Byggnad och "
                    "Anläggning i urvalet för att se invånarnas egna utsläpp.")
     with flikar[3]:
+        visa_person_mot_budget(res, u)
+        st.divider()
         b = res.budget
         c = st.columns(4)
         c[0].metric("Global budget", f"{fmt(b['global_gt'])} Gt CO2", help=f"{ss.scen['budget']['temperatur']} °C, {ss.scen['budget']['sannolikhet']} % sannolikhet")

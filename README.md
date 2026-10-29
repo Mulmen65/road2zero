@@ -2,7 +2,7 @@
 
 Klimatberäkning för stadsdelar utan karta. Modellen räknar tio klimatkategorier år för år och jämför nettoutsläppen med en vetenskapligt baserad koldioxidbudget (Forster m.fl. 2026), fördelad lika per person på de invånare som faktiskt bor i området.
 
-Appen startar med ett tomt projekt. Alla schabloner är förifyllda och varje värde hänvisar till en publicerad källa eller är tydligt markerat som modellval.
+Appen startar med standardprojektet Jägersro (Svensk Travsports del, utbyggnad 2030–2045); sidopanelen kan också börja med ett tomt projekt. Alla schabloner är förifyllda och varje värde hänvisar till en publicerad källa eller är tydligt markerat som modellval.
 
 ## Flikar
 
@@ -10,7 +10,7 @@ Appen startar med ett tomt projekt. Alla schabloner är förifyllda och varje v�
 |---|---|
 | Indata | Moduler 0–8 och klimatbudget. Byggbeståndet anges som andelar med egen byggnadstyp, stomme och egna energival. |
 | Emissionsfaktorer över tid | Startvärden 2026 och årlig förändring i procent per period 2027–2100 för byggpåverkan per stomme, anläggning, el, fjärrvärme, bilproduktion, förbränningsbilar, el- och laddhybridbilar, bilinnehav, körsträcka, mat, övrig konsumtion, flyg och offentlig sektor. |
-| Resultat | Välj vilka klimatkategorier som ska ingå (förvalt efter redovisningsnivå) och om flygets höghöjdseffekt ska räknas med. Nyckeltal och underflikar: Översikt (summa per kategori, vattenfall, trädkarta med delposter), Över tid (per år, ackumulerat, en panel per kategori), Per person (t CO2e per person och år, ackumulerat per person och snitt 2027–2050, jämfört med budgetandelen), Klimatbudget, Tabeller och export (t CO2e, t per person och år eller kg per m² BTA; CSV och Excel) samt Källor och beräkning för de valda kategorierna. |
+| Resultat | Välj vilka klimatkategorier som ska ingå (förvalt efter redovisningsnivå) och om flygets höghöjdseffekt ska räknas med. Nyckeltal och underflikar: Översikt (summa per kategori, vattenfall, trädkarta med delposter, bland annat kosten per kostprofil), Över tid (per år, ackumulerat, en panel per kategori), Per person (t CO2e per person och år, ackumulerat per person och snitt för en valbar analysperiod, standard 2027–2050, jämfört med budgetandelen), Klimatbudget (snitt per person mot budgetutrymmet per person för valfri temperatur 1,5–2,0 °C och sannolikhet, inklusive andra växthusgaser, samt ackumulerat mot stadsdelens budget), Tabeller och export (t CO2e, t per person och år eller kg per m² BTA; CSV och Excel) samt Källor och beräkning för de valda kategorierna. |
 | Beräkningar | Formler, steg, parametrar och mellanled för varje modul. |
 | Faktorer och parametrar | Hela faktabiblioteket med värde, enhet, statusklass och källa. Egna värden kan anges per parameter. |
 | Referenser | Alla källor, grupperade, med länk och var de används. |

@@ -16,12 +16,17 @@ from ..kontext import Kontext
 MODUL = "Klimatbudget"
 
 
+def global_gt(fb, temperatur, sannolikhet) -> float:
+    """Kvarvarande global koldioxidbudget från 2026 (Gt CO2) för en temperaturgräns och sannolikhet."""
+    d = fb.budget
+    r = d[(d["temperatur"] == str(temperatur)) & (d["sannolikhet"].astype(int) == int(sannolikhet))]
+    return float(r.iloc[0]["gt_co2"])
+
+
 def global_budget(k: Kontext) -> float:
     b = k.scen["budget"]
-    d = k.fb.budget
-    r = d[(d["temperatur"] == str(b["temperatur"])) & (d["sannolikhet"].astype(int) == int(b["sannolikhet"]))]
     k.tabell("budget_forster2026")
-    return float(r.iloc[0]["gt_co2"])
+    return global_gt(k.fb, b["temperatur"], b["sannolikhet"])
 
 
 def bana(B: float, E0: float, n: int, y0: int = 2026) -> tuple[list[float], str]:
@@ -36,16 +41,22 @@ def bana(B: float, E0: float, n: int, y0: int = 2026) -> tuple[list[float], str]
     return out, f"Linjärt till noll på {T:.1f} år".replace(".", ",")
 
 
+def andel_per_person(fb, B: float, E0: float, kf: float, ar: list[int]) -> tuple[dict[int, float], str]:
+    """Andel per person och år (t CO2e, med påslag kf för andra växthusgaser) av en global budget B, för åren i ar.
+    År före 2026 får ingen budget."""
+    pop = Kurva({float(a): float(v) for a, v in zip(fb.befolkning["ar"], fb.befolkning["miljarder"])})
+    ar_bana = [y for y in ar if y >= 2026]
+    E, text = bana(B, E0, len(ar_bana))
+    return {y: E[i] * kf / pop(y) for i, y in enumerate(ar_bana)}, text
+
+
 def berakna(k: Kontext, invanare: dict[int, float], netto: pd.DataFrame) -> dict:
     """netto: DataFrame med kolumnerna ar, niva1, niva2, niva3 (t CO2e per år)."""
     B = global_budget(k)
     E0 = k.p("budget.e0"); kf = k.p("budget.k")
     k.tabell("befolkning_unwpp2024")
-    pop = Kurva({float(a): float(v) for a, v in zip(k.fb.befolkning["ar"], k.fb.befolkning["miljarder"])})
     # banan börjar 2026 enligt Forster; år före 2026 får ingen budget
-    ar_bana = [y for y in k.ar if y >= 2026]
-    E, text = bana(B, E0, len(ar_bana))
-    per_person = {y: E[i] * kf / pop(y) for i, y in enumerate(ar_bana)}
+    per_person, text = andel_per_person(k.fb, B, E0, kf, k.ar)
     rows = []
     kum_b = 0.0; kum = {1: 0.0, 2: 0.0, 3: 0.0}
     for y in k.ar:

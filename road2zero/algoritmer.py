@@ -126,11 +126,12 @@ ALGORITMER = [
     },
     {
         "modul": "5 Matkonsumtion",
-        "kod": "road2zero/modules/konsumtion.py: mat_per_inv()",
-        "text": "Kostprofilmodell: andel per profil gånger klimatavtryck per profil och dag. Valfri kalibrering mot Konsumtionskompassens livsmedel och valfri kostomställning mot målandelar.",
+        "kod": "road2zero/modules/konsumtion.py: mat_per_profil()",
+        "text": "Kostprofilmodell: andel per profil gånger klimatavtryck per profil och dag. Valfri kalibrering mot Konsumtionskompassens livsmedel och valfri kostomställning mot målandelar. "
+                "Resultatet redovisas per kostprofil (vegan, vegetarian, fiskätare och tre nivåer av köttätare) som delposter under Matkonsumtion.",
         "formler": [
-            r"m(t) = \sum_p w_p(t) \cdot c_p \cdot 365 / 1000 \cdot I_{\mathrm{mat}}(t) \quad [\mathrm{t/inv,\,år}]",
-            r"E_{\mathrm{mat}}(t) = N(t) \cdot m(t)",
+            r"m_p(t) = w_p(t) \cdot c_p \cdot 365 / 1000 \cdot I_{\mathrm{mat}}(t) \quad [\mathrm{t/inv,\,år}], \qquad m(t) = \sum_p m_p(t)",
+            r"E_{\mathrm{mat},p}(t) = N(t) \cdot m_p(t) \qquad E_{\mathrm{mat}}(t) = \sum_p E_{\mathrm{mat},p}(t)",
         ],
         "steg": ["Andelar summerar till 100 %.", "Kalibrering skalar så att snittet blir 1,08 t (SEI 2026)."],
         "parametrar": ["mat.dagar", "mat.kalibrering_mal"],

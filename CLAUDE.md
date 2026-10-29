@@ -11,6 +11,7 @@ pip install -r requirements.txt
 python -m pytest -q                                   # ska alltid vara grönt innan commit
 python -m streamlit run streamlit_app.py --server.port 8501
 python verktyg/las_tabell_a.py                        # läser underlag/tabell_a_utokad.xlsx till faktabiblioteket
+python verktyg/jagersro.py                            # bygger standardprojektet ur underlag/jagersro_*
 ```
 
 Efter en ändring i gränssnittet: starta appen, öppna den i webbläsaren och titta på fliken du ändrat. Testerna fångar inte layoutfel.
@@ -25,6 +26,7 @@ Efter en ändring i gränssnittet: starta appen, öppna den i webbläsaren och t
 - `road2zero/data/` – faktabiblioteket (CSV med `;`, JSON). Varje värde har kolumnen `kalla` med id i `referenser.csv`.
 - `app/` – en fil per flik. `common.py` har `fmt()` (svenskt talformat), `editor()` och `senare()`.
 - `verktyg/las_tabell_a.py` – läser Tabell A utökad till `byggschabloner.csv`, `reduktionskurvor.csv` och byggraderna i `utveckling.csv`.
+- `verktyg/jagersro.py` – bygger `road2zero/data/standardprojekt_jagersro.json` ur Excel-underlaget och planskissen i `underlag/`.
 - `underlag/` – källfiler som skripten läser. Visas aldrig i gränssnittet.
 - `tests/test_motor.py` – regressionstester, källkonsistens och test för rent gränssnitt.
 
@@ -34,7 +36,9 @@ Efter en ändring i gränssnittet: starta appen, öppna den i webbläsaren och t
    Värden utan extern källa får källan `MODELLVAL` och statusen Modellval eller Antagande.
 2. **Rent gränssnitt.** Gränssnittet, faktabiblioteket och koden får inte hänvisa till internt eller tidigare bilagt underlag
    (Klimatanalys 3.0, Jägersro, Vägvis, Oceanhamnen, QA-underlag). Hänvisa till de publicerade källorna. `test_rent_granssnitt` kontrollerar.
-3. **Appen startar med ett tomt projekt.** `scenario.exempel()` är ett påhittat testfall och används bara av testerna.
+   Undantag: standardprojektets JSON-fil får bära projektets namn; koden och gränssnittet läser namnet ur filen.
+3. **Appen startar med standardprojektet** (`scenario.standardprojekt()`, Jägersro, Svensk Travsports del). Sidopanelen kan ladda det
+   igen eller börja med ett tomt projekt. `scenario.exempel()` är ett påhittat testfall och används bara av testerna.
 4. **Allt indata som påverkar resultatet har ett förifyllt värde med källa** som användaren kan ändra.
 5. **Svenskt talformat** i gränssnittet: mellanslag som tusentalsavgränsare och decimalkomma (`fmt()`).
 6. **Indataflikar som visar resultat** använder `senare()` så att tabeller och diagram fylls efter att alla indata lästs.
@@ -64,7 +68,8 @@ Efter en ändring i gränssnittet: starta appen, öppna den i webbläsaren och t
 - **Fjärrvärme:** ortens värde (användaren anger), förändring enligt EU:s referensscenario 2020.
 - **Mobilitet:** de boendes bilar: hushåll × bilar per hushåll × körsträcka; livscykelfaktor per drivlina (ICCT 2025, direktiv 2015/652).
   Drivlinemix 2025 (Trafikanalys). Bilproduktionen följer den globala elens klimatfaktor (IEA).
-- **Mat:** kostprofiler med andelar ur EPIC-Oxford-kohorten (Scarborough m.fl. 2023); utveckling enligt FAO:s globala utsläppsintensitet.
+- **Mat:** kostprofiler med andelar ur EPIC-Oxford-kohorten (Scarborough m.fl. 2023), redovisade som en delpost per kostprofil;
+  utveckling enligt FAO:s globala utsläppsintensitet.
 - **Övrig konsumtion:** sju kategorier ur Konsumtionskompassen 2.1, ändringsbara; följer bilproduktionens kurva (globalt elsnitt).
 - **Flygresor:** egen kategori, 1,1 t per invånare (Kamb och Larsson 2018, år 2017 med höghöjdseffekt); redovisas som två delposter,
   koldioxid från bränslet och höghöjdseffekt (faktor 170/90 ≈ 1,89). Utveckling enligt globalt snitt för flygbränsle (IATA).
@@ -73,7 +78,11 @@ Efter en ändring i gränssnittet: starta appen, öppna den i webbläsaren och t
 - **Mark:** Skogskolmodellen 10.4 för skog; åker, gräsmark och urban grönyta med kolförråd per pool som användaren kan ändra.
   Våtmark och befintlig bebyggelse ingår inte.
 - **Klimatbudget:** Forster m.fl. 2026, uppräknad för andra växthusgaser (56,8/43,2), fördelad lika per person på de invånare som
-  faktiskt bor i området år för år.
+  faktiskt bor i området år för år. Resultatfliken jämför också snittet per person och år för en vald analysperiod (standard
+  2027–2050) med budgetutrymmet per person för valfri temperatur (1,5–2,0 °C) och sannolikhet.
+- **Standardprojektet:** BTA per byggnadstyp ur underlaget, utbyggnad 2030–2045; varje typ 50 % Trä BÄST klass A, 25 % Betong BAU
+  klass C, 25 % Betong BÄST klass A. Anläggning ur planskissens färgytor skalade till 401 000 m², minus byggnadernas BYA.
+  3 000 stadsträd i jämn takt 2030–2045. Förändrad markanvändning är inte ifylld.
 
 ## Kända osäkerheter
 

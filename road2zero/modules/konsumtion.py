@@ -6,7 +6,9 @@ from __future__ import annotations
 from ..kontext import Kontext
 
 
-def mat_per_inv(k: Kontext, y: int) -> float:
+def mat_per_profil(k: Kontext, y: int) -> dict[str, float]:
+    """t CO2e per invånare och år per kostprofil: profilens andel gånger dess klimatavtryck (EPIC-Oxford), med omställning,
+    kalibrering och matproduktionens index. Summan är kosten per invånare."""
     m = k.scen["mat"]
     dagar = k.p("mat.dagar")
     k.tabell("kostprofiler")
@@ -15,11 +17,15 @@ def mat_per_inv(k: Kontext, y: int) -> float:
         y0, y1 = k.ar[0], int(m.get("malar", 2045))
         w = 1.0 if y >= y1 else max(0.0, (y - y0) / max(1, y1 - y0))
         andel = {p: (1 - w) * andel[p] + w * float(m["mal_andelar"].get(p, andel[p])) for p in andel}
-    t = sum(andel[p] * float(m["avtryck"][p]) for p in andel) * dagar / 1000
+    skala = k.index("mat", y)
     if m.get("kalibrering"):
         bas = sum(float(m["andelar"][p]) * float(m["avtryck"][p]) for p in andel) * dagar / 1000
-        t *= k.p("mat.kalibrering_mal") / bas if bas else 1
-    return t * k.index("mat", y)
+        skala *= k.p("mat.kalibrering_mal") / bas if bas else 1
+    return {p: andel[p] * float(m["avtryck"][p]) * dagar / 1000 * skala for p in andel}
+
+
+def mat_per_inv(k: Kontext, y: int) -> float:
+    return sum(mat_per_profil(k, y).values())
 
 
 def berakna(k: Kontext, invanare: dict[int, float]):
@@ -28,6 +34,7 @@ def berakna(k: Kontext, invanare: dict[int, float]):
     k.tabell("ovrig_konsumtion")
     k.anvanda.update({"ovr.hushall_total", "flyg.per_inv", "off.konsumtion", "off.investeringar", "off.andel"})
     namn = {r.kategori: r.namn for r in k.fb.ovrig.itertuples()}
+    profilnamn = {r.profil: r.namn for r in k.fb.kostprofiler.itertuples()}
     summa = {"mat": 0.0, "ovrig": 0.0, "flyg": 0.0, "off": 0.0}
     hoghojd = k.p("flyg.hoghojd_faktor")
     bransle = 1 / hoghojd if hoghojd > 0 else 1.0     # andel av flygets klimatpåverkan som är koldioxid från bränslet
@@ -35,8 +42,8 @@ def berakna(k: Kontext, invanare: dict[int, float]):
         n = invanare.get(y, 0.0)
         if n <= 0:
             continue
-        v = n * mat_per_inv(k, y)
-        k.add("Matkonsumtion", "Kost", "5 Matkonsumtion", y, v); summa["mat"] += v
+        for p, t in mat_per_profil(k, y).items():
+            k.add("Matkonsumtion", profilnamn.get(p, p), "5 Matkonsumtion", y, n * t); summa["mat"] += n * t
         fo = k.index("ovrig", y)
         for kat, t in ovr["varden"].items():
             v = n * float(t) * fo
@@ -51,6 +58,9 @@ def berakna(k: Kontext, invanare: dict[int, float]):
         k.add("Offentliga investeringar", "Offentlig andel av investeringarna", "7 Offentlig sektor", y, v2)
         summa["off"] += v1 + v2
     personar = sum(invanare.values())
+    for p, t in mat_per_profil(k, k.ar[0]).items():
+        k.steg("5 Matkonsumtion", f"Kost per invånare första året: {profilnamn.get(p, p)}", round(t, 3), "t CO2e/år",
+               f"andel {float(s['mat']['andelar'][p]):.1%} × {float(s['mat']['avtryck'][p])} kg CO2e per dag".replace(".", ","))
     k.steg("5 Matkonsumtion", "Kost per invånare första året", round(mat_per_inv(k, k.ar[0]), 3), "t CO2e/år",
            "kalibrerad" if s["mat"].get("kalibrering") else "okalibrerad")
     k.steg("5 Matkonsumtion", "Matkonsumtion totalt", round(summa["mat"], 1), "t CO2e", f"{personar:,.1f} personår".replace(",", " "))

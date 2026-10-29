@@ -22,9 +22,10 @@ def berakna(k: Kontext):
         f = k.fb.ytschablon(r["typ"], r.get("utforande", "standard"))
         tot = float(r["yta_m2"] or 0) * f
         ar = _ar(r)
+        namn = r.get("namn") or ANLAGGNINGSTYPER.get(r["typ"], r["typ"])
         for y in ar:
-            k.add("Anläggning", ANLAGGNINGSTYPER.get(r["typ"], r["typ"]), MODUL, y, tot / len(ar) * k.index("anl", y))
-        k.steg(MODUL, f"Yta: {ANLAGGNINGSTYPER.get(r['typ'], r['typ'])}, nivå 2026", round(tot, 1), "t CO2e",
+            k.add("Anläggning", namn, MODUL, y, tot / len(ar) * k.index("anl", y))
+        k.steg(MODUL, f"Yta: {namn}, nivå 2026", round(tot, 1), "t CO2e",
                f"{float(r['yta_m2']):,.0f} m² × {f*1000:g} kg/m² ({r.get('utforande', 'standard')})".replace(",", " "))
     for r in a.get("betong", []):
         pid = "anl.betong_klimatforbattrad" if r.get("utforande") == "klimatförbättrad" else "anl.betong_standard"

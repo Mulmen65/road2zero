@@ -268,9 +268,9 @@ def _kolinlagring(b: dict) -> float:
     return sum(takt(b).values()) * v * eget_param(VIRKESPRODUKTER[virkesprodukt(b)]) / 1000
 
 
-def _bygg_df():
+def _bygg_df(andelar: list[dict] | None = None):
     rader = []
-    for b in ss.scen["byggnader"]:
+    for b in ss.scen["byggnader"] if andelar is None else andelar:
         rader.append({
             "Byggnadstyp": BYGGNADSTYPER[b["typ"]][0], "Stomme": STOMMAR.get(b.get("stomme"), "Generisk"), "BTA (m²)": float(b["bta"]),
             "Första år klar": int(b["forsta_ar"]), "Sista år klar": int(b["sista_ar"]), "Fördelning": b.get("fordelning", "jämn"),
@@ -290,13 +290,14 @@ def _bygg_df():
     return df
 
 
-def _las_bygg_df(df: pd.DataFrame) -> tuple[list[dict], list[str]]:
-    """Läser tabellen över byggbeståndet. Rättar energival som inte passar byggnadstypen och returnerar vad som rättades."""
-    gamla = ss.scen["byggnader"]
+def _las_bygg_df(df: pd.DataFrame, gamla: list[dict] | None = None, standardtyp: str = "flerbostadshus") -> tuple[list[dict], list[str]]:
+    """Läser en tabell över byggbeståndet. Rättar energival som inte passar byggnadstypen och returnerar vad som rättades.
+    gamla är andelarna som tabellen byggdes av; deras egna utbyggnadstakter behålls."""
+    gamla = ss.scen["byggnader"] if gamla is None else gamla
     p0 = int(ss.scen["projekt"]["startar"])
     nya, rattat = [], []
     for idx, r in df.iterrows():
-        typ = TYP_FRAN_NAMN.get(tal(r["Byggnadstyp"], "Flerbostadshus"), "flerbostadshus")
+        typ = TYP_FRAN_NAMN.get(tal(r["Byggnadstyp"], BYGGNADSTYPER[standardtyp][0]), standardtyp)
         st_ = STOMME_FRAN_NAMN.get(tal(r["Stomme"], "Generisk"), "generisk")
         a0 = int(tal(r["Första år klar"], p0 + 2))
         klass = tal(r["Energiklass"], standardklass(typ))
@@ -325,17 +326,8 @@ def _las_bygg_df(df: pd.DataFrame) -> tuple[list[dict], list[str]]:
     return nya, rattat
 
 
-def byggnader():
-    _byggare()
-
-    st.markdown("##### Byggbeståndet")
-    if not ss.scen["byggnader"]:
-        st.info("Inga andelar ännu. Lägg till byggbestånd i formuläret ovan, eller lägg till rader direkt i tabellen.")
-    st.caption("En rad per andel av byggbeståndet. Byggnadstyp, stomme och energival hör till samma BTA. Fjärrvärme (%) är andelen av "
-               "fastighetsvärmen från fjärrvärme; resten är värmepump (el). Köpt el och köpt fjärrvärme per m² BTA är valfria och ersätter "
-               "energiklassens värden. Trä-produkt och virke gäller Trä BAU och Trä BÄST och ger kolinlagring som negativt utsläpp. "
-               "Tomma fält betyder att schablonen med källa används.")
-    df = editor("byggnader", _bygg_df, num_rows="dynamic", column_config={
+def _bygg_kolumner() -> dict:
+    return {
         "Byggnadstyp": COL.SelectboxColumn(options=[v[0] for v in BYGGNADSTYPER.values()], required=True),
         "Stomme": COL.SelectboxColumn(options=list(STOMMAR.values()), required=True, help="Byggpåverkan per typ och stomme visas i tabellen Härledda värden"),
         "BTA (m²)": COL.NumberColumn(min_value=0, step=100, format="%d", required=True),
@@ -356,10 +348,38 @@ def byggnader():
                                               help="Mängd inbyggt stomvirke. Tomt = schablonen 0,15 m³/m² BTA för trästomme; räknas inte för andra stommar"),
         "Eget byggvärde (kg CO2e/m²)": COL.NumberColumn(min_value=0, step=5, help="Ersätter schablonen och ändras inte över tid"),
         "Namn (valfritt)": COL.TextColumn(),
-    })
-    nya, rattat = _las_bygg_df(df)
+    }
+
+
+def byggnader():
+    _byggare()
+
+    st.markdown("##### Byggbeståndet")
+    if not ss.scen["byggnader"]:
+        st.info("Inga andelar ännu. Lägg till byggbestånd i formuläret ovan, eller lägg till rader direkt i tabellen.")
+    st.caption("En rad per andel av byggbeståndet. Byggnadstyp, stomme och energival hör till samma BTA. Fjärrvärme (%) är andelen av "
+               "fastighetsvärmen från fjärrvärme; resten är värmepump (el). Köpt el och köpt fjärrvärme per m² BTA är valfria och ersätter "
+               "energiklassens värden. Trä-produkt och virke gäller Trä BAU och Trä BÄST och ger kolinlagring som negativt utsläpp. "
+               "Tomma fält betyder att schablonen med källa används.")
+    grupper: dict[str, list[dict]] = {}
+    for b in ss.scen["byggnader"]:
+        grupper.setdefault(b["typ"], []).append(b)
+    nya, rattat, flyttad = [], [], False
+    if not grupper:
+        df = editor("byggnader", _bygg_df, num_rows="dynamic", column_config=_bygg_kolumner())
+        nya, rattat = _las_bygg_df(df)
+    for typ in [t for t in BYGGNADSTYPER if t in grupper]:
+        rader = grupper[typ]
+        with st.expander(BYGGNADSTYPER[typ][0], expanded=True):
+            st.caption(f"{len(rader)} {'andel' if len(rader) == 1 else 'andelar'} · {fmt(sum(float(b['bta']) for b in rader))} m² BTA · "
+                       + ", ".join(f"{STOMMAR.get(b['stomme'], b['stomme'])} {b.get('energiklass')} "
+                                   f"{fmt(float(b['bta']) / (sum(float(x['bta']) for x in rader) or 1) * 100)} %" for b in rader))
+            df = editor(f"byggnader_{typ}", lambda r=rader: _bygg_df(r), num_rows="dynamic", column_config=_bygg_kolumner())
+            n, r_ = _las_bygg_df(df, rader, typ)
+            flyttad |= any(b["typ"] != typ for b in n)
+            nya += n; rattat += r_
     ss.scen["byggnader"] = nya
-    if rattat:
+    if rattat or flyttad:          # rättade energival eller ändrad byggnadstyp: bygg om avsnitten
         ss["bygg_rattat"] = rattat
         ny_version(); st.rerun()
     for t in ss.pop("bygg_rattat", []):
@@ -465,18 +485,20 @@ def anlaggning():
     p0 = ss.scen["projekt"]["startar"] + 1
     st.markdown("##### Ytor per anläggningstyp")
     df = editor("ytor", lambda: pd.DataFrame([{"Typ": ANLAGGNINGSTYPER[r["typ"]], "Utförande": r.get("utforande", "standard"), "Yta (m²)": float(r["yta_m2"]),
-                                               "Första år": int(r["forsta_ar"]), "Sista år": int(r["sista_ar"])} for r in a["ytor"]],
-                                             columns=["Typ", "Utförande", "Yta (m²)", "Första år", "Sista år"]),
+                                               "Första år": int(r["forsta_ar"]), "Sista år": int(r["sista_ar"]), "Namn (valfritt)": r.get("namn") or ""}
+                                              for r in a["ytor"]],
+                                             columns=["Typ", "Utförande", "Yta (m²)", "Första år", "Sista år", "Namn (valfritt)"]),
                 num_rows="dynamic", column_config={
                     "Typ": COL.SelectboxColumn(options=list(ANLAGGNINGSTYPER.values()), required=True),
                     "Utförande": COL.SelectboxColumn(options=["standard", "klimatförbättrad"]),
                     "Yta (m²)": COL.NumberColumn(min_value=0, step=100, format="%d"),
-                    "Första år": COL.NumberColumn(format="%d", step=1), "Sista år": COL.NumberColumn(format="%d", step=1)})
+                    "Första år": COL.NumberColumn(format="%d", step=1), "Sista år": COL.NumberColumn(format="%d", step=1),
+                    "Namn (valfritt)": COL.TextColumn(help="Visas som delpost i resultatet i stället för typens namn")})
     a["ytor"] = [{"typ": ANLAGGNING_FRAN_NAMN.get(r["typ"], "lokalgata"), "utforande": r["utforande"], "yta_m2": r["yta_m2"],
-                  "forsta_ar": r["forsta_ar"], "sista_ar": max(r["sista_ar"], r["forsta_ar"])}
+                  "forsta_ar": r["forsta_ar"], "sista_ar": max(r["sista_ar"], r["forsta_ar"]), "namn": r["namn"]}
                  for r in _records(df, {"Typ": ("typ", str), "Utförande": ("utforande", str), "Yta (m²)": ("yta_m2", float),
-                                        "Första år": ("forsta_ar", int), "Sista år": ("sista_ar", int)},
-                                   {"typ": "Lokalgata", "utforande": "standard", "yta_m2": 0, "forsta_ar": p0, "sista_ar": p0})]
+                                        "Första år": ("forsta_ar", int), "Sista år": ("sista_ar", int), "Namn (valfritt)": ("namn", str)},
+                                   {"typ": "Lokalgata", "utforande": "standard", "yta_m2": 0, "forsta_ar": p0, "sista_ar": p0, "namn": ""})]
     tab = fb().ytschabloner.pivot(index="anlaggningstyp", columns="utforande", values="t_co2e_m2").astype(float) * 1000
     tab.index = [ANLAGGNINGSTYPER.get(i, i) for i in tab.index]
     with st.expander("Ytschabloner (kg CO2e/m²)"):

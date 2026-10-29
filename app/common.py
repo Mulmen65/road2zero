@@ -11,7 +11,7 @@ from road2zero import __version__
 from road2zero.engine import Resultat, berakna
 from road2zero.factlib import Faktabibliotek, ladda
 from road2zero.konstanter import KATEGORI_NAMN, NIVA_NAMN
-from road2zero.scenario import fran_json, till_json, tomt
+from road2zero.scenario import fran_json, standardprojekt, till_json, tomt
 
 LOGO = (Path(__file__).parent / "logo.svg").read_text(encoding="utf-8")
 ss = st.session_state
@@ -34,7 +34,7 @@ def fb() -> Faktabibliotek:
 def init():
     ss["_senare"] = []
     if "scen" not in ss:
-        ss.scen = tomt(fb())
+        ss.scen = standardprojekt(fb())
         ss.v = 0
 
 
@@ -149,6 +149,9 @@ def sidopanel(res: Resultat):
             st.rerun()
         except Exception as e:  # noqa: BLE001
             sb.error(f"Filen kunde inte läsas: {e}")
+    std = standardprojekt(fb())
+    if sb.button("Ladda standardprojektet", width="stretch", help=f"{std['projekt']['namn']}: ersätter alla indata med standardprojektet"):
+        ladda_indata(std); st.rerun()
     if sb.button("Börja om med tomt projekt", width="stretch", help="Tar bort alla indata och återställer alla schabloner"):
         ladda_indata(tomt(fb())); st.rerun()
 

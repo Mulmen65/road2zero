@@ -1,0 +1,730 @@
+{
+  "modellversion": "0.6.0",
+  "projekt": {
+    "namn": "Jägersro, Svensk Travsports del",
+    "kommun": "Malmö",
+    "fas": "Planprogram",
+    "startar": 2026,
+    "slutar": 2076
+  },
+  "fjarrvarme": {
+    "startvarde": 83.0
+  },
+  "utveckling": {
+    "takt": {
+      "bygg.betong_bau": [
+        -5.71,
+        -5.98,
+        -1.44,
+        -1.53,
+        -1.23,
+        -0.89,
+        -0.72,
+        0.0
+      ],
+      "bygg.betong_bast": [
+        -9.24,
+        -5.92,
+        -1.65,
+        -1.8,
+        -0.97,
+        -1.05,
+        -0.87,
+        0.0
+      ],
+      "bygg.stal_bau": [
+        -5.71,
+        -5.98,
+        -2.18,
+        -2.0,
+        -1.76,
+        -1.23,
+        -0.82,
+        0.0
+      ],
+      "bygg.stal_bast": [
+        -9.24,
+        -5.92,
+        -4.36,
+        -3.2,
+        -2.47,
+        -1.42,
+        -0.39,
+        0.0
+      ],
+      "bygg.tra_bau": [
+        -5.71,
+        -5.98,
+        -1.08,
+        -1.12,
+        -0.78,
+        -0.41,
+        -0.42,
+        0.0
+      ],
+      "bygg.tra_bast": [
+        -9.24,
+        -5.92,
+        -1.65,
+        -1.34,
+        -1.44,
+        -0.51,
+        -0.54,
+        0.0
+      ],
+      "anl": [
+        -5.71,
+        -5.98,
+        -1.44,
+        -1.53,
+        -1.23,
+        -0.89,
+        -0.72,
+        0.0
+      ],
+      "el": [
+        -3.54,
+        -2.52,
+        -2.88,
+        -2.09,
+        -2.33,
+        -2.33,
+        -2.33,
+        -2.33
+      ],
+      "fjv": [
+        -1.63,
+        -1.75,
+        -1.92,
+        -2.13,
+        -2.38,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bilprod": [
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7
+      ],
+      "forbranning": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bev": [
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0
+      ],
+      "phev": [
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7
+      ],
+      "bilar_hh": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "km_bil": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mat": [
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3
+      ],
+      "ovrig": [
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7
+      ],
+      "flyg": [
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8
+      ],
+      "offentlig": [
+        -5.74,
+        -13.96,
+        -13.96,
+        -13.96,
+        -13.96,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "anl_foljer_betong": true,
+    "ovrig_foljer_bilprod": true
+  },
+  "hushall": {
+    "personer_per_hushall": 2.1,
+    "bta_per_hushall": 110.0
+  },
+  "byggnader": [
+    {
+      "namn": "",
+      "typ": "flerbostadshus",
+      "stomme": "tra_bast",
+      "bta": 194734.5,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "A",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "flerbostadshus",
+      "stomme": "betong_bau",
+      "bta": 97367.2,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "flerbostadshus",
+      "stomme": "betong_bast",
+      "bta": 97367.2,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "A",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "småhus",
+      "stomme": "tra_bast",
+      "bta": 16364.0,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "A",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "småhus",
+      "stomme": "betong_bau",
+      "bta": 8182.0,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "småhus",
+      "stomme": "betong_bast",
+      "bta": 8182.0,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "A",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "kontor",
+      "stomme": "tra_bast",
+      "bta": 20238.0,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "A",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "kontor",
+      "stomme": "betong_bau",
+      "bta": 10119.0,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "kontor",
+      "stomme": "betong_bast",
+      "bta": 10119.0,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "A",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "skola",
+      "stomme": "tra_bast",
+      "bta": 12527.0,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "A",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "skola",
+      "stomme": "betong_bau",
+      "bta": 6263.5,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "skola",
+      "stomme": "betong_bast",
+      "bta": 6263.5,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "A",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "mobilitetshus",
+      "stomme": "tra_bast",
+      "bta": 29770.0,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "mobilitetshus",
+      "stomme": "betong_bau",
+      "bta": 14885.0,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "",
+      "typ": "mobilitetshus",
+      "stomme": "betong_bast",
+      "bta": 14885.0,
+      "forsta_ar": 2030,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    }
+  ],
+  "anlaggning": {
+    "ytor": [
+      {
+        "typ": "bostadsgard",
+        "utforande": "standard",
+        "yta_m2": 65890.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2045,
+        "namn": "Tomtyta bostäder, handel och kontor samt LSS, utan byggnader"
+      },
+      {
+        "typ": "skolgard",
+        "utforande": "standard",
+        "yta_m2": 59330.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2045,
+        "namn": "Tomtyta skola och förskola, utan byggnader"
+      },
+      {
+        "typ": "markparkering",
+        "utforande": "standard",
+        "yta_m2": 5880.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2045,
+        "namn": "Tomtyta mobilitetshus, utan byggnader"
+      },
+      {
+        "typ": "lokalgata",
+        "utforande": "standard",
+        "yta_m2": 68300.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2045,
+        "namn": "Gator, torg och övrigt"
+      },
+      {
+        "typ": "gc_vag",
+        "utforande": "standard",
+        "yta_m2": 8490.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2045,
+        "namn": "Gångfartsgator och gröna gångfartsgator"
+      },
+      {
+        "typ": "park",
+        "utforande": "standard",
+        "yta_m2": 64550.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2045,
+        "namn": "Park, natur med dammar och urbana gröningar"
+      }
+    ],
+    "massor": [],
+    "betong": [],
+    "ledningar": [],
+    "engangsvarden": []
+  },
+  "mark": {
+    "overgangar": [],
+    "pooler": {},
+    "bevarande": {}
+  },
+  "mobilitet": {
+    "kommunvarden": true,
+    "bilar_per_hushall": 0.581,
+    "km_per_bil": 11892.0,
+    "mix": {
+      "petrol": 0.37,
+      "diesel": 0.36,
+      "hev": 0.05,
+      "bev": 0.11,
+      "phev": 0.1,
+      "biogas": 0.01
+    },
+    "phev_eldrift": 0.35,
+    "bensin_fossil": 0.92,
+    "diesel_fossil": 0.93
+  },
+  "mat": {
+    "andelar": {
+      "vegan": 0.037,
+      "vegetarian": 0.284,
+      "fisk": 0.146,
+      "kott_lag": 0.168,
+      "kott_medel": 0.216,
+      "kott_hog": 0.149
+    },
+    "avtryck": {
+      "vegan": 2.47,
+      "vegetarian": 4.16,
+      "fisk": 2.74,
+      "kott_lag": 5.37,
+      "kott_medel": 7.04,
+      "kott_hog": 10.24
+    },
+    "kalibrering": false,
+    "omstallning": false,
+    "mal_andelar": {
+      "vegan": 0.037,
+      "vegetarian": 0.284,
+      "fisk": 0.146,
+      "kott_lag": 0.168,
+      "kott_medel": 0.216,
+      "kott_hog": 0.149
+    },
+    "malar": 2045
+  },
+  "ovrig": {
+    "varden": {
+      "fritid": 0.4314,
+      "ovrigt": 0.2696,
+      "klader": 0.2157,
+      "mobler": 0.2157,
+      "restaurang": 0.2157,
+      "kommunikation": 0.1618,
+      "alkohol": 0.1078
+    }
+  },
+  "flyg": {
+    "per_inv": 1.1
+  },
+  "offentlig": {
+    "konsumtion": 0.83,
+    "investeringar": 2.09,
+    "andel": 0.18
+  },
+  "negativa": {
+    "biokol": [],
+    "trad": [
+      {
+        "antal": 187.5,
+        "planteringsar": 2030
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2031
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2032
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2033
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2034
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2035
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2036
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2037
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2038
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2039
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2040
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2041
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2042
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2043
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2044
+      },
+      {
+        "antal": 187.5,
+        "planteringsar": 2045
+      }
+    ]
+  },
+  "budget": {
+    "temperatur": "1,5",
+    "sannolikhet": 50,
+    "niva": 3
+  },
+  "parametrar": {}
+}

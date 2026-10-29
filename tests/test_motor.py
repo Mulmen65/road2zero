@@ -9,7 +9,8 @@ from road2zero.algoritmer import ALGORITMER, TABELLKALLOR
 from road2zero.engine import berakna
 from road2zero.factlib import ladda
 from road2zero.modules.byggnader import energi_kwh_m2
-from road2zero.scenario import exempel, fran_json, ny_andel, takt, till_json, tomt, validera
+from road2zero.modules.budget import andel_per_person, global_gt
+from road2zero.scenario import exempel, fran_json, ny_andel, standardprojekt, takt, till_json, tomt, validera
 from road2zero.utveckling import PERIODER, Utveckling
 
 ROT = Path(__file__).resolve().parents[1]
@@ -285,7 +286,42 @@ def test_rent_granssnitt():
     filer = list((ROT / "app").glob("*.py")) + list((ROT / "road2zero").rglob("*.py")) + list((ROT / "road2zero" / "data").glob("*.csv")) \
         + list((ROT / "road2zero" / "data").glob("*.json")) + [ROT / "streamlit_app.py"]
     for f in filer:
-        if f.name == "skogskol_kurvbibliotek.csv":
+        if f.name in ("skogskol_kurvbibliotek.csv", "standardprojekt_jagersro.json"):   # standardprojektet får bära sitt namn
             continue
         for nr, rad in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
             assert not (text.search(rad) or kallid.search(rad)), f"{f.relative_to(ROT)}:{nr}: {rad[:120]}"
+
+
+def test_kost_per_kostprofil(res):
+    """Matkonsumtionen redovisas per kostprofil, och delposterna summerar till kategorins total."""
+    d = res.lang[res.lang["kategori"] == "Matkonsumtion"]
+    assert set(d["delpost"]) == set(ladda().kostprofiler["namn"])
+    assert round(d["t"].sum()) == FORVANTAT["Matkonsumtion"]
+
+
+def test_budget_per_person_samma_som_modulen(res):
+    """Budgetandelen per person kan räknas för valfri temperatur och sannolikhet med samma bana som modulen."""
+    fb = ladda()
+    s = exempel(fb)
+    andel, _ = andel_per_person(fb, global_gt(fb, s["budget"]["temperatur"], s["budget"]["sannolikhet"]),
+                                fb.param("budget.e0"), fb.param("budget.k"), res.ar())
+    t = res.budget["tabell"].set_index("ar")["andel_per_person_t"]
+    for y, v in andel.items():
+        assert v == pytest.approx(t[y])
+    assert global_gt(fb, "2,0", 90) > global_gt(fb, "1,5", 90)
+
+
+def test_standardprojekt():
+    """Appen startar med standardprojektet: 15 andelar, BTA ur underlaget, 3 000 träd och anläggning på 2030–2045."""
+    fb = ladda()
+    s = standardprojekt(fb)
+    assert not [f for f in validera(s, fb) if f[0] == "fel"]
+    assert len(s["byggnader"]) == 15
+    assert sum(b["bta"] for b in s["byggnader"]) == pytest.approx(547267, abs=1)
+    for typ in {b["typ"] for b in s["byggnader"]}:
+        andelar = sorted(b["bta"] for b in s["byggnader"] if b["typ"] == typ)
+        assert andelar[2] == pytest.approx(2 * andelar[0], rel=1e-3)          # 50/25/25
+    assert sum(t["antal"] for t in s["negativa"]["trad"]) == pytest.approx(3000)
+    assert {(r["forsta_ar"], r["sista_ar"]) for r in s["anlaggning"]["ytor"]} == {(2030, 2045)}
+    r = berakna(s)
+    assert r.totalt_per_kategori()["Byggnad"] > 0

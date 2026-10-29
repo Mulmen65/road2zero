@@ -6,5 +6,7 @@ Källfiler som skripten i `verktyg/` läser. Filerna visas aldrig i appen; appen
 | Fil | Läses av | Ger |
 |---|---|---|
 | `tabell_a_utokad.xlsx` | `python verktyg/las_tabell_a.py` | Startvärden per byggnadstyp och stomme, reduktionskurvor och standardtakter för byggpåverkan |
+| `jagersro_underlag.xlsx` | `python verktyg/jagersro.py` | BTA och byggnadsarea per objekt för standardprojektet |
+| `jagersro_markyta.webp` | `python verktyg/jagersro.py` | Planskissen med markyta per kategori; ytorna mäts pixelvis och skalas till 401 000 m² |
 
 Byt ut filen mot en ny version med samma bladnamn och kör skriptet och testerna. Håll repot privat om filerna inte ska vara offentliga.
