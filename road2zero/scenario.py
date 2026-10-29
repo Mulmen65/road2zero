@@ -21,7 +21,7 @@ def standard_mat(fb: Faktabibliotek) -> dict:
     return {
         "andelar": {r.profil: float(r.andel_standard) for r in kp.itertuples()},
         "avtryck": {r.profil: float(r.kg_co2e_per_dag) for r in kp.itertuples()},
-        "kalibrering": False,
+        "kalibrering": True,       # kostprofilernas avtryck skalas till svensk nivå (mat.kalibrering_mal)
         "omstallning": False,
         "mal_andelar": {r.profil: float(r.andel_standard) for r in kp.itertuples()},
         "malar": 2045,

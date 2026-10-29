@@ -127,13 +127,13 @@ ALGORITMER = [
     {
         "modul": "5 Matkonsumtion",
         "kod": "road2zero/modules/konsumtion.py: mat_per_profil()",
-        "text": "Kostprofilmodell: andel per profil gånger klimatavtryck per profil och dag. Valfri kalibrering mot Konsumtionskompassens livsmedel och valfri kostomställning mot målandelar. "
+        "text": "Kostprofilmodell: andel per profil gånger klimatavtryck per profil och dag. Kalibrering mot svensk nivå (standard, 1,75 t per invånare och år enligt svenska LCA-studier) och valfri kostomställning mot målandelar. "
                 "Resultatet redovisas per kostprofil (vegan, vegetarian, fiskätare och tre nivåer av köttätare) som delposter under Matkonsumtion.",
         "formler": [
             r"m_p(t) = w_p(t) \cdot c_p \cdot 365 / 1000 \cdot I_{\mathrm{mat}}(t) \quad [\mathrm{t/inv,\,år}], \qquad m(t) = \sum_p m_p(t)",
             r"E_{\mathrm{mat},p}(t) = N(t) \cdot m_p(t) \qquad E_{\mathrm{mat}}(t) = \sum_p E_{\mathrm{mat},p}(t)",
         ],
-        "steg": ["Andelar summerar till 100 %.", "Kalibrering skalar så att snittet blir 1,08 t (SEI 2026)."],
+        "steg": ["Andelar summerar till 100 %.", "Kalibreringen skalar alla profiler med samma faktor, så att snittet år 2026 blir mat.kalibrering_mal (1,75 t); andelarna påverkar då bara fördelningen mellan profiler och kostomställningen.", "Utvecklingen följer den svenska trenden för livsmedel per person, −1,73 % per år (Naturvårdsverket 2008–2023)."],
         "parametrar": ["mat.dagar", "mat.kalibrering_mal"],
         "tabeller": ["kostprofiler", "utveckling"],
     },
@@ -147,7 +147,7 @@ ALGORITMER = [
                     r"E_{\mathrm{flyg}}(t) = N(t) \cdot f_{\mathrm{flyg}} \cdot I_{\mathrm{flyg}}(t)",
                     r"E_{\mathrm{flyg,\,bränsle}}(t) = E_{\mathrm{flyg}}(t) / h, \qquad E_{\mathrm{flyg,\,höghöjd}}(t) = E_{\mathrm{flyg}}(t) \cdot (1 - 1/h)"],
         "steg": ["Varje kategori kan ändras.",
-                 "f_flyg är flygresor per invånare och år (standard 1,1 t CO2e, år 2017). Flygandet var 2023 drygt 25 % lägre än före pandemin enligt Konsumtionskompassen; ange ett eget värde vid behov.",
+                 "f_flyg är flygresor per invånare och år (standard 0,88 t CO2e: 1,1 t år 2017 gånger 0,8 för att resandet ligger cirka 20 % under 2019 års nivå). Utvecklingen följer EU:s krav på hållbart flygbränsle (ReFuelEU Aviation) och bränsleeffektiviteten.",
                  "h är höghöjdsfaktorn 170/90 ≈ 1,89. Höghöjdseffekten är vetenskapligt osäker och redovisas som egen delpost, så att den kan väljas bort i resultatet.",
                  "Flygresor redovisas på nivå 2."],
         "parametrar": ["ovr.hushall_total", "flyg.per_inv", "flyg.hoghojd_faktor"],
@@ -209,7 +209,7 @@ TABELLKALLOR = {
     "energiklasser": ("Energiklasser per byggnadstyp", "BOVERKET_BBR,MODELLVAL"),
     "ytschabloner": ("Ytschabloner per anläggningstyp", "SBUF_SCHABLON"),
     "kurvor": ("Tidskurvor: el och fjärrvärme (underlag för standardtakten) och trädtillväxt", "EU_REF2020,ITREE"),
-    "utveckling": ("Emissionsfaktorer över tid: årlig förändring per period", "TABELL_A_UTOKAD,EU_REF2020,IEA_EL2026,TRAFA_KM_2025,FAO2025,IATA_EFF2024,IATA_SAF2025,EU_KLIMATLAG2026,EEA_TP2025"),
+    "utveckling": ("Emissionsfaktorer över tid: årlig förändring per period", "TABELL_A_UTOKAD,EU_REF2020,IEA_EL2026,TRAFA_KM_2025,NV_KONSUMTION,REFUELEU2023,IATA_EFF2024,EU_KLIMATLAG2026,EEA_TP2025"),
     "markpooler": ("Kolförråd per marktyp och pool", "KSLA2025,SLU2025"),
     "bevarande": ("Bevarad andel per markanvändning", "MODELLVAL"),
     "skogskol_kurvbibliotek": ("Skogskolmodellens kurvbibliotek per hektar", "SKOGSKOL104"),

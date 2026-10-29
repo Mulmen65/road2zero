@@ -57,9 +57,9 @@ mob.diesel.bio;Mobilitet och transport;Biodiesel, livscykel;16;g CO2e/MJ;Officie
 mob.biogas.ttw;Mobilitet och transport;Biogas, förbränning (fossil del);56.2;g CO2e/MJ;Modellantagande;MODELLVAL;Används bara för fossil gas
 mob.biogas.bio;Mobilitet och transport;Biogas, livscykel;1.3;g CO2e/MJ;Officiell statistik;NV_KLIMATKLIVET_2025;Biogas 4,7 g/kWh
 mat.dagar;Matkonsumtion;Dagar per år;365;dagar;Härlett;MODELLVAL;
-mat.kalibrering_mal;Matkonsumtion;Livsmedel i Konsumtionskompassen (för kalibrering);1.08;t CO2e per invånare och år;Officiell statistik;SEI2026;20 % av 5,39 t
+mat.kalibrering_mal;Matkonsumtion;Svensk kost, livscykelanalys (nivå för kalibrering);1.75;t CO2e per invånare och år;Modellval;BALTER2017,MODELLVAL;"Svenska LCA-studier ger 1,7–1,8 t per år, bland annat 4,7 kg CO2e per dag i LifeGene (Bälter m.fl. 2017); 1,75 t är valt mitt i intervallet. Konsumtionskompassen anger 1,08 t för livsmedel 2023 (input-output, SEI 2026)"
 ovr.hushall_total;Övrig konsumtion;Hushållens konsumtionsbaserade utsläpp;5.392;t CO2e per invånare och år;Officiell statistik;SEI2026;År 2023
-flyg.per_inv;Flygresor;Flygresor, inrikes och utrikes;1.1;t CO2e per invånare och år;Litteraturvärde;KAMB2018;"År 2017, med höghöjdseffekt: svenska befolkningens flygresor cirka 10 Mt CO2e delat på invånarna. Flygandet var 2023 drygt 25 % lägre än före pandemin"
+flyg.per_inv;Flygresor;Flygresor, inrikes och utrikes;0.88;t CO2e per invånare och år;Härlett;KAMB2018,TRANSPORTSTYRELSEN2024;"1,1 t år 2017 med höghöjdseffekt (Kamb och Larsson 2018) gånger 0,8: flygresandet 2023 var 79 % av 2019 års nivå och ökade 2 % till 2024 (Transportstyrelsen)"
 flyg.hoghojd_faktor;Flygresor;Höghöjdseffekt, faktor på koldioxiden från bränslet;1.89;CO2e/CO2;Litteraturvärde;KAMB2018;"170 g CO2e per personkilometer med höghöjdseffekt mot 90 g CO2 utan, år 2017. Vetenskapligt osäker; används bara för att dela upp flyget i två delposter"
 off.konsumtion;Offentliga investeringar;Offentlig konsumtion;0.83;t CO2e per invånare och år;Officiell statistik;NV_KONSUMTION,SEI2026;År 2023
 off.investeringar;Offentliga investeringar;Investeringar, offentliga och privata;2.09;t CO2e per invånare och år;Officiell statistik;NV_KONSUMTION,SEI2026;År 2023

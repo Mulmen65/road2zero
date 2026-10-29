@@ -68,11 +68,14 @@ Efter en ändring i gränssnittet: starta appen, öppna den i webbläsaren och t
 - **Fjärrvärme:** ortens värde (användaren anger), förändring enligt EU:s referensscenario 2020.
 - **Mobilitet:** de boendes bilar: hushåll × bilar per hushåll × körsträcka; livscykelfaktor per drivlina (ICCT 2025, direktiv 2015/652).
   Drivlinemix 2025 (Trafikanalys). Bilproduktionen följer den globala elens klimatfaktor (IEA).
-- **Mat:** kostprofiler med andelar ur EPIC-Oxford-kohorten (Scarborough m.fl. 2023), redovisade som en delpost per kostprofil;
-  utveckling enligt FAO:s globala utsläppsintensitet.
+- **Mat:** kostprofiler med andelar och avtryck ur EPIC-Oxford-kohorten (Scarborough m.fl. 2023), redovisade som en delpost per
+  kostprofil och som standard kalibrerade till svensk nivå 1,75 t per invånare och år (svenska LCA-studier, Bälter m.fl. 2017);
+  utveckling enligt den svenska trenden för livsmedel per person, −1,73 % per år (Naturvårdsverket 2008–2023).
 - **Övrig konsumtion:** sju kategorier ur Konsumtionskompassen 2.1, ändringsbara; följer bilproduktionens kurva (globalt elsnitt).
-- **Flygresor:** egen kategori, 1,1 t per invånare (Kamb och Larsson 2018, år 2017 med höghöjdseffekt); redovisas som två delposter,
-  koldioxid från bränslet och höghöjdseffekt (faktor 170/90 ≈ 1,89). Utveckling enligt globalt snitt för flygbränsle (IATA).
+- **Flygresor:** egen kategori, 0,88 t per invånare (Kamb och Larsson 2018: 1,1 t år 2017 med höghöjdseffekt, gånger 0,8 för
+  resandet efter pandemin enligt Transportstyrelsen); redovisas som två delposter, koldioxid från bränslet och höghöjdseffekt
+  (faktor 170/90 ≈ 1,89). Utveckling enligt ReFuelEU Aviation (hållbart flygbränsle, antagen livscykelminskning 70 %, bara på
+  koldioxiden) och bränsleeffektivitet −1,5 % per år (IATA).
 - **Offentlig sektor:** offentlig konsumtion plus bara den offentliga andelen av investeringarna; följer EU:s klimatmål
   (−55 % 2030, −90 % 2040 jämfört med 1990).
 - **Mark:** Skogskolmodellen 10.4 för skog; åker, gräsmark och urban grönyta med kolförråd per pool som användaren kan ändra.
@@ -86,7 +89,6 @@ Efter en ändring i gränssnittet: starta appen, öppna den i webbläsaren och t
 
 ## Kända osäkerheter
 
-- Fiskätarnas klimatavtryck (2,74 kg CO2e per dag, Scarborough m.fl. 2023) bryter ordningen mellan grupperna; ska kontrolleras.
 - Fullständig referens till Dodoo m.fl. 2026 saknas.
 - Boverkets rapport 2026:16 är inte genomläst.
 - Riksgenomsnitt för markkol 0–50 cm saknas; gräsmark och urban grönyta använder SLU:s länsvärde för Uppsala.

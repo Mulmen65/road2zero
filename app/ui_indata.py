@@ -721,8 +721,10 @@ def mat():
     if c1.button("Återställ standard", key=k("std_mat")):
         ss.scen["mat"] = standard_mat(fb()); ny_version(); st.rerun()
     with c2:
-        chk("Kalibrera mot Konsumtionskompassen", ("mat", "kalibrering"),
-            help=f"Skalar avtrycket så att snittet blir {fmt(eget_param('mat.kalibrering_mal'), 2)} t per invånare och år (livsmedel, SEI 2026)")
+        chk("Kalibrera mot svensk kost", ("mat", "kalibrering"),
+            help=f"Skalar kostprofilernas avtryck så att snittet blir {fmt(eget_param('mat.kalibrering_mal'), 2)} t per invånare och år "
+                 f"({param_info('mat.kalibrering_mal')}). Andelarna och avtrycken kommer från en brittisk kohort; kalibreringen ger svensk nivå. "
+                 "Utan kalibrering används kohortens värden direkt.")
     with c3:
         if chk("Kostomställning", ("mat", "omstallning")):
             num("Målår", ("mat", "malar"), min_value=2027, max_value=2100, step=1)
@@ -737,8 +739,8 @@ def mat():
         from road2zero.modules.konsumtion import mat_per_inv
         kx = Kontext(fb(), ss.scen)
         st.caption(f"Kost per invånare 2026: **{fmt(mat_per_inv(kx, 2026), 2)} t CO2e**, 2050: {fmt(mat_per_inv(kx, 2050), 2)} t med "
-                   "matproduktionens index i fliken Emissionsfaktorer över tid. Andelar och avtryck per kostprofil från EPIC-Oxford-kohorten, "
-                   + kalla_text("SCARBOROUGH2023") + ". Avtrycken ska kontrolleras mot artikelns tabell.")
+                   "matkonsumtionens index i fliken Emissionsfaktorer över tid. Andelar och avtryck per kostprofil från EPIC-Oxford-kohorten, "
+                   + kalla_text("SCARBOROUGH2023") + " (tabell 3, medianer för en kost på 2 000 kcal per dag).")
     senare(_kost)
     st.markdown("##### Modulens bidrag")
     bidrag("5 ")
@@ -766,10 +768,10 @@ def ovrig():
     with c2:
         st.markdown("##### Flygresor (egen klimatkategori)")
         num("Inrikes och utrikes flyg (t CO2e per invånare och år)", ("flyg", "per_inv"), min_value=0.0, step=0.05, format="%.2f")
-        kalla(f"Standard 1,1 t: {param_info('flyg.per_inv')}, år 2017 med höghöjdseffekt (170 g CO2e per personkilometer mot 90 g CO2 från bränslet). "
+        kalla(f"Standard {fmt(fb().param('flyg.per_inv'), 2)} t: {param_info('flyg.per_inv')}. Kamb och Larsson anger 1,1 t år 2017 med höghöjdseffekt "
+              "(170 g CO2e per personkilometer mot 90 g CO2 från bränslet); flygresandet har sedan dess minskat till cirka 80 %. "
               "Resultatet delas i två delposter, koldioxid från bränslet och höghöjdseffekt, och höghöjdseffekten kan väljas bort i fliken Resultat. "
-              "Konsumtionskompassen visar att flygresandet 2023 var drygt 25 % lägre än före pandemin. "
-              "Utvecklingen över tid (globalt snitt för flygbränsle) anges i fliken Emissionsfaktorer över tid.")
+              "Utvecklingen över tid (EU:s krav på hållbart flygbränsle och bränsleeffektivitet) anges i fliken Emissionsfaktorer över tid.")
     st.markdown("##### Modulens bidrag")
     bidrag("6 ")
 

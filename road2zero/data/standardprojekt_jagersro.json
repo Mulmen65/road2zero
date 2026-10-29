@@ -1,5 +1,5 @@
 {
-  "modellversion": "0.6.0",
+  "modellversion": "0.7.0",
   "projekt": {
     "namn": "Jägersro, Svensk Travsports del",
     "kommun": "Malmö",
@@ -163,14 +163,14 @@
         0.0
       ],
       "mat": [
-        -1.3,
-        -1.3,
-        -1.3,
-        -1.3,
-        -1.3,
-        -1.3,
-        -1.3,
-        -1.3
+        -1.73,
+        -1.73,
+        -1.73,
+        -1.73,
+        -1.73,
+        -1.73,
+        -1.73,
+        -1.73
       ],
       "ovrig": [
         -3.7,
@@ -183,14 +183,14 @@
         -3.7
       ],
       "flyg": [
-        -1.8,
-        -1.8,
-        -1.8,
-        -1.8,
-        -1.8,
-        -1.8,
-        -1.8,
-        -1.8
+        -1.88,
+        -2.58,
+        -2.65,
+        -2.19,
+        -4.09,
+        -1.5,
+        -1.5,
+        -1.5
       ],
       "offentlig": [
         -5.74,
@@ -616,12 +616,12 @@
     "avtryck": {
       "vegan": 2.47,
       "vegetarian": 4.16,
-      "fisk": 2.74,
+      "fisk": 4.74,
       "kott_lag": 5.37,
       "kott_medel": 7.04,
       "kott_hog": 10.24
     },
-    "kalibrering": false,
+    "kalibrering": true,
     "omstallning": false,
     "mal_andelar": {
       "vegan": 0.037,
@@ -645,7 +645,7 @@
     }
   },
   "flyg": {
-    "per_inv": 1.1
+    "per_inv": 0.88
   },
   "offentlig": {
     "konsumtion": 0.83,

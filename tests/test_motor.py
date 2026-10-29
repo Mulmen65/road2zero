@@ -17,7 +17,7 @@ ROT = Path(__file__).resolve().parents[1]
 
 FORVANTAT = {  # ton CO2e 2026–2076 för testfallet i scenario.exempel(), med standardtakterna i data/utveckling.csv
     "Byggnad": 17967, "Energi": 10268, "Anläggning": 2607, "Förändrad markanvändning": 2112,
-    "Mobilitet och transport": 17682, "Flygresor": 37993, "Matkonsumtion": 79973, "Övrig konsumtion": 36639,
+    "Mobilitet och transport": 17682, "Flygresor": 26839, "Matkonsumtion": 61460, "Övrig konsumtion": 36639,
     "Offentliga investeringar": 9539, "Negativa utsläpp": -5520,
 }
 
@@ -64,7 +64,7 @@ def test_budget(res):
 def test_budget_2_grader():
     s = exempel(); s["budget"].update(temperatur="2,0", sannolikhet=50)
     b = berakna(s).budget
-    assert b["slutar"][1] is None and b["slutar"][3] == 2049
+    assert b["slutar"][1] is None and b["slutar"][3] == 2053
 
 
 def test_halvarsregel(res):

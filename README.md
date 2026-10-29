@@ -39,8 +39,8 @@ Varje faktor har ett startvärde som gäller 2026 och en årlig förändring i p
 | Bilproduktion och övrig konsumtion | Global elens klimatfaktor −3,7 % per år | IEA Electricity 2026 |
 | Elbilar och laddhybrider | +3,0 respektive +1,7 procentenheter per år | Trafikanalys, körsträckor 2024 och 2025 |
 | Bilar per hushåll, körsträcka, förbränningsbilar | 0 % | Användarval |
-| Matproduktion | −1,30 % per år | FAO 2025 (utsläppsintensitet −25 % 2001–2023) |
-| Flyg | −1,8 % per år | IATA: bränsleeffektivitet och hållbart flygbränsle |
+| Matkonsumtion | −1,73 % per år | Naturvårdsverket: livsmedel per person −23 % 2008–2023 |
+| Flyg | −1,9 till −4,1 % per år till 2050, sedan −1,5 % | ReFuelEU Aviation (hållbart flygbränsle 6–70 %) och bränsleeffektivitet (IATA) |
 | Offentlig sektor | −5,74 % per år 2027–2030, −13,96 % per år 2031–2050, därefter 0 % | EU:s klimatlag: −55 % 2030, −90 % 2040; EEA 2025 |
 
 ## Arbeta med Claude Code
