@@ -383,6 +383,45 @@ def budget_per_temperatur(res, u: Urval, temp: str, sann: int):
     return fig
 
 
+def person_over_tid(res, u: Urval, temp: str, sann: int):
+    """Utsläpp per person och år över tiden mot budgetutrymmet per person och år för vald temperatur och sannolikhet."""
+    pp = per_person(res, u)
+    if pp.empty:
+        return None
+    kx = Kontext(fb(), ss.scen)
+    kf = kx.p("budget.k")
+    andel, _ = andel_per_person(fb(), global_gt(fb(), temp, sann), kx.p("budget.e0"), kf, res.ar())
+    ar = list(pp.index)
+    bud = [andel.get(y, 0.0) for y in ar]
+    fig = go.Figure()
+    for kat in u.kat:
+        if kat in pp and pp[kat].abs().sum():
+            fig.add_bar(x=ar, y=pp[kat], name=kat, marker=dict(color=FARG[kat], line=dict(color=SURF, width=1)),
+                        hovertemplate=f"{kat}: %{{y:,.2f}} t<extra></extra>")
+    fig.add_scatter(x=ar, y=[b / kf for b in bud], name="Budget, koldioxid", mode="lines", fill="tozeroy",
+                    fillcolor=rgba(BUDGET, 0.35), line=dict(color=BUDGET, width=1), hovertemplate="Budget, koldioxid: %{y:,.2f} t<extra></extra>")
+    fig.add_scatter(x=ar, y=bud, name="Budget med andra växthusgaser", mode="lines", fill="tonexty", fillcolor=rgba(BUDGET, 0.15),
+                    line=dict(color=BUDGET, width=2, dash="dash"), hovertemplate="Budget med andra växthusgaser: %{y:,.2f} t<extra></extra>")
+    summa = pp.sum(axis=1)
+    fig.add_scatter(x=ar, y=summa, name="Summa per person", mode="lines", line=dict(color=INK, width=2),
+                    hovertemplate="Summa: %{y:,.2f} t per person<extra></extra>")
+    i = [y for y in ar if u.period[0] <= y <= u.period[1]]
+    if i:
+        a0, a1 = min(i), max(i)
+        snitt = float(summa.loc[i].mean())
+        fig.add_vrect(x0=a0 - 0.5, x1=a1 + 0.5, fillcolor=rgba(MELLANBLA, 0.07), line_width=0)
+        fig.add_shape(type="line", x0=a0 - 0.5, x1=a1 + 0.5, y0=snitt, y1=snitt, line=dict(color=PETROL, width=2, dash="dot"))
+        fig.add_annotation(x=a1 + 0.5, y=snitt, text=f"Snitt {a0}–{a1}: {fmt(snitt, 2)} t", showarrow=False, xanchor="right",
+                           yanchor="bottom", font=dict(color=PETROL, size=12))
+    fig.update_layout(barmode="relative", bargap=0.18, hovermode="x unified")
+    fig = layout(fig, "Utsläpp och budgetutrymme per person, år för år",
+                 f"t CO2e per invånare och år · budget {temp} °C, {sann} % sannolikhet · skuggat: analysperioden",
+                 yt="t CO2e per person och år", hojd=520)
+    fig.update_yaxes(tickformat=",.1f")
+    fig.update_layout(margin=dict(l=10, r=10, t=72, b=120), legend=dict(yref="container", y=0.01, yanchor="bottom"))
+    return fig
+
+
 def visa_person_mot_budget(res, u: Urval):
     b = ss.scen["budget"]
     temps = list(dict.fromkeys(fb().budget["temperatur"]))
@@ -400,6 +439,9 @@ def visa_person_mot_budget(res, u: Urval):
         st.info("Inga invånare under analysperioden, så det finns inget att jämföra per person.")
         return
     _visa(fig)
+    f = person_over_tid(res, u, temp, sann)
+    if f is not None:
+        _visa(f)
     _visa(budget_per_temperatur(res, u, temp, sann))
     st.caption(f"Budgetutrymmet är den globala kvarvarande koldioxidbudgeten från 2026 (Forster m.fl. 2026) som en jämnt minskande bana, "
                f"räknad upp med {fmt(kf, 3)} (56,8/43,2) för andra växthusgaser och delad lika per person med världsbefolkningen år för år "
