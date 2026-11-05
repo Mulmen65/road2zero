@@ -7,7 +7,8 @@ const M = require(path.join(OP, 'app/model.js')), RZ = require(path.join(OP, 'ap
 const read = p => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
 const csv = f => fs.readFileSync(path.join(OP, '..', 'road2zero', 'data', f), 'utf8').trim().split(/\r?\n/).slice(1).map(l => l.split(';'));
 const B = {budget: csv('budget_forster2026.csv').map(([t, s, g]) => ({temperatur: t, sannolikhet: Number(s), gt_co2: Number(g)})),
-  befolkning: csv('befolkning_unwpp2024.csv').map(([a, m]) => ({ar: Number(a), miljarder: Number(m)})), e0: 43.0, k: 1.314815, farg: {}};
+  befolkning: csv('befolkning_unwpp2024.csv').map(([a, m]) => ({ar: Number(a), miljarder: Number(m)})), e0: 43.0, k: 1.314815, farg: {},
+  andelar: csv('budgetandelar.csv').map(([o, ar, h, bo, tr, fl, off, inv]) => ({omrade: o, ar: Number(ar), hushall_kg: Number(h), boende_kg: Number(bo), transport_kg: Number(tr), flyg_kg: Number(fl), offentlig_kg: Number(off), investeringar_kg: Number(inv)}))};
 const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, (msg || '') + ' ' + a + ' ≠ ' + b);
 let passed = 0; const test = (n, f) => { f(); passed++; console.log('✓ ' + n); };
 const D = {deso: read('data/kalla/deso_2025_malmo.geojson'), energi: read('data/energi_deklarationer.json'), mob: read('data/mobilitet_vagvis.json'), expl: read('data/exploatering_op2023.json')};
@@ -49,5 +50,32 @@ test('budget.py ger samma andel per person', () => {
   } catch (e) { console.log('  (Python saknas, jämförelsen hoppas över)'); return; }
   const a = JSON.parse(py), j = RZ.andelPerPerson(B, '1,7', 67, Array.from({length: 27}, (_, i) => 2024 + i));
   for (const [y, v] of Object.entries(a)) near(j[y], v, 1e-9, 'år ' + y);
+});
+test('budgetandelar enligt Konsumtionskompassen (Malmö 2022) mot hela fotavtrycket', () => {
+  const a = RZ.standardAndelar(B, 'Malmö'), F = 5754.14 + 830 + 2090;
+  near(a.boende, 1066.46 / F, 1e-12); near(a.investeringar, 2090 / F, 1e-12); near(a.transport, (1749.27 - 848) / F, 1e-12);
+  near(100 * a.boende, 12.3, 0.05); near(100 * a.investeringar, 24.1, 0.05); near(100 * a.transport, 10.4, 0.05);
+  near(RZ.standardAndelar(B, 'Malmö', 0.5).investeringar, 0.5 * 2090 / F, 1e-12);
+  assert.deepStrictEqual(B.andelar.map(r => r.omrade), ['Malmö', 'Skåne', 'Sverige']);
+  assert.deepStrictEqual(RZ.BUDGETGRUPPER.flatMap(g => g.kat).sort(), RZ.KATEGORIER.slice().sort(), 'varje kategori i exakt en grupp');
+});
+test('budgetfaktorn är summan av andelarna för grupper med valda kategorier', () => {
+  const a = RZ.standardAndelar(B, 'Malmö'), u = {...alla, tilldelning: 'Malmö'};
+  near(RZ.budgetFaktor(B, u), a.boende + a.investeringar + a.transport, 1e-12);
+  near(RZ.budgetFaktor(B, {...u, kat: ['Energi']}), a.boende, 1e-12);
+  near(RZ.budgetFaktor(B, {...u, kat: ['Byggnad']}), a.investeringar, 1e-12);
+  near(RZ.budgetFaktor(B, {...u, kat: ['Byggnad', 'Förändrad markanvändning', 'Mobilitet och transport']}), a.investeringar + a.transport, 1e-12);
+  near(RZ.budgetFaktor(B, {...u, byggandel: 40}), a.boende + 0.4 * a.investeringar + a.transport, 1e-12);
+  assert.strictEqual(RZ.budgetFaktor(B, alla), 1, 'utan tilldelning: hela budgeten');
+  near(RZ.budgetFaktor(B, {...alla, tilldelning: 'egen', andelar: {boende: 10, investeringar: 5, transport: 20}}), 0.35, 1e-12);
+});
+test('stadens budget och budgetåret med tilldelning', () => {
+  const hel = RZ.berakna(rows, B, alla), u = {...alla, tilldelning: 'Malmö'}, r = RZ.berakna(rows, B, u);
+  near(r.stadBudget, hel.stadBudget * r.faktor, 1e-6); near(r.snittBudget, hel.snittBudget * r.faktor, 1e-12);
+  assert.ok(r.slut <= hel.slut, 'mindre budget förbrukas tidigare');
+  assert.strictEqual(r.grupper.length, 3);
+  for (const g of r.grupper) near(g.snittBudget, r.snittHel * g.andel, 1e-12);
+  near(r.grupper.reduce((s, g) => s + g.snitt, 0), r.snitt, 1e-9, 'grupperna summerar till snittet');
+  near(RZ.budgetSnitt(rows, B, u, '1,5', 50), r.snittBudget, 1e-12);
 });
 console.log('\n' + passed + ' tester för resultatvyn godkända.');

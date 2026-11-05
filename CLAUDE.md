@@ -142,6 +142,12 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   period, standard EU:s referensscenario 2020 (`UTV` i `model.js`; testet jämför med `road2zero/data/utveckling.csv`). Sysavs
   koldioxidavskiljning är ett valbart steg för fjärrvärmen (av som standard; 2030, −43 %). Klimattrappa för nybyggnation: Boverkets
   gränsvärden 2030 (standard), Boverkets färdplan, linjär bana, SBUF Insteg, SBUF Färdplan, referensvärden eller egen takt.
+  Budgettilldelning (0.12.0): de valda kategorierna jämförs med sin andel av budgeten, a_g = gruppens utsläpp per person / hela
+  fotavtrycket (hushåll + offentlig konsumtion + investeringar). Grupper: boende = Energi; investeringar = Byggnad och Förändrad
+  markanvändning (nybyggnation hör till investeringarna oavsett byggherre, aldrig till hushållens boende), × nybyggnationens andel
+  av investeringarna (standard 100 %, övre gräns); transport = Mobilitet och transport, hushållens transport minus flyget.
+  Värden i `road2zero/data/budgetandelar.csv` (Konsumtionskompassen 2022 för Malmö, Skåne och Sverige; offentligt och
+  investeringar SEI 2026). Standard Malmö (46,8 %); val: Skåne, Sverige, egna andelar, hela budgeten (faktor 1).
 
 ## Kända osäkerheter
 

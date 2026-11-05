@@ -567,3 +567,21 @@ def test_planappen_startar():
     at = AppTest.from_file(str(ROT / "plan" / "streamlit_app.py"), default_timeout=300)
     at.run()
     assert not at.exception
+
+
+def test_budgetandelar_kallor_och_varden():
+    """budgetandelar.csv (Road2Zero-OP): källor finns i referenser.csv och hushållens delar är rimliga."""
+    import pandas as pd
+    fb = ladda()
+    refs = set(fb.referenser["id"])
+    df = pd.read_csv(Path(__file__).resolve().parents[1] / "road2zero" / "data" / "budgetandelar.csv", sep=";")
+    assert list(df["omrade"]) == ["Malmö", "Skåne", "Sverige"]
+    for k in df["kalla"]:
+        for r in str(k).split(","):
+            assert r in refs, r
+    assert ((df["flyg_kg"] < df["transport_kg"]) & (df["boende_kg"] + df["transport_kg"] < df["hushall_kg"])).all()
+    m = df.set_index("omrade").loc["Malmö"]
+    tot = m["hushall_kg"] + m["offentlig_kg"] + m["investeringar_kg"]
+    assert round(100 * m["boende_kg"] / tot, 1) == 12.3
+    assert round(100 * (m["transport_kg"] - m["flyg_kg"]) / tot, 1) == 10.4
+    assert round(100 * m["investeringar_kg"] / tot, 1) == 24.1

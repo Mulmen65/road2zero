@@ -1,7 +1,7 @@
 {
  "app": "MalmoOP",
  "version": "1.0.0",
- "byggdatum": "2026-10-29",
+ "byggdatum": "2026-11-05",
  "adresskoppling": {
   "totalt": 31356,
   "godkanda": 31028,
@@ -33,6 +33,8 @@
   "Statistiska centralbyrån (2025) <i>DeSO – Demografiska statistikområden</i>, version 2025_v2. Tillgänglig på: <a href=\"https://www.scb.se/vara-tjanster/oppna-data/oppna-geodata/demografiska-statistikomraden-deso/\" target=\"_blank\" rel=\"noopener\">scb.se</a> (Hämtad: 26 oktober 2026).",
   "Statistiska centralbyrån (2026a) <i>Slutanvändning (MWh), efter län och kommun, förbrukarkategori samt bränsletyp. År 2009–2024</i> [tabell EN0203A/SlutAnvSektor, kommunal och regional energistatistik]. Tillgänglig på: <a href=\"https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__EN__EN0203__EN0203A/SlutAnvSektor/\" target=\"_blank\" rel=\"noopener\">statistikdatabasen.scb.se</a> (Hämtad: 29 oktober 2026). Fjärrvärme 2024 för Malmö, totalt och per sektor; används för kalibrering av Atemp.",
   "Statistiska centralbyrån (2026b) <i>Antal lägenheter efter region, hustyp och bostadsarea. År 2013–2025</i> [tabell BO0104T5]. Tillgänglig på: <a href=\"https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__BO__BO0104__BO0104D/BO0104T5/\" target=\"_blank\" rel=\"noopener\">statistikdatabasen.scb.se</a> (Hämtad: 29 oktober 2026). Antal småhus och bostadsarea 2024; används som kontroll av skattad Atemp.",
+  "SEI (2026a) <i>Konsumtionskompassen 2.1: hushållens klimatpåverkan per kommun</i>, data för 2022 (webbverktyg). Tillgänglig på: <a href=\"https://konsumtionskompassen.pages.dev/skane/malmo\" target=\"_blank\" rel=\"noopener\">konsumtionskompassen.pages.dev</a> (Hämtad: 5 november 2026).",
+  "SEI (2026b) <i>Konsumtionskompassen i siffror</i>, version 2.1, data för 2023. Tillgänglig på: <a href=\"https://www.sei.org/wp-content/uploads/2026/05/konsumtionskompassen-siffror-sei2026-013.pdf\" target=\"_blank\" rel=\"noopener\">sei.org</a> (Hämtad: 5 november 2026).",
   "SVT Nyheter (2026) <i>Kritiken mot Sysavs miljardsatsning: ”För tankarna till Northvolt”</i>, 6 mars 2026. Tillgänglig på: <a href=\"https://www.svt.se/nyheter/lokalt/skane/kritiken-mot-sysavs-miljardsatsning-for-tankarna-till-northvolt\" target=\"_blank\" rel=\"noopener\">svt.se</a> (Hämtad: 5 november 2026).",
   "Sysav (2024) <i>Miljörapport 2023</i>, avfallskraftvärmeverket i Malmö. Tillgänglig på: <a href=\"https://www.sysav.se/media/5ebj4j4n/milj%C3%B6rapport-2023-ema.pdf\" target=\"_blank\" rel=\"noopener\">sysav.se (PDF)</a> (Hämtad: 5 november 2026). 1 437 GWh fjärrvärme till E.ON, cirka 65 % av behovet i Malmö och Burlöv.",
   "Sysav (2025) <i>Sysav beviljas stöd för fortsatt satsning på koldioxidavskiljning – ny milstolpe för projekt SkyZero</i>, 17 april 2025. Tillgänglig på: <a href=\"https://www.sysav.se/om-oss/press-och-media/nyheter/sysav-beviljas-stod-for-fortsatt-satsning-pa-koldioxidavskiljning-ny-milstolpe-for-projekt-skyzero/\" target=\"_blank\" rel=\"noopener\">sysav.se</a> (Hämtad: 5 november 2026).",
