@@ -126,11 +126,52 @@ test('Enheter: kg/ha = 1 000 × t/ha; per invånare', () => {
   near(M.metric(r, 'total', 't_inv'), r.total / r.bef, 1e-12);
 });
 
-test('Effektivisering och emissionsfaktorer verkar linjärt till 2050', () => {
-  const base = M.view(S, M.compute(S, {}), 2050).city.energi;
-  near(M.view(S, M.compute(S, {effektivisering2050: 30}), 2050).city.energi, base * 0.7, 1e-9, 'eff');
-  near(M.view(S, M.compute(S, {efForandring2050: -50}), 2050).city.energi, base * 0.5, 1e-9, 'ef');
+const NOLL = Object.fromEntries(['elR', 'fvR', 'byggR'].flatMap(p => [1, 2, 3, 4, 5].map(k => [p + k, 0])));
+test('Effektivisering verkar linjärt till 2050; utan förändrade faktorer är energin densamma som 2024', () => {
+  const base = M.view(S, M.compute(S, NOLL), 2050).city.energi;
+  near(base, M.view(S, M.compute(S, NOLL), 2024).city.energi, 1e-12, 'oförändrade faktorer');
+  near(M.view(S, M.compute(S, {...NOLL, effektivisering2050: 30}), 2050).city.energi, base * 0.7, 1e-9, 'eff');
   near(M.view(S, M.compute(S, {effektivisering2050: 30}), 2024).city.energi, base, 1e-9, '2024 oförändrat');
+});
+
+test('Standardtakterna för el, fjärrvärme och klimattrappor = Road2Zero-Plans faktabibliotek (utveckling.csv)', () => {
+  const rader = fs.readFileSync(path.join(OP, '..', 'road2zero', 'data', 'utveckling.csv'), 'utf8').trim().split(/\r?\n/).map(r => r.split(';'));
+  const hdr = rader[0], kol = ['p2027_2030', 'p2031_2035', 'p2036_2040', 'p2041_2045', 'p2046_2050'].map(c => hdr.indexOf(c));
+  const rad = id => rader.find(r => r[0] === id);
+  for (const [nyckel, id] of [['el', 'el'], ['fv', 'fjv'], ['insteg', 'bygg.betong_bau'], ['fardplan', 'bygg.betong_bast']])
+    assert.deepStrictEqual(M.UTV[nyckel], kol.map(c => Number(rad(id)[c])), nyckel);
+  assert.deepStrictEqual(M.PERIODER.map(([a, b]) => 'p' + a + '_' + b), hdr.filter(h => /^p20(2|3|4)/.test(h)).slice(0, 5));
+});
+
+test('Emissionsfaktorer över tid: index 1 till 2026, sedan (1 + r/100) per år och period', () => {
+  const P = M.params({}), r = M.UTV.el;
+  near(M.faktorer(P, 2026).el, P.efEl, 1e-15); near(M.faktorer(P, 2024).fv, P.efFv, 1e-15);
+  near(M.indexAr(r, 2030), Math.pow(1 + r[0] / 100, 4), 1e-12);
+  near(M.indexAr(r, 2032), Math.pow(1 + r[0] / 100, 4) * Math.pow(1 + r[1] / 100, 2), 1e-12);
+  const v = M.view(S, M.compute(S, {}), 2050).city.energi, eb = M.energyBase(S, P), fk = M.faktorer(P, 2050);
+  near(v, sum(eb.tEl) * fk.iEl + sum(eb.tFv) * fk.iFv, 1e-9, 'energi 2050 = el- och fjärrvärmedelen var för sig');
+  near(sum(eb.tEl) + sum(eb.tFv), sum(eb.t), 1e-9, 'el + fjärrvärme = summa');
+});
+
+test('Sysavs koldioxidavskiljning sänker fjärrvärmens faktor från valt år, i befintliga och nya byggnader', () => {
+  const nej = M.compute(S, {}), ja = M.compute(S, {beccs: 'ja'}), eb = nej.energyBase, P = M.params({});
+  assert.strictEqual(M.DEFAULTS.beccs, 'nej'); assert.strictEqual(M.DEFAULTS.beccsAr, 2030); assert.strictEqual(M.DEFAULTS.beccsMinskning, 43);
+  near(M.view(S, ja, 2024).city.energi, M.view(S, nej, 2024).city.energi, 1e-12);
+  const y = nej.years.indexOf(2029), y30 = nej.years.indexOf(2030);
+  near(sum(ja.comp.energi[y]), sum(nej.comp.energi[y]), 1e-12, '2029 oförändrat');
+  near(sum(nej.comp.energi[y30]) - sum(ja.comp.energi[y30]), sum(eb.tFv) * M.faktorer(P, 2030).iFv * 0.43, 1e-9, '43 % av fjärrvärmedelen 2030');
+  assert.ok(M.view(S, ja, 2050).city.nydrift < M.view(S, nej, 2050).city.nydrift, 'nya byggnader');
+  near(M.faktorer(M.params({beccs: 'ja', beccsAr: 2035, beccsMinskning: 100}), 2035).fv, 0, 1e-15);
+});
+
+test('Klimattrappor för nybyggnation', () => {
+  const f = (k, y, x = {}) => M.byggFaktor(M.params({klimatBygg: k, ...x}), 'bostad', y), m2040 = 0.1 * 358 * M.P75_PROXY;
+  near(f('trappa', 2034), 235, 1e-12); near(f('trappa', 2035), (235 + m2040) / 2, 1e-12); near(f('trappa', 2040), m2040, 1e-12);
+  near(f('insteg', 2026), 358, 1e-12); near(f('insteg', 2030), 358 * Math.pow(1 - 0.0571, 4), 1e-9);
+  near(f('fardplan', 2031), 358 * Math.pow(1 - 0.0924, 4) * (1 - 0.0592), 1e-9);
+  near(f('egen', 2045, NOLL), 358, 1e-12); near(f('referens', 2045), 358, 1e-12); near(f('gransvarde2030', 2045), 235, 1e-12);
+  const ref = M.view(S, M.compute(S, {klimatBygg: 'referens'}), 'ack').city.bygg, ins = M.view(S, M.compute(S, {klimatBygg: 'insteg'}), 'ack').city.bygg;
+  assert.ok(ins < ref, 'Insteg lägre än oförändrade referensvärden');
 });
 
 test('Ogiltiga antaganden avvisas eller begränsas', () => {
@@ -176,10 +217,12 @@ test('Deklarationernas DeSO-vikter summerar till 1', () => {
     near(z2.city.p025, 2 * z1.city.p025, 1e-9, 'dubbla faktorer ger dubbla värden'); near(z2.deso.p975[10], 2 * z1.deso.p975[10], 1e-9);
   });
   test('Intervall för framtida år skalas med effektivisering och emissionsfaktorer', () => {
-    const Q = M.params({effektivisering2050: 30, efForandring2050: -20});
-    const I24 = M.energyInterval(a, Q, 2024), I50 = M.energyInterval(a, Q, 2050), Iack = M.energyInterval(a, Q, 'ack');
-    near(I24.city.p975, a.city.p975, 1e-12); near(I50.f, 0.7 * 0.8, 1e-12); near(I50.hi(5), a.deso.p975[5] * 0.7 * 0.8, 1e-12);
-    const R = M.compute(S, Q); near(M.view(S, R, 'ack').city.energi, sum(R.energyBase.t) * Iack.f, 1e-9, 'ack-faktor');
+    const Q = M.params({effektivisering2050: 30, beccs: 'ja'}), R = M.compute(S, Q), eb = R.energyBase;
+    const I24 = M.energyInterval(a, Q, 2024, eb), I50 = M.energyInterval(a, Q, 2050, eb), Iack = M.energyInterval(a, Q, 'ack', eb);
+    const fk = M.faktorer(Q, 2050), sEl = sum(eb.tEl) / sum(eb.t), s5 = eb.tEl[5] / eb.t[5];
+    near(I24.city.p975, a.city.p975, 1e-12); near(I50.f, 0.7 * (sEl * fk.iEl + (1 - sEl) * fk.iFv), 1e-12);
+    near(I50.hi(5), a.deso.p975[5] * 0.7 * (s5 * fk.iEl + (1 - s5) * fk.iFv), 1e-12);
+    near(M.view(S, R, 'ack').city.energi, sum(eb.t) * Iack.f, 1e-9, 'ack-faktor');
   });
   const stop = await M.simulateEnergy(S, {iterationer: 500}, p => p < 0.2);
   test('Avbruten Monte Carlo returnerar null', () => assert.strictEqual(stop, null));

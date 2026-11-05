@@ -52,7 +52,7 @@ python -m streamlit run op/streamlit_app.py
 | 02 Resultat & klimatbudget | Samma resultatvy som Road2Zero-Plan: summa per klimatkategori, från brutto till summa, trädkarta, över tid, per person, klimatbudget för 1,5–2,0 °C (Parisavtalet, Forster m.fl. 2026), tabeller med CSV och källor. Kategorier och befintlig stad/exploatering väljs överst. |
 | 03 Karta & områden | Koropletkarta (OSM-bakgrund, havsavskiljning, utbyggnadsområden), områdespanel och tabell över alla 209 DeSO, med 95 %-intervall för energin |
 | 04 Så räknas resultatet | Beräkningen steg för steg med siffror för vald DeSO, inklusive deklarationerna och de skattade byggnaderna |
-| 05 Antaganden & scenario | Alla antaganden med källor; ändringar sparas i webbläsaren |
+| 05 Antaganden & scenario | Emissionsfaktorer över tid (el, fjärrvärme, Sysavs koldioxidavskiljning och klimattrappa för nybyggnation) och alla övriga antaganden med källor; ändringar sparas i webbläsaren |
 | 06 Exploatering 2030–2050 | Utbyggnadsområden, BTA, åkermark, nybyggnation och mark per år |
 | 07 Trafik & geodata | Vägvis modell A och B för hela staden, bilinnehav och mobilitet per DeSO |
 | 08 Data & kvalitet | Urval, adressflaggor, hela byggnadsbeståndet, kontroll och kalibrering mot SCB, Atemp-källor, energibärarmetod och nedladdningar |
@@ -62,12 +62,13 @@ python -m streamlit run op/streamlit_app.py
 ## Beräkning i korthet
 
 ```
-Energi (t)        = Σ k × energiprestanda × Atemp × (s·0,037 + (1−s)·0,056) / 1000 × adressandel
+Energi (t)        = Σ k × energiprestanda × Atemp × (s·EF_el(år) + (1−s)·EF_fv(år)) / 1000 × adressandel × effektivisering(år)
                     (deklarationer + skattade byggnader; k = SCB-fjärrvärme / modellens fjärrvärme per sektor)
 Mobilitet (t)     = Vägvis A eller B (2024) × flottfaktor(år) × trafikförändring(år)
-Nybyggnation (t)  = BTA × klimatfaktor (kg CO₂e/m² BTA, A1–A5) / 1000, jämnt över byggåren
+EF(år)            = startvärde × Π(1 + r_period/100) från 2027; fjärrvärmen × (1 − minskning) från Sysavs driftår (valbart)
+Nybyggnation (t)  = BTA × klimatfaktor(år) enligt vald klimattrappa (kg CO₂e/m² BTA, A1–A5) / 1000, jämnt över byggåren
 Mark (t)          = ha × hårdgörandel × (kolförråd före − 22 t C/ha) × 44/12, över byggåren
-Nya byggnader (t) = BTA × 0,9 × 50 kWh/m² × emissionsfaktor, när de är klara
+Nya byggnader (t) = BTA × 0,9 × 50 kWh/m² × EF(år), när de är klara
 Ny mobilitet (t)  = nya hushåll × bilar/hushåll × km/bil × t CO₂e/fkm (från Vägvis B för värd-DeSO)
 Budget (t)        = Σ(2026–2050) invånare(t) × k · E(t) / världsbefolkning(t), E(t) = E₀(1 − E₀/B)^(t−2026)  (Forster m.fl. 2026)
 Per hektar        = t / landyta utan hav (ha); kg/ha = 1000 × t/ha
@@ -75,7 +76,9 @@ Per hektar        = t / landyta utan hav (ha); kg/ha = 1000 × t/ha
 
 | Standardantagande | Värde | Källa |
 |---|---|---|
-| El / fjärrvärme | 0,037 / 0,056 kg CO₂e/kWh | Boverket (2026a), klimatdatabasen |
+| El / fjärrvärme, startvärden | 0,037 / 0,056 kg CO₂e/kWh | Boverket (2026a), klimatdatabasen |
+| El / fjärrvärme, förändring per år 2027–2030, 2031–2035, 2036–2040, 2041–2045, 2046–2050 | −3,54 / −2,52 / −2,88 / −2,09 / −2,33 % och −1,63 / −1,75 / −1,92 / −2,13 / −2,38 % | EU:s referensscenario 2020 (Europeiska kommissionen, 2021), samma som Road2Zero-Plan |
+| Sysavs koldioxidavskiljning | Av; om på: från 2030, −43 % för fjärrvärmen | Sysav (2024, 2025), Energinyheter (2024), SVT Nyheter (2026); 0,65 × 400/600 härlett |
 | Atemp/BTA | 0,9 | Antagande |
 | Byggnader som ingår | Hela beståndet (deklarerade + skattade) | OSM-klassning, se Data & kvalitet |
 | Kalibrering | Per sektor mot SCB:s fjärrvärme 2024 | SCB (2026a) |
@@ -84,7 +87,7 @@ Per hektar        = t / landyta utan hav (ha); kg/ha = 1000 × t/ha
 | Emissionsfaktorer i osäkerhetsberäkningen | Fasta (Boverkets värden) | Boverket (2026a) |
 | Fokus 1 / Fokus 2 | byggs 2030–2039 / 2040–2049 | Malmö stad: Fokus 1 detaljplaneras före 2030 |
 | BTA per bostad / arbetsplats | 90 m² / 25 m² (blandad stad), 100 m² (verksamhet) | Antaganden |
-| Uppförande A1–A5 | 235 (flerbostadshus), 250 (kontor/skola), 190 (hall) kg/m² BTA | Boverket (2026b), förslag till gränsvärden 2030 |
+| Uppförande A1–A5 (klimattrappa) | Gränsvärden 2030: 235 (flerbostadshus), 250 (kontor/skola), 190 (hall) kg/m² BTA, oförändrade. Alternativ: Boverkets färdplan (skärpning 2035 och 2040), linjär bana, SBUF Insteg, SBUF Färdplan, referensvärden eller egen takt | Boverket (2026b); Chalmers m.fl. (2025), SBUF 14381 |
 | Energi nya byggnader | 50 kWh/m² Atemp, 22 % el | Median i underlaget, klass A–B, ≥ 1 000 m² BTA |
 | Kolförråd åker / öppen / skog / bebyggd | 121 / 103 / 146 / 22 t C/ha | Länsstyrelsen i Uppsala län (2025), proxy |
 | Hårdgörandel | 0,7 | Antagande |
@@ -124,7 +127,7 @@ Kalibreringen räknas om i varje iteration. Intervallen för framtida år skalas
 ## Tester
 
 ```bash
-node tests/test_model.js                 # 24 beräkningstester (massbalans, kalibrering, Monte Carlo, räkneexempel, enheter, tidsplan …)
+node tests/test_model.js                 # 28 beräkningstester (massbalans, kalibrering, Monte Carlo, räkneexempel, enheter, tidsplan …)
 python -m unittest discover tests        # 12 tester av sidbygge, data, byggnadsbestånd och uppdateringsflöde
 ```
 
@@ -146,7 +149,7 @@ tests/                     beräknings- och apptester
 * Atemp och energibärare är **skattningar**. Modellen antar att all energi som inte är el är fjärrvärme. Gas, biobränsle och olja i småhus och industri behandlas därför som fjärrvärme. Detta är troligen förklaringen till att småhusens skattade fjärrvärme ligger över SCB. Boverkets öppna data om energideklarationer med Atemp och energislag kan ersätta skattningen i en senare version.
 * Byggnadstypen för odeklarerade byggnader bestäms ur OSM-taggar, markanvändning och storlek. Den kan bli fel för enskilda byggnader. Intervallen per DeSO är därför breda, särskilt i små områden.
 * Emissionsfaktorerna är nationella medelvärden ur Boverkets klimatdatabas, inte Malmöspecifika eller marginella. Faktorerna kommer från Boverkets räkneexempel för modul A5. Att använda dem för årlig driftenergi är ett modellval.
-* Framtidsåren är scenarier med uttryckliga antaganden. Flottans klimatfaktor är som standard oförändrad (1,0) och kan ändras under *Antaganden & scenario*.
+* Framtidsåren är scenarier med uttryckliga antaganden. El och fjärrvärme minskar som standard enligt EU:s referensscenario 2020. Flottans klimatfaktor är som standard oförändrad (1,0). Båda kan ändras under *Antaganden & scenario*.
 * Kolförråden kommer från Uppsala län och används som proxy för Skåne. Marktäcket kommer från OpenStreetMap, och oklassad mark räknas som standard som redan bebyggd.
 * Energins 95-procentsintervall kommer från MalmoOP:s Monte Carlo och mobilitetens från Vägvis. Modellstruktur och framtidsantaganden ingår inte i intervallen. För exploateringen redovisas inga statistiska intervall.
 
@@ -155,6 +158,9 @@ tests/                     beräknings- och apptester
 * Boverket (2026a) *Indata om energianvändning i klimatdeklarationen*. Senast granskad 29 maj 2026. https://www.boverket.se/sv/klimatdeklaration/gor-sa-har/underlag/indata-om-energi/ (Hämtad: 29 oktober 2026).
 * Boverket (2026b) *Utkast färdplan för införande av gränsvärden för byggnaders klimatpåverkan*. Rapport 2026:29. https://www.boverket.se/globalassets/publikationer/dokument/2026/rapport-2026-29_utkast-fardplan-gransvarden-klimatpaverkan-byggnader.pdf (Hämtad: 29 oktober 2026).
 * Boverket (u.å.) *Vad är primärenergital?* https://www.boverket.se/sv/PBL-kunskapsbanken/regler-om-byggande/boverkets-byggregler/energihushallning/vad-ar-primarenergital/ (Hämtad: 29 oktober 2026).
+* Chalmers m.fl. (2025) *Klimatkrav för byggnader – på väg mot netto noll*. Vägledning, SBUF 14381, tabell 5. https://research.chalmers.se/publication/548167/file/548167_Fulltext.pdf
+* Energinyheter (2024) *Sysavs planer för koldioxidinfångning fortsätter*, 4 juni 2024. https://www.energinyheter.se/20240604/31443/sysavs-planer-koldioxidinfangning-fortsatter (Hämtad: 5 november 2026).
+* Europeiska kommissionen (2021) *EU Reference Scenario 2020*. https://energy.ec.europa.eu/data-and-analysis/energy-modelling/eu-reference-scenario-2020_en
 * Länsstyrelsen i Uppsala län (2025) *Kolförråd och kolsänka i skog och mark inom Uppsala län – slutrapport*. (Hämtad: 29 oktober 2026).
 * Malmö stad (2023) *Översiktsplan för Malmö*. Antagen av kommunfullmäktige 28 september 2023.
 * Malmö stad (2024) *OP2023_Underlag – Utbyggnadsområden*. https://gis.malmo.se/arcgis/rest/services/op/OP2023_Underlag/MapServer/129 (Hämtad: 29 oktober 2026).
@@ -164,12 +170,16 @@ tests/                     beräknings- och apptester
 * Statistiska centralbyrån (2026a) *Slutanvändning (MWh), efter län och kommun, förbrukarkategori samt bränsletyp*. Tabell EN0203A/SlutAnvSektor. https://www.statistikdatabasen.scb.se (Hämtad: 29 oktober 2026).
 * Statistiska centralbyrån (2026b) *Antal lägenheter efter region, hustyp och bostadsarea*. Tabell BO0104T5. https://www.statistikdatabasen.scb.se (Hämtad: 29 oktober 2026).
 * Statistiska centralbyrån (2025) *DeSO – Demografiska statistikområden*, 2025_v2. https://www.scb.se/vara-tjanster/oppna-data/oppna-geodata/demografiska-statistikomraden-deso/
+* SVT Nyheter (2026) *Kritiken mot Sysavs miljardsatsning: ”För tankarna till Northvolt”*, 6 mars 2026. https://www.svt.se/nyheter/lokalt/skane/kritiken-mot-sysavs-miljardsatsning-for-tankarna-till-northvolt (Hämtad: 5 november 2026).
+* Sysav (2024) *Miljörapport 2023*, avfallskraftvärmeverket i Malmö. https://www.sysav.se/media/5ebj4j4n/milj%C3%B6rapport-2023-ema.pdf (Hämtad: 5 november 2026).
+* Sysav (2025) *Sysav beviljas stöd för fortsatt satsning på koldioxidavskiljning – ny milstolpe för projekt SkyZero*, 17 april 2025. https://www.sysav.se/om-oss/press-och-media/nyheter/sysav-beviljas-stod-for-fortsatt-satsning-pa-koldioxidavskiljning-ny-milstolpe-for-projekt-skyzero/ (Hämtad: 5 november 2026).
 * Vägvis (2026) *Vägvis 2.3.1 – trafikens klimatavtryck*. GitHub: Mulmen65/vagvisa.
 
 ## Versioner
 
 | Version | Datum | Innehåll |
 |---|---|---|
+| 1.3.0 | 5 november 2026 | Emissionsfaktorer över tid som i Road2Zero-Plan: el och fjärrvärme med årlig förändring per period (standard EU:s referensscenario 2020), Sysavs koldioxidavskiljning som valbart steg för fjärrvärmen och sju klimattrappor för nybyggnation. Standardresultatet 2050 blir 568,8 kt i stället för 628,3 kt (perspektiv A). |
 | 1.2.0 | 29 oktober 2026 | Emissionsfaktorerna för el och fjärrvärme är Boverkets värden (0,037 / 0,056 kg CO₂e/kWh) och hålls fasta i osäkerhetsberäkningen. Energins 95 %-intervall 2024: 121–154 kt; per DeSO typiskt ±24 %. |
 | 1.1.0 | 29 oktober 2026 | Hela byggnadsbeståndet (odeklarerade byggnader skattas), kalibrering mot SCB:s fjärrvärme 2024 per sektor, Monte Carlo för energin, kort om byggnadsbestånd och SCB-kontroll. |
 | 1.0.0 | 29 oktober 2026 | Första versionen: energideklarationer, mobilitet från Vägvis 2.3.1 och exploatering enligt ÖP 2023 per DeSO. |

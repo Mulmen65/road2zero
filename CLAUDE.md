@@ -138,6 +138,10 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   Plan med samma kategorier, färger och budget (Forster m.fl. 2026, 1,5–2,0 °C enligt Parisavtalet); budgetperioden är 2026–2050.
   Budgettabell, befolkning, påslag och färger läses från `road2zero/data` och `road2zero/konstanter.py` när sidan byggs, och
   Plotly.js från Python-paketet plotly, så att diagrammen ser ut som i Plan.
+  Emissionsfaktorer över tid (MalmoOP 1.3): el och fjärrvärme som i Plan, startvärde till och med 2026 och årlig förändring per
+  period, standard EU:s referensscenario 2020 (`UTV` i `model.js`; testet jämför med `road2zero/data/utveckling.csv`). Sysavs
+  koldioxidavskiljning är ett valbart steg för fjärrvärmen (av som standard; 2030, −43 %). Klimattrappa för nybyggnation: Boverkets
+  gränsvärden 2030 (standard), Boverkets färdplan, linjär bana, SBUF Insteg, SBUF Färdplan, referensvärden eller egen takt.
 
 ## Kända osäkerheter
 
