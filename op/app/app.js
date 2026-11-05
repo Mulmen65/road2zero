@@ -8,6 +8,7 @@ const sig = x => { if (x == null || !Number.isFinite(x)) return '–'; const a =
 const json = id => JSON.parse($(id).textContent);
 const D = {deso: json('d-deso'), land: json('d-land'), energi: json('d-energi'), mob: json('d-mob'), expl: json('d-expl'), meta: json('d-meta')};
 const PJ = (() => { try { return json('d-projekt'); } catch (e) { return {}; } })();
+const R2Z = (() => { try { return json('d-r2z'); } catch (e) { return null; } })();
 const S = M.prepare(D);
 const COLORS = {energi: '#1baf7a', mobilitet: '#2a78d6', bygg: '#eb6834', mark: '#6250d6', nydrift: '#eda100', nymob: '#e87ba4'};
 const STORE = 'r2z-op-' + (PJ.id || 'malmo_op') + '-antaganden';
@@ -81,6 +82,7 @@ const stockCount = new Float64Array(S.n); if (D.energi.bestand) D.energi.bestand
 /* ---------- ram: sidomeny, rubrik, år ---------- */
 const HEAD = {
   overview: ['ROAD2ZERO-OP · ' + esc(PJ.namn || 'ÖVERSIKT'), esc(PJ.rubrik || 'Staden växer.') + '<br><em>' + esc(PJ.betonad || 'Hela klimatavtrycket.') + '</em>', PJ.ingress || 'Årligt klimatavtryck per DeSO från energi i befintliga byggnader, mobilitet och utbyggnaden enligt översiktsplanen.'],
+  results: ['PARISAVTALET · 1,5–2,0 °C', 'Resultat & klimatbudget', 'Stadens utsläpp per klimatkategori och år, per invånare och mot en koldioxidbudget för 1,5–2,0 °C enligt Forster m.fl. (2026).'],
   map: ['DESO 2025 · ' + S.n + ' OMRÅDEN', 'Karta & områden', 'Utforska områdena. Välj nyckeltal, enhet och år; klicka på ett område för detaljer.'],
   calc: ['STEG FÖR STEG', 'Så räknas resultatet', 'Följ beräkningen för ett område, från energideklaration och trafik till nybyggnation och mark.'],
   parameters: ['ANTAGANDEN', 'Antaganden & scenario', 'Alla värden kan ändras. Beräkningen uppdateras direkt och sparas i din webbläsare.'],
@@ -610,6 +612,13 @@ function bindExports() {
 }
 
 
+/* ---------- Resultat & klimatbudget (samma vy som Road2Zero-Plan) ---------- */
+function resultsCtx() { return {rows: M.cityByYear(R), mobLabel: mobLabel()}; }
+function resultsView() {
+  if (!window.R2ZResultat || !R2Z) return notice('Resultatvyn saknar sitt underlag (klimatbudget och diagrambibliotek).', 'error');
+  return window.R2ZResultat.html(resultsCtx(), R2Z);
+}
+
 /* ---------- Trafik & geodata (Vägvis modell A och B) ---------- */
 function trafficView() {
   const mob = D.mob, city = mob.stad, cal = (mob.A_metadata || {}).calibration || {};
@@ -644,9 +653,10 @@ function render() {
   const view = $('view');
   if (map && st.view !== 'map') { map.remove(); map = null; }
   charts.length = 0;
-  const html = {overview, map: mapView, calc: calcView, parameters: paramsView, expl: explView, traffic: trafficView, data: dataView, method: methodView}[st.view]();
+  const html = {overview, results: resultsView, map: mapView, calc: calcView, parameters: paramsView, expl: explView, traffic: trafficView, data: dataView, method: methodView}[st.view]();
   view.innerHTML = html;
   drawCharts();
+  if (st.view === 'results' && window.R2ZResultat && R2Z) window.R2ZResultat.bind(resultsCtx(), R2Z, render);
   if (st.view === 'expl') {
     document.querySelectorAll('#expl-table th[data-sort]').forEach(th => th.onclick = () => { const c = th.dataset.sort; st.explSort = [c, st.explSort[0] === c ? -st.explSort[1] : (c === 'namn' ? 1 : -1)]; render(); });
     document.querySelectorAll('[data-area]').forEach(b => b.onclick = () => { const a = D.expl.omraden.find(x => String(x.id) === b.dataset.area); const big = a.delar.slice().sort((x, y) => y.ha - x.ha)[0]; st.selected = big.deso; st.dev = true; go('map'); setTimeout(() => { if (map) map.fitBounds(window.L.geoJSON(a.geometry).getBounds(), {padding: [60, 60], maxZoom: 15}); }, 120); }); }

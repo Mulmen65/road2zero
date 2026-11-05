@@ -104,3 +104,23 @@ td.iv{color:var(--muted)}
 .r2z-steg{display:flex;gap:14px;margin:0 0 14px}
 .r2z-steg .nr{flex:0 0 30px;height:30px;border-radius:50%;background:var(--pale);color:var(--teal);font-weight:750;display:flex;align-items:center;justify-content:center}
 .r2z-ex{background:var(--bg);border-left:3px solid var(--teal);padding:7px 11px;border-radius:0 8px 8px 0;font-size:13px;margin-top:5px}
+
+/* Road2Zero-OP: Resultat & klimatbudget (samma vy som Road2Zero-Plan) */
+.r2zr-urval .r2zr-rad{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.r2zr-etikett{font-size:11px;font-weight:600;color:var(--ink);margin-bottom:7px}
+.r2zr-piller{display:flex;flex-wrap:wrap;gap:6px}
+.r2zr-pill{background:#fff;border:1px solid var(--line);color:var(--ink);padding:7px 13px;font-size:12px;font-weight:500;border-radius:999px}
+.r2zr-pill:hover{background:#eef4ef}
+.r2zr-pill.on{background:var(--pale);border-color:#9cc5b2;color:var(--dark);font-weight:650}
+.r2zr-pill i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+.r2zr-val{margin-top:16px;gap:18px!important}
+.r2zr-val label.field{min-width:180px;flex:1 1 180px}
+.r2zr-kpis{display:grid;grid-template-columns:1.35fr repeat(4,1fr);gap:12px;margin:16px 0}
+.r2zr-kpis .card{padding:16px 18px}
+.r2zr-kpis .kpi-value{font-size:25px;margin:8px 0 4px}
+.r2zr-flikar{display:inline-flex;flex-wrap:wrap;margin:4px 0 16px}
+.r2zr-fig{padding:0;margin:0 0 16px;min-height:220px;overflow:hidden}
+.r2zr-paris{border-left:4px solid var(--teal);margin-bottom:16px}
+.r2zr-paris p{font-size:12.5px;max-width:980px}
+@media(max-width:1150px){.r2zr-kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:720px){.r2zr-kpis{grid-template-columns:1fr}}

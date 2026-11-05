@@ -16,7 +16,8 @@ from html import escape as html_escape
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent            # op/
-REPO = ROOT.parent                                # repots rot, med gemensamt/ (logotyp)
+REPO = ROOT.parent                                # repots rot, med gemensamt/ (logotyp) och road2zero/data (klimatbudget)
+R2Z_DATA = REPO / "road2zero" / "data"
 PROJEKTMAPP = ROOT / "projekt"
 STANDARD = "malmo_op"
 SHELL = "app/shell.html"
@@ -56,10 +57,40 @@ def _embed(name: str, text: str) -> str:
     return text
 
 
+def _plotly_fil() -> Path:
+    """Plotly.js från Python-paketet plotly, så att diagrammen ser ut som i Road2Zero-Plan och fungerar utan internet."""
+    import plotly
+    return Path(plotly.__file__).resolve().parent / "package_data" / "plotly.min.js"
+
+
+def r2z_underlag() -> dict:
+    """Underlag för Resultat & klimatbudget ur Road2Zero:s faktabibliotek: budget enligt Forster m.fl. (2026) per temperaturgräns
+    och sannolikhet, världsbefolkningen (UN WPP 2024), globala utsläpp 2025 och påslaget för andra växthusgaser, samt
+    kategorifärgerna. Samma filer som Road2Zero-Plan använder."""
+    import csv
+
+    def rader(namn):
+        with open(R2Z_DATA / namn, encoding="utf-8", newline="") as fh:
+            return list(csv.DictReader(fh, delimiter=";"))
+
+    par = {r["id"]: float(r["varde"]) for r in rader("parametrar.csv") if r["id"] in ("budget.e0", "budget.k")}
+    farg = {}
+    for rad in (R2Z_DATA.parent / "konstanter.py").read_text(encoding="utf-8").splitlines():
+        m = re.match(r'\s*\("([^"]+)", \d, "(#[0-9a-fA-F]{6})"\),', rad)
+        if m:
+            farg[m[1]] = m[2]
+    return {"budget": [{"temperatur": r["temperatur"], "sannolikhet": int(r["sannolikhet"]), "gt_co2": float(r["gt_co2"])}
+                       for r in rader("budget_forster2026.csv")],
+            "befolkning": [{"ar": int(r["ar"]), "miljarder": float(r["miljarder"])} for r in rader("befolkning_unwpp2024.csv")],
+            "e0": par["budget.e0"], "k": par["budget.k"], "farg": farg}
+
+
 def _signature(projekt: str) -> tuple:
     rot = projekt_rot(projekt)
     files = [ROOT / SHELL, *sorted((ROOT / "app").glob("*")), *sorted((rot / "data").glob("*.json")), rot / "projekt.json",
-             rot / "data/kalla/deso_2025_malmo.geojson", rot / "data/kalla/land_malmo_osm.json", REPO / "gemensamt" / "logo.svg"]
+             rot / "data/kalla/deso_2025_malmo.geojson", rot / "data/kalla/land_malmo_osm.json", REPO / "gemensamt" / "logo.svg",
+             R2Z_DATA / "budget_forster2026.csv", R2Z_DATA / "befolkning_unwpp2024.csv", R2Z_DATA / "parametrar.csv",
+             R2Z_DATA.parent / "konstanter.py", _plotly_fil()]
     return tuple((str(p), p.stat().st_mtime_ns, p.stat().st_size) for p in files if p.is_file())
 
 
@@ -86,6 +117,10 @@ def assemble(overrides: dict | None = None, projekt: str = STANDARD) -> str:
             return (REPO / "gemensamt" / "logo.svg").read_text(encoding="utf-8").strip()
         if name == "projekt":
             return _embed("projekt.json", json.dumps(pmeta, ensure_ascii=False))
+        if name == "r2z":
+            return _embed("r2z.json", json.dumps(r2z_underlag(), ensure_ascii=False))
+        if name == "plotly":
+            return _embed("plotly.js", _plotly_fil().read_text(encoding="utf-8"))
         if name.startswith("projekt:"):
             return html_escape(str(pmeta.get(name.split(":", 1)[1], "")))
         if ".." in name.split("/") or not (name.startswith("app/") or name.startswith("data/")):

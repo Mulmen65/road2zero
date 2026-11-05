@@ -49,12 +49,14 @@ python -m streamlit run op/streamlit_app.py
 | Sida | Innehåll |
 |---|---|
 | 01 Översikt | Nyckeltal, klimatavtryckets delar, utveckling 2024–2050 och energins osäkerhet (histogram och 95 %-intervall) |
-| 02 Karta & DeSO | Koropletkarta (OSM-bakgrund, havsavskiljning, utbyggnadsområden), områdespanel och tabell över alla 209 DeSO, med 95 %-intervall för energin |
-| 03 Så räknas resultatet | Beräkningen steg för steg med siffror för vald DeSO, inklusive deklarationerna och de skattade byggnaderna |
-| 04 Antaganden & scenario | Alla antaganden med källor; ändringar sparas i webbläsaren |
-| 05 Exploatering 2030–2050 | Utbyggnadsområden, BTA, åkermark, nybyggnation och mark per år |
-| 06 Data & kvalitet | Urval, adressflaggor, hela byggnadsbeståndet, kontroll och kalibrering mot SCB, Atemp-källor, energibärarmetod och nedladdningar |
-| 07 Metod & källor | Formler, systemgränser och Harvard-referenser |
+| 02 Resultat & klimatbudget | Samma resultatvy som Road2Zero-Plan: summa per klimatkategori, från brutto till summa, trädkarta, över tid, per person, klimatbudget för 1,5–2,0 °C (Parisavtalet, Forster m.fl. 2026), tabeller med CSV och källor. Kategorier och befintlig stad/exploatering väljs överst. |
+| 03 Karta & områden | Koropletkarta (OSM-bakgrund, havsavskiljning, utbyggnadsområden), områdespanel och tabell över alla 209 DeSO, med 95 %-intervall för energin |
+| 04 Så räknas resultatet | Beräkningen steg för steg med siffror för vald DeSO, inklusive deklarationerna och de skattade byggnaderna |
+| 05 Antaganden & scenario | Alla antaganden med källor; ändringar sparas i webbläsaren |
+| 06 Exploatering 2030–2050 | Utbyggnadsområden, BTA, åkermark, nybyggnation och mark per år |
+| 07 Trafik & geodata | Vägvis modell A och B för hela staden, bilinnehav och mobilitet per DeSO |
+| 08 Data & kvalitet | Urval, adressflaggor, hela byggnadsbeståndet, kontroll och kalibrering mot SCB, Atemp-källor, energibärarmetod och nedladdningar |
+| 09 Metod & källor | Formler, systemgränser och Harvard-referenser |
 | Underlag (Streamlit) | Ladda ned adresskopplingen. Läs in en ny CSV eller hämta Malmö stads aktuella energideklarationer. Nya adresser kopplas automatiskt. |
 
 ## Beräkning i korthet
@@ -67,6 +69,7 @@ Nybyggnation (t)  = BTA × klimatfaktor (kg CO₂e/m² BTA, A1–A5) / 1000, jä
 Mark (t)          = ha × hårdgörandel × (kolförråd före − 22 t C/ha) × 44/12, över byggåren
 Nya byggnader (t) = BTA × 0,9 × 50 kWh/m² × emissionsfaktor, när de är klara
 Ny mobilitet (t)  = nya hushåll × bilar/hushåll × km/bil × t CO₂e/fkm (från Vägvis B för värd-DeSO)
+Budget (t)        = Σ(2026–2050) invånare(t) × k · E(t) / världsbefolkning(t), E(t) = E₀(1 − E₀/B)^(t−2026)  (Forster m.fl. 2026)
 Per hektar        = t / landyta utan hav (ha); kg/ha = 1000 × t/ha
 ```
 

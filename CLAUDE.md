@@ -19,6 +19,7 @@ Repot är `Mulmen65/road2zero`. Alla tre apparna publiceras från samma repo på
 pip install -r requirements.txt
 python -m pytest -q                                              # alla Python-tester, även op/tests; ska vara grönt före commit
 node op/tests/test_model.js                                      # beräkningstester för Road2Zero-OP
+node op/tests/test_resultat.js                                   # resultatvyn och klimatbudgeten i Road2Zero-OP
 python -m streamlit run plan/streamlit_app.py --server.port 8501
 python -m streamlit run cityscenario/streamlit_app.py --server.port 8502
 python -m streamlit run op/streamlit_app.py --server.port 8503
@@ -133,7 +134,10 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   yta och intensitet (`road2zero/jamforelse.py`).
 - **Road2Zero-OP:** beräkningen per DeSO för hela staden körs i webbläsaren (`op/app/model.js`, från MalmoOP 1.2): energi i befintliga
   byggnader ur energideklarationer, mobilitet ur Vägvis 2.3.1 (modell A eller B, adderas aldrig) och exploatering enligt
-  översiktsplanens utbyggnadsområden 2030–2050.
+  översiktsplanens utbyggnadsområden 2030–2050. Sidan Resultat & klimatbudget (`op/app/resultat.js`) visar samma resultatvy som
+  Plan med samma kategorier, färger och budget (Forster m.fl. 2026, 1,5–2,0 °C enligt Parisavtalet); budgetperioden är 2026–2050.
+  Budgettabell, befolkning, påslag och färger läses från `road2zero/data` och `road2zero/konstanter.py` när sidan byggs, och
+  Plotly.js från Python-paketet plotly, så att diagrammen ser ut som i Plan.
 
 ## Kända osäkerheter
 
