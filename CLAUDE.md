@@ -145,9 +145,11 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   Budgettilldelning (0.12.0): de valda kategorierna jämförs med sin andel av budgeten, a_g = gruppens utsläpp per person / hela
   fotavtrycket (hushåll + offentlig konsumtion + investeringar). Grupper: boende = Energi; investeringar = Byggnad och Förändrad
   markanvändning (nybyggnation hör till investeringarna oavsett byggherre, aldrig till hushållens boende), × nybyggnationens andel
-  av investeringarna (standard 100 %, övre gräns); transport = Mobilitet och transport, hushållens transport minus flyget.
+  av investeringarnas utsläpp n (0.12.1: 21,1 % = F41–F43 / fasta bruttoinvesteringar, SCB 2023 × (bostäder + lokaler) /
+  bygginvesteringar, Byggföretagen 2023 × nybyggnad / (nybyggnad + ombyggnad), Boverket 2015; `nybyggnadsandel.csv`);
+  transport = Mobilitet och transport, hushållens transport minus flyget.
   Värden i `road2zero/data/budgetandelar.csv` (Konsumtionskompassen 2022 för Malmö, Skåne och Sverige; offentligt och
-  investeringar SEI 2026). Standard Malmö (46,8 %); val: Skåne, Sverige, egna andelar, hela budgeten (faktor 1).
+  investeringar SEI 2026). Standard Malmö (27,8 %); val: Skåne, Sverige, egna andelar, hela budgeten (faktor 1).
 
 ## Kända osäkerheter
 

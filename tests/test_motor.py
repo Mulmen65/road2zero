@@ -585,3 +585,17 @@ def test_budgetandelar_kallor_och_varden():
     assert round(100 * m["boende_kg"] / tot, 1) == 12.3
     assert round(100 * (m["transport_kg"] - m["flyg_kg"]) / tot, 1) == 10.4
     assert round(100 * m["investeringar_kg"] / tot, 1) == 24.1
+
+
+def test_nybyggnadsandel_kallor_och_varde():
+    """nybyggnadsandel.csv (Road2Zero-OP): källor finns och nybyggnationens andel av investeringarnas utsläpp blir 21,1 %."""
+    import pandas as pd
+    refs = set(ladda().referenser["id"])
+    df = pd.read_csv(Path(__file__).resolve().parents[1] / "road2zero" / "data" / "nybyggnadsandel.csv", sep=";")
+    assert set(df["kalla"]) <= refs
+    v = df.set_index("post")["varde"]
+    assert v["byggprodukter_ghg"] < v["investeringar_ghg"]
+    n = (v["byggprodukter_ghg"] / v["investeringar_ghg"]
+         * (v["bygginv_bostader"] + v["bygginv_lokaler"]) / (v["bygginv_bostader"] + v["bygginv_lokaler"] + v["bygginv_anlaggningar"])
+         * v["nybyggnad_ghg"] / (v["nybyggnad_ghg"] + v["ombyggnad_ghg"]))
+    assert round(100 * n, 1) == 21.1

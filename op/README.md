@@ -73,6 +73,8 @@ Ny mobilitet (t)  = nya hushåll × bilar/hushåll × km/bil × t CO₂e/fkm (fr
 Budget (t)        = Σ(2026–2050) invånare(t) × k · E(t) / världsbefolkning(t) × Σ a_g, E(t) = E₀(1 − E₀/B)^(t−2026)  (Forster m.fl. 2026)
 a_g (andel)       = boende U_boende / F; investeringar U_investeringar × n / F; transport (U_transport − U_flyg) / F
                     F = U_hushåll + U_offentlig + U_investeringar per person och år (SEI 2026); summan över grupper i urvalet
+n (nybyggnation)  = byggprodukter F41–F43 / fasta bruttoinvesteringar (SCB 2023) × (bostäder + lokaler) / bygginvesteringar
+                    (Byggföretagen 2023) × nybyggnad / (nybyggnad + ombyggnad) (Boverket 2015) = 42,3 % × 78,1 % × 63,7 % = 21,1 %
 Per hektar        = t / landyta utan hav (ha); kg/ha = 1000 × t/ha
 ```
 
@@ -94,8 +96,8 @@ Per hektar        = t / landyta utan hav (ha); kg/ha = 1000 × t/ha
 | Kolförråd åker / öppen / skog / bebyggd | 121 / 103 / 146 / 22 t C/ha | Länsstyrelsen i Uppsala län (2025), proxy |
 | Hårdgörandel | 0,7 | Antagande |
 | Invånare per bostad | 2,11 | SCB 2024 via Vägvis |
-| Budgettilldelning | Malmö 2022: boende (Energi) 12,3 %, investeringar (Byggnad och Förändrad markanvändning) 24,1 %, transport utan flyg (Mobilitet och transport) 10,4 % av budgeten; summa 46,8 %. Alternativ: Skåne, Sverige, egna andelar eller hela budgeten | SEI (2026a, 2026b) |
-| Nybyggnationens andel av investeringarna (n) | 100 %, en övre gräns (investeringarna omfattar också infrastruktur, maskiner och fordon) | Antagande |
+| Budgettilldelning | Malmö 2022: boende (Energi) 12,3 %, investeringar – nybyggnation av byggnader (Byggnad och Förändrad markanvändning) 24,1 % × n = 5,1 %, transport utan flyg (Mobilitet och transport) 10,4 % av budgeten; summa 27,8 %. Alternativ: Skåne, Sverige, egna andelar eller hela budgeten | SEI (2026a, 2026b) |
+| Nybyggnationens andel av investeringarnas utsläpp (n) | 21,1 % = byggprodukternas andel av investeringarnas utsläpp 42,3 % × byggnadernas andel av bygginvesteringarna 78,1 % × nybyggnadens andel av byggandets utsläpp 63,7 % | SCB (2026c), Byggföretagen (2025), Naturvårdsverket och Boverket (2019) |
 
 ## Uppdatera underlaget
 
@@ -154,7 +156,7 @@ tests/                     beräknings- och apptester
 * Byggnadstypen för odeklarerade byggnader bestäms ur OSM-taggar, markanvändning och storlek. Den kan bli fel för enskilda byggnader. Intervallen per DeSO är därför breda, särskilt i små områden.
 * Emissionsfaktorerna är nationella medelvärden ur Boverkets klimatdatabas, inte Malmöspecifika eller marginella. Faktorerna kommer från Boverkets räkneexempel för modul A5. Att använda dem för årlig driftenergi är ett modellval.
 * Framtidsåren är scenarier med uttryckliga antaganden. El och fjärrvärme minskar som standard enligt EU:s referensscenario 2020. Flottans klimatfaktor är som standard oförändrad (1,0). Båda kan ändras under *Antaganden & scenario*.
-* Budgettilldelningen fördelar budgeten efter dagens utsläpp (grandfathering inom Malmöbornas fotavtryck) och hålls konstant över tid. Nybyggnationen räknas till investeringarna, oavsett om byggherren är offentlig eller privat, och inte till hushållens boende. Hur stor del av investeringarnas utsläpp som är nybyggnation av byggnader saknar källa; standardvärdet 100 % ger därför en för stor andel och en för snäll jämförelse för nybyggnationen.
+* Budgettilldelningen fördelar budgeten efter dagens utsläpp (grandfathering inom Malmöbornas fotavtryck) och hålls konstant över tid. Nybyggnationen räknas till investeringarna, oavsett om byggherren är offentlig eller privat, och inte till hushållens boende. Nybyggnationens andel av investeringarnas utsläpp (21,1 %) är härledd ur tre källor från olika år: byggnadernas andel av byggandet bygger på investeringarnas värde, inte på utsläpp, och nybyggnadens andel på Boverkets miljöindikatorer för 2015.
 * Kolförråden kommer från Uppsala län och används som proxy för Skåne. Marktäcket kommer från OpenStreetMap, och oklassad mark räknas som standard som redan bebyggd.
 * Energins 95-procentsintervall kommer från MalmoOP:s Monte Carlo och mobilitetens från Vägvis. Modellstruktur och framtidsantaganden ingår inte i intervallen. För exploateringen redovisas inga statistiska intervall.
 
@@ -175,8 +177,11 @@ tests/                     beräknings- och apptester
 * Statistiska centralbyrån (2026a) *Slutanvändning (MWh), efter län och kommun, förbrukarkategori samt bränsletyp*. Tabell EN0203A/SlutAnvSektor. https://www.statistikdatabasen.scb.se (Hämtad: 29 oktober 2026).
 * Statistiska centralbyrån (2026b) *Antal lägenheter efter region, hustyp och bostadsarea*. Tabell BO0104T5. https://www.statistikdatabasen.scb.se (Hämtad: 29 oktober 2026).
 * Statistiska centralbyrån (2025) *DeSO – Demografiska statistikområden*, 2025_v2. https://www.scb.se/vara-tjanster/oppna-data/oppna-geodata/demografiska-statistikomraden-deso/
+* Byggföretagen (2025) *Byggkonjunkturen*, april 2025. Tabell bygginvesteringar. https://byggforetagen.se/app/uploads/2025/04/Byggkonjunkturen.pdf (Hämtad: 5 november 2026).
+* Naturvårdsverket och Boverket (2019) *Klimatscenarier för bygg- och fastighetssektorn: förslag på metod för bättre beslutsunderlag*. Tabell 6. https://www.naturvardsverket.se/contentassets/8897c1c6a8a44c6e8461443625909c86/klimatscenarier-for-bygg-och-fastighetssektorn.pdf (Hämtad: 5 november 2026).
 * SEI (2026a) *Konsumtionskompassen 2.1: hushållens klimatpåverkan per kommun*, data för 2022 (webbverktyg). https://konsumtionskompassen.pages.dev/skane/malmo (Hämtad: 5 november 2026).
 * SEI (2026b) *Konsumtionskompassen i siffror*, version 2.1, data för 2023. https://www.sei.org/wp-content/uploads/2026/05/konsumtionskompassen-siffror-sei2026-013.pdf (Hämtad: 5 november 2026).
+* Statistiska centralbyrån (2026c) *Miljöpåverkan från konsumtion efter produktgrupp SPIN 2007, användning och ämne. År 2008–2024*. Miljöräkenskaper, tabell TAB7084. https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__MI__MI1301__MI1301F/MPSPIN/ (Hämtad: 5 november 2026).
 * SVT Nyheter (2026) *Kritiken mot Sysavs miljardsatsning: ”För tankarna till Northvolt”*, 6 mars 2026. https://www.svt.se/nyheter/lokalt/skane/kritiken-mot-sysavs-miljardsatsning-for-tankarna-till-northvolt (Hämtad: 5 november 2026).
 * Sysav (2024) *Miljörapport 2023*, avfallskraftvärmeverket i Malmö. https://www.sysav.se/media/5ebj4j4n/milj%C3%B6rapport-2023-ema.pdf (Hämtad: 5 november 2026).
 * Sysav (2025) *Sysav beviljas stöd för fortsatt satsning på koldioxidavskiljning – ny milstolpe för projekt SkyZero*, 17 april 2025. https://www.sysav.se/om-oss/press-och-media/nyheter/sysav-beviljas-stod-for-fortsatt-satsning-pa-koldioxidavskiljning-ny-milstolpe-for-projekt-skyzero/ (Hämtad: 5 november 2026).
@@ -186,6 +191,7 @@ tests/                     beräknings- och apptester
 
 | Version | Datum | Innehåll |
 |---|---|---|
+| 1.3.0 (Road2Zero 0.12.1) | 5 november 2026 | Nybyggnationens andel av investeringarnas utsläpp är 21,1 % i stället för 100 %, härledd ur SCB:s miljöräkenskaper, bygginvesteringarna och Boverkets miljöindikatorer. Standard Malmö: 27,8 % av budgeten, 1,53 t per person mot 0,16 t (9,8 gånger), stadens budget 2 069 kt, förbrukad 2029. |
 | 1.3.0 (Road2Zero 0.12.0) | 5 november 2026 | Budgettilldelning: de valda kategorierna jämförs med sin andel av budgeten enligt Konsumtionskompassen (Malmö, Skåne eller Sverige 2022), egna andelar eller hela budgeten. Nybyggnationen hör till investeringarna. Standard Malmö: 46,8 % av budgeten, 1,53 t per person mot 0,26 t, förbrukad 2031. |
 | 1.3.0 | 5 november 2026 | Emissionsfaktorer över tid som i Road2Zero-Plan: el och fjärrvärme med årlig förändring per period (standard EU:s referensscenario 2020), Sysavs koldioxidavskiljning som valbart steg för fjärrvärmen och sju klimattrappor för nybyggnation. Standardresultatet 2050 blir 568,8 kt i stället för 628,3 kt (perspektiv A). |
 | 1.2.0 | 29 oktober 2026 | Emissionsfaktorerna för el och fjärrvärme är Boverkets värden (0,037 / 0,056 kg CO₂e/kWh) och hålls fasta i osäkerhetsberäkningen. Energins 95 %-intervall 2024: 121–154 kt; per DeSO typiskt ±24 %. |

@@ -60,8 +60,18 @@
     return ut;
   }
 
-  /* Andelar per budgetgrupp (0–1) för ett område i budgetandelar.csv. */
-  function standardAndelar(B, omrade, byggandel = 1) {
+  /* Nybyggnationens andel av investeringarnas utsläpp (0–1) ur nybyggnadsandel.csv: byggprodukternas andel av investeringarnas
+     utsläpp × byggnadernas andel av bygginvesteringarna × nybyggnadens andel av byggandets utsläpp. Saknas underlaget: 1. */
+  function nybyggnadsdelar(B) {
+    const d = B.nybyggnad || {}, krav = ['investeringar_ghg', 'byggprodukter_ghg', 'bygginv_bostader', 'bygginv_lokaler', 'bygginv_anlaggningar', 'nybyggnad_ghg', 'ombyggnad_ghg'];
+    if (!krav.every(k => Number.isFinite(d[k]) && d[k] > 0)) return null;
+    const bygg = d.byggprodukter_ghg / d.investeringar_ghg, hus = (d.bygginv_bostader + d.bygginv_lokaler) / (d.bygginv_bostader + d.bygginv_lokaler + d.bygginv_anlaggningar),
+          ny = d.nybyggnad_ghg / (d.nybyggnad_ghg + d.ombyggnad_ghg);
+    return {bygg, hus, ny, n: bygg * hus * ny};
+  }
+  function standardByggandel(B) { const d = nybyggnadsdelar(B); return d ? d.n : 1; }
+  /* Andelar per budgetgrupp (0–1) för ett område i budgetandelar.csv; byggandel = nybyggnationens andel av investeringarna. */
+  function standardAndelar(B, omrade, byggandel = standardByggandel(B)) {
     const r = (B.andelar || []).find(x => x.omrade === omrade);
     if (!r) return null;
     const tot = r.hushall_kg + r.offentlig_kg + r.investeringar_kg;
@@ -74,7 +84,7 @@
     const hela = {hela: true}; for (const g of BUDGETGRUPPER) hela[g.id] = 1;
     if (t === 'hela') return hela;
     if (t === 'egen') { const o = {}; for (const g of BUDGETGRUPPER) o[g.id] = Number((urval.andelar || {})[g.id]) / 100 || 0; return o; }
-    return standardAndelar(B, t, (urval.byggandel ?? 100) / 100) || hela;
+    return standardAndelar(B, t, urval.byggandel == null ? standardByggandel(B) : urval.byggandel / 100) || hela;
   }
   /* Faktor på budgeten per person: summan av andelarna för de grupper som har minst en vald kategori. Hela budgeten = 1. */
   function budgetFaktor(B, urval) {
@@ -147,7 +157,7 @@
   function urvalStart() {
     let s = null; try { s = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (e) { s = null; }
     const u = {flik: 'oversikt', kat: KATEGORIER.slice(), grupper: ['befintlig', 'ny'], period: SNITT.slice(), temp: '1,5', sann: 50,
-               tilldelning: 'Malmö', andelar: null, byggandel: 100};
+               tilldelning: 'Malmö', andelar: null, byggandel: null, v: 2};
     if (s && typeof s === 'object') {
       if (FLIKAR.some(f => f[0] === s.flik)) u.flik = s.flik;
       if (Array.isArray(s.kat)) u.kat = KATEGORIER.filter(k => s.kat.includes(k));
@@ -157,7 +167,8 @@
       if (SANNOLIKHETER.includes(Number(s.sann))) u.sann = Number(s.sann);
       if (TILLDELNINGAR.includes(s.tilldelning)) u.tilldelning = s.tilldelning;
       if (s.andelar && typeof s.andelar === 'object') { u.andelar = {}; for (const g of BUDGETGRUPPER) u.andelar[g.id] = Math.max(0, Math.min(100, Number(s.andelar[g.id]) || 0)); }
-      if (Number.isFinite(Number(s.byggandel))) u.byggandel = Math.max(0, Math.min(100, Number(s.byggandel)));
+      // byggandel sparas från v 2 (0.12.1); i 0.12.0 var standardvärdet 100 % och sparades alltid, så det läses inte in
+      if (s.v >= 2 && s.byggandel != null && Number.isFinite(Number(s.byggandel))) u.byggandel = Math.max(0, Math.min(100, Number(s.byggandel)));
     }
     return u;
   }
@@ -187,19 +198,27 @@
       '</div>' + tilldelningRad(B) + '<p class="small">Mobiliteten följer perspektivet i sidomenyn (' + esc(ctx.mobLabel) + '). Klimatbudgeten gäller från 2026; år före 2026 visas men får ingen budgetandel och räknas inte in i jämförelsen med budgeten.</p></article>';
   }
 
+  function byggandelVisad(B) { return st.byggandel == null ? Number((100 * standardByggandel(B)).toFixed(1)) : st.byggandel; }
+  function byggandelText(B) {
+    const d = nybyggnadsdelar(B), pct = x => nf(100 * x, 1);
+    const std = d ? 'byggprodukternas andel av investeringarnas utsläpp ' + pct(d.bygg) + ' % (SCB, 2026) × byggnadernas andel av bygginvesteringarna ' + pct(d.hus) + ' % (Byggföretagen, 2025) × nybyggnadens andel av byggandets utsläpp ' + pct(d.ny) + ' % (Naturvårdsverket och Boverket, 2019)' : '';
+    if (st.byggandel == null) return 'Nybyggnationen och marken får ' + pct(standardByggandel(B)) + ' % av investeringarnas andel' + (d ? ': ' + std : '');
+    return 'Nybyggnationen och marken får ' + nf(st.byggandel, 1) + ' % av investeringarnas andel (eget värde' + (d ? '; standard ' + pct(d.n) + ' %' : '') + ')';
+  }
+
   function tilldelningRad(B) {
     const opt = (v, l) => '<option value="' + esc(v) + '"' + (st.tilldelning === v ? ' selected' : '') + '>' + esc(l) + '</option>';
     const a = andelar(B, st), fakt = budgetFaktor(B, st), pct = x => nf(100 * x, 1);
     const val = TILLDELNINGAR.filter(t => t === 'egen' || t === 'hela' || standardAndelar(B, t)).map(t => t === 'egen' ? opt(t, 'Egna andelar') : t === 'hela' ? opt(t, 'Hela budgeten') : opt(t, t + ' ' + standardAndelar(B, t).rad.ar)).join('');
     const falt = BUDGETGRUPPER.map(g => '<label class="field">' + esc(g.namn) + ', % av budgeten<input class="input" type="number" min="0" max="100" step="0.1" data-r2zr-andel="' + g.id + '" value="' + (a.hela ? 100 : Number((100 * a[g.id]).toFixed(1))) + '"' + (a.hela ? ' disabled' : '') + '></label>').join('') +
-      (st.tilldelning === 'egen' || a.hela ? '' : '<label class="field">Nybyggnationens andel av investeringarna, %<input class="input" type="number" min="0" max="100" step="1" data-r2zr-byggandel="1" value="' + st.byggandel + '"></label>');
+      (st.tilldelning === 'egen' || a.hela ? '' : '<label class="field">Nybyggnationens andel av investeringarna, %<input class="input" type="number" min="0" max="100" step="0.1" data-r2zr-byggandel="1" value="' + byggandelVisad(B) + '"></label>');
     let text;
     if (a.hela) text = 'Hela budgeten per person jämförs med de valda kategorierna, som om de vore stadens enda utsläpp.';
     else {
       const sk = standardAndelar(B, st.tilldelning === 'egen' ? 'Malmö' : st.tilldelning);
       const vald = BUDGETGRUPPER.filter(g => g.kat.some(k => st.kat.includes(k)));
       text = 'Urvalet får <b>' + pct(fakt) + ' %</b> av budgeten per person: ' + vald.map(g => { const kat = g.kat.map(k => k.toLowerCase()).join(' och '); return esc(g.namn.toLowerCase()) + ' ' + pct(a[g.id]) + ' %' + (kat === g.namn.toLowerCase() ? '' : ' (' + kat + ')'); }).join(', ') + '. ' +
-        (st.tilldelning === 'egen' ? 'Egna andelar.' : 'Andelarna är dagens utsläpp per person för boende (energi, vatten och hyra) och transport utan flyg i hushållens konsumtion enligt Konsumtionskompassen (' + esc(st.tilldelning) + ' ' + sk.rad.ar + ') och för investeringarna (SEI, 2026), delat med hela fotavtrycket per person: ' + nf(sk.totalKg / 1000, 2) + ' t, varav hushållen ' + nf(sk.rad.hushall_kg / 1000, 2) + ' t, offentlig konsumtion ' + nf(sk.rad.offentlig_kg / 1000, 2) + ' t och investeringar ' + nf(sk.rad.investeringar_kg / 1000, 2) + ' t. Nybyggnationen och marken får ' + nf(st.byggandel) + ' % av investeringarnas andel' + (st.byggandel === 100 ? ', en övre gräns eftersom investeringarna också omfattar infrastruktur, maskiner och fordon' : '') + '.') +
+        (st.tilldelning === 'egen' ? 'Egna andelar.' : 'Andelarna är dagens utsläpp per person för boende (energi, vatten och hyra) och transport utan flyg i hushållens konsumtion enligt Konsumtionskompassen (' + esc(st.tilldelning) + ' ' + sk.rad.ar + ') och för investeringarna (SEI, 2026), delat med hela fotavtrycket per person: ' + nf(sk.totalKg / 1000, 2) + ' t, varav hushållen ' + nf(sk.rad.hushall_kg / 1000, 2) + ' t, offentlig konsumtion ' + nf(sk.rad.offentlig_kg / 1000, 2) + ' t och investeringar ' + nf(sk.rad.investeringar_kg / 1000, 2) + ' t. ' + byggandelText(B) + '.') +
         ' Resten av budgeten går till det som Road2Zero-OP inte räknar: mat, varor, flygresor, offentlig konsumtion och övriga investeringar.';
     }
     return '<div class="r2zr-rad r2zr-val"><label class="field">Budgettilldelning enligt Konsumtionskompassen<select data-r2zr="tilldelning">' + val + '</select></label>' + falt + '</div><p class="small">' + text + '</p>';
@@ -310,7 +329,7 @@
       const tb = res.tab.filter(r => r.ar >= BUDGETSTART), arb = tb.map(r => r.ar);
       let l = layout('Vägen mot noll: ackumulerade utsläpp mot stadens klimatbudget', st.temp + ' °C och ' + st.sann + ' % sannolikhet · Forster m.fl. (2026), lika per person, faktiska invånare · från 2026', 460);
       l.hovermode = 'x unified'; l.shapes = [{type: 'line', xref: 'paper', x0: 0, x1: 1, y0: res.stadBudget, y1: res.stadBudget, line: {color: BUDGET, width: 1}}];
-      l.annotations = [{xref: 'paper', x: 0, y: res.stadBudget, text: 'Hela budgeten ' + nf(res.stadBudget) + ' t', showarrow: false, xanchor: 'left', yanchor: 'bottom', font: {color: INK2, size: 12}}];
+      l.annotations = [{xref: 'paper', x: 1, y: res.stadBudget, text: (res.faktor < 1 ? 'Urvalets budget ' : 'Hela budgeten ') + nf(res.stadBudget) + ' t', showarrow: false, xanchor: 'right', yanchor: 'bottom', font: {color: INK2, size: 12}}];
       if (res.slut) { l.shapes.push({type: 'line', yref: 'paper', x0: res.slut, x1: res.slut, y0: 0, y1: 1, line: {color: VARNING, width: 1.5, dash: 'dot'}}); l.annotations.push({x: res.slut, yref: 'paper', y: 1, text: 'Budgeten förbrukad ' + res.slut, showarrow: false, xanchor: 'left', xshift: 6, font: {color: VARNING, size: 12}}); }
       plot('motbudget', [{type: 'scatter', mode: 'lines', x: arb, y: tb.map(r => r.budgetKum), name: 'Stadens budget, ackumulerad', fill: 'tozeroy', fillcolor: rgba(BUDGET, 0.10), line: {color: BUDGET, width: 2, dash: 'dash'}, hovertemplate: 'Budget t.o.m. %{x}: %{y:,.0f} t<extra></extra>'},
         {type: 'scatter', mode: 'lines', x: arb, y: tb.map(r => r.nettoKum), name: 'Utsläpp, ackumulerade från 2026', line: {color: INK, width: 2.5}, hovertemplate: 'Utsläpp t.o.m. %{x}: %{y:,.0f} t<extra></extra>'}], l);
@@ -396,6 +415,8 @@
       res.tab.map(r => [r.ar, ...kat.map(k => d(r[k])), d(r.summa), d(r.inv), d(r.perPerson), r.ar >= BUDGETSTART ? d(r.andel) : '', r.ar >= BUDGETSTART ? d(r.budget) : '', d(r.nettoKum), r.ar >= BUDGETSTART ? d(r.budgetKum) : ''].join(';')).join('\n');
   }
   function kallor(B) {
+    const d = nybyggnadsdelar(B), pct = x => nf(100 * x, 1);
+    const nText = () => d ? ', som standard ' + pct(d.bygg) + ' % × ' + pct(d.hus) + ' % × ' + pct(d.ny) + ' % = ' + pct(d.n) + ' %: byggprodukternas (F41–F43) andel av de konsumtionsbaserade utsläppen från fasta bruttoinvesteringar 2023 (SCB, 2026), byggnadernas andel av bygginvesteringarna 2023 (Byggföretagen, 2025) och nybyggnadens andel av byggandets utsläpp 2015 enligt Boverkets miljöindikatorer (Naturvårdsverket och Boverket, 2019). Andelen kan ändras under Budgettilldelning' : ', som standard 100 %';
     return '<article class="card method-text"><h2>Så räknas resultatvyn</h2>' +
       '<p><b>Klimatkategorier.</b> Road2Zero-OP:s delar redovisas i samma kategorier som Road2Zero-Plan: <i>Byggnad</i> = nybyggnation A1–A5; <i>Energi</i> = energi i befintliga byggnader och i nya byggnader; <i>Förändrad markanvändning</i> = kolförlust när mark hårdgörs; <i>Mobilitet och transport</i> = befintlig stad och nya invånare, enligt perspektiv A eller B. Alla värden är t CO₂e per kalenderår 2024–2050 för hela kommunen.</p>' +
       '<div class="formula">b(t) = k · E(t) / P(t), &nbsp; E(t) = E₀ (1 − r)<sup>t−2026</sup>, &nbsp; r = E₀ / B</div>' +
@@ -403,11 +424,15 @@
       '<div class="formula">B<sub>stad</sub> = Σ<sub>t = 2026…2050</sub> N(t) · b(t)</div>' +
       '<p>N(t) är stadens invånare år t, befintliga och nya. Budgeten är förbrukad det första år då stadens ackumulerade utsläpp från 2026 är större än B<sub>stad</sub>. Budgetandelen efter 2050 ingår inte, eftersom modellen slutar 2050.</p>' +
       '<div class="formula">b<sub>urval</sub>(t) = b(t) · Σ<sub>grupper i urvalet</sub> a<sub>g</sub>, &nbsp; a<sub>boende</sub> = U<sub>boende</sub> / F, &nbsp; a<sub>investeringar</sub> = U<sub>investeringar</sub> · n / F, &nbsp; a<sub>transport</sub> = (U<sub>transport</sub> − U<sub>flyg</sub>) / F, &nbsp; F = U<sub>hushåll</sub> + U<sub>offentlig</sub> + U<sub>investeringar</sub></div>' +
-      '<p><b>Budgettilldelning.</b> U är utsläpp per person och år. Hushållens delar (boende: energi, vatten och hyra; transport; flygresor) kommer från Konsumtionskompassen för det valda området, data för 2022. Offentlig konsumtion (0,83 t) och investeringar (2,09 t) är riksvärden för 2023 (SEI, 2026). Gruppen boende täcker Energi, gruppen investeringar Byggnad och Förändrad markanvändning och gruppen transport Mobilitet och transport. Nybyggnation hör till investeringarna oavsett om byggherren är offentlig eller privat; n är nybyggnationens andel av investeringarna, som standard 100 %, en övre gräns. En grupp får hela sin andel när minst en av dess kategorier är vald. Andelarna hålls konstanta över tid. Med <i>Hela budgeten</i> är faktorn 1, som före version 0.12.0.</p>' +
+      '<div class="formula">n = (U<sub>byggprodukter</sub> / U<sub>investeringar</sub>)<sub>SCB 2023</sub> · ((bostäder + lokaler) / (bostäder + lokaler + anläggningar))<sub>bygginvesteringar 2023</sub> · (nybyggnad / (nybyggnad + ombyggnad))<sub>Boverket 2015</sub></div>' +
+      '<p><b>Budgettilldelning.</b> U är utsläpp per person och år. Hushållens delar (boende: energi, vatten och hyra; transport; flygresor) kommer från Konsumtionskompassen för det valda området, data för 2022. Offentlig konsumtion (0,83 t) och investeringar (2,09 t) är riksvärden för 2023 (SEI, 2026). Gruppen boende täcker Energi, gruppen investeringar Byggnad och Förändrad markanvändning och gruppen transport Mobilitet och transport. Nybyggnation hör till investeringarna oavsett om byggherren är offentlig eller privat; n är nybyggnationens andel av investeringarnas utsläpp' + nText() + '. En grupp får hela sin andel när minst en av dess kategorier är vald. Andelarna hålls konstanta över tid. Med <i>Hela budgeten</i> är faktorn 1, som före version 0.12.0.</p>' +
       '<p><b>Avgränsning.</b> Konsumtion (mat, varor, flygresor) och offentlig sektor ingår inte i Road2Zero-OP. Jämförelsen med budgeten visar därför bara en del av stadens klimatpåverkan. För en plan med konsumtionen inräknad: Road2Zero-Plan.</p>' +
       '<h2>Referenser</h2>' +
       '<div class="source"><strong>Forster, P.M. m.fl. (2026)</strong><p>Indicators of Global Climate Change 2025. <i>Earth System Science Data</i>, 18, s. 3889–3933.</p><a href="https://essd.copernicus.org/articles/18/3889/2026/" target="_blank" rel="noopener">essd.copernicus.org/articles/18/3889/2026</a></div>' +
       '<div class="source"><strong>SEI (2026)</strong><p><i>Konsumtionskompassen 2.1</i>: hushållens klimatpåverkan per kommun, data för 2022 (webbverktyg), och <i>Konsumtionskompassen i siffror</i> (data för 2023).</p><a href="https://konsumtionskompassen.pages.dev/skane/malmo" target="_blank" rel="noopener">konsumtionskompassen.pages.dev/skane/malmo</a> · <a href="https://www.sei.org/wp-content/uploads/2026/05/konsumtionskompassen-siffror-sei2026-013.pdf" target="_blank" rel="noopener">sei.org (PDF)</a></div>' +
+      '<div class="source"><strong>Byggföretagen (2025)</strong><p><i>Byggkonjunkturen</i>, april 2025. Tabell bygginvesteringar (nationalräkenskaperna).</p><a href="https://byggforetagen.se/app/uploads/2025/04/Byggkonjunkturen.pdf" target="_blank" rel="noopener">byggforetagen.se (PDF)</a></div>' +
+      '<div class="source"><strong>Naturvårdsverket och Boverket (2019)</strong><p><i>Klimatscenarier för bygg- och fastighetssektorn: förslag på metod för bättre beslutsunderlag</i>, tabell 6.</p><a href="https://www.naturvardsverket.se/contentassets/8897c1c6a8a44c6e8461443625909c86/klimatscenarier-for-bygg-och-fastighetssektorn.pdf" target="_blank" rel="noopener">naturvardsverket.se (PDF)</a></div>' +
+      '<div class="source"><strong>SCB (2026)</strong><p><i>Miljöpåverkan från konsumtion efter produktgrupp SPIN 2007, användning och ämne. År 2008–2024</i>. Miljöräkenskaper, tabell TAB7084.</p><a href="https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__MI__MI1301__MI1301F/MPSPIN/" target="_blank" rel="noopener">statistikdatabasen.scb.se</a></div>' +
       '<div class="source"><strong>Förenta nationerna (2015)</strong><p><i>Parisavtalet</i>. FN:s ramkonvention om klimatförändringar, artikel 2.1 a.</p><a href="https://unfccc.int/sites/default/files/english_paris_agreement.pdf" target="_blank" rel="noopener">unfccc.int/sites/default/files/english_paris_agreement.pdf</a></div>' +
       '<div class="source"><strong>United Nations, Department of Economic and Social Affairs (2024)</strong><p><i>World Population Prospects 2024</i>, medelvariant.</p><a href="https://population.un.org/wpp/" target="_blank" rel="noopener">population.un.org/wpp</a></div>' +
       '</article>';
@@ -432,7 +457,7 @@
       cur[el.dataset.r2zrAndel] = Math.max(0, Math.min(100, Number(el.value) || 0));
       st.andelar = cur; st.tilldelning = 'egen'; om();
     });
-    document.querySelectorAll('[data-r2zr-byggandel]').forEach(el => el.onchange = () => { st.byggandel = Math.max(0, Math.min(100, Number(el.value) || 0)); om(); });
+    document.querySelectorAll('[data-r2zr-byggandel]').forEach(el => el.onchange = () => { st.byggandel = el.value === '' ? null : Math.max(0, Math.min(100, Number(el.value) || 0)); om(); });
     const c = document.getElementById('r2zr-csv');
     if (c) c.onclick = () => { const b = new Blob([csv(ctx, B)], {type: 'text/csv'}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'road2zero_op_resultat_per_ar.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
     rita(ctx, B);
@@ -441,5 +466,5 @@
     if (typeof Plotly !== 'undefined') { requestAnimationFrame(omMat); setTimeout(omMat, 250); }
   }
 
-  return {DELPOSTER, KATEGORIER, BUDGETSTART, BUDGETGRUPPER, TILLDELNINGAR, bana, andelPerPerson, globalGt, standardAndelar, andelar, budgetFaktor, perAr, berakna, budgetSnitt, html, bind, csv};
+  return {DELPOSTER, KATEGORIER, BUDGETSTART, BUDGETGRUPPER, TILLDELNINGAR, bana, andelPerPerson, globalGt, nybyggnadsdelar, standardByggandel, standardAndelar, andelar, budgetFaktor, perAr, berakna, budgetSnitt, html, bind, csv};
 });

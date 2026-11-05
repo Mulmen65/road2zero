@@ -1,0 +1,8 @@
+post;ar;varde;enhet;kalla;beskrivning
+investeringar_ghg;2023;22451346;t CO2e;SCB2026MI;Konsumtionsbaserade utsläpp från fasta bruttoinvesteringar, alla produktgrupper (tabell TAB7084)
+byggprodukter_ghg;2023;9507646;t CO2e;SCB2026MI;Konsumtionsbaserade utsläpp från fasta bruttoinvesteringar, produktgrupp F41–F43 Byggprodukter
+bygginv_bostader;2023;235.9;Mdkr;BYGGF2025;Bygginvesteringar i bostäder (nybyggnad och ombyggnad), 2023 års priser
+bygginv_lokaler;2023;273.6;Mdkr;BYGGF2025;Bygginvesteringar i lokaler (privata och offentliga), 2023 års priser
+bygginv_anlaggningar;2023;143.2;Mdkr;BYGGF2025;Bygginvesteringar i anläggningar (privata och offentliga), 2023 års priser
+nybyggnad_ghg;2015;7240;kt CO2e;NVBOV2019;Boverkets miljöindikator: nybyggnad, inklusive import
+ombyggnad_ghg;2015;4129;kt CO2e;NVBOV2019;Boverkets miljöindikator: ombyggnad, utbyte och reparation, inklusive import

@@ -66,7 +66,8 @@ def _plotly_fil() -> Path:
 def r2z_underlag() -> dict:
     """Underlag för Resultat & klimatbudget ur Road2Zero:s faktabibliotek: budget enligt Forster m.fl. (2026) per temperaturgräns
     och sannolikhet, världsbefolkningen (UN WPP 2024), globala utsläpp 2025 och påslaget för andra växthusgaser,
-    kategorifärgerna och budgetandelarna per kategori (budgetandelar.csv). Samma faktabibliotek som Road2Zero-Plan."""
+    kategorifärgerna, budgetandelarna per kategori (budgetandelar.csv) och nybyggnationens andel av investeringarna
+    (nybyggnadsandel.csv). Samma faktabibliotek som Road2Zero-Plan."""
     import csv
 
     def rader(namn):
@@ -86,14 +87,16 @@ def r2z_underlag() -> dict:
             # budgetandelar per kategori enligt Konsumtionskompassen (hushåll) och SEI (2026) (offentlig konsumtion, investeringar)
             "andelar": [{"omrade": r["omrade"], "ar": int(r["ar"]), **{k: float(r[k]) for k in
                          ("hushall_kg", "boende_kg", "transport_kg", "flyg_kg", "offentlig_kg", "investeringar_kg")}}
-                        for r in rader("budgetandelar.csv")]}
+                        for r in rader("budgetandelar.csv")],
+            # underlag för nybyggnationens andel av investeringarnas utsläpp (SCB, Byggföretagen, Naturvårdsverket och Boverket)
+            "nybyggnad": {r["post"]: float(r["varde"]) for r in rader("nybyggnadsandel.csv")}}
 
 
 def _signature(projekt: str) -> tuple:
     rot = projekt_rot(projekt)
     files = [ROOT / SHELL, *sorted((ROOT / "app").glob("*")), *sorted((rot / "data").glob("*.json")), rot / "projekt.json",
              rot / "data/kalla/deso_2025_malmo.geojson", rot / "data/kalla/land_malmo_osm.json", REPO / "gemensamt" / "logo.svg",
-             R2Z_DATA / "budget_forster2026.csv", R2Z_DATA / "befolkning_unwpp2024.csv", R2Z_DATA / "parametrar.csv", R2Z_DATA / "budgetandelar.csv",
+             R2Z_DATA / "budget_forster2026.csv", R2Z_DATA / "befolkning_unwpp2024.csv", R2Z_DATA / "parametrar.csv", R2Z_DATA / "budgetandelar.csv", R2Z_DATA / "nybyggnadsandel.csv",
              R2Z_DATA.parent / "konstanter.py", _plotly_fil()]
     return tuple((str(p), p.stat().st_mtime_ns, p.stat().st_size) for p in files if p.is_file())
 

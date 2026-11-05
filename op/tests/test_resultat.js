@@ -8,7 +8,8 @@ const read = p => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
 const csv = f => fs.readFileSync(path.join(OP, '..', 'road2zero', 'data', f), 'utf8').trim().split(/\r?\n/).slice(1).map(l => l.split(';'));
 const B = {budget: csv('budget_forster2026.csv').map(([t, s, g]) => ({temperatur: t, sannolikhet: Number(s), gt_co2: Number(g)})),
   befolkning: csv('befolkning_unwpp2024.csv').map(([a, m]) => ({ar: Number(a), miljarder: Number(m)})), e0: 43.0, k: 1.314815, farg: {},
-  andelar: csv('budgetandelar.csv').map(([o, ar, h, bo, tr, fl, off, inv]) => ({omrade: o, ar: Number(ar), hushall_kg: Number(h), boende_kg: Number(bo), transport_kg: Number(tr), flyg_kg: Number(fl), offentlig_kg: Number(off), investeringar_kg: Number(inv)}))};
+  andelar: csv('budgetandelar.csv').map(([o, ar, h, bo, tr, fl, off, inv]) => ({omrade: o, ar: Number(ar), hushall_kg: Number(h), boende_kg: Number(bo), transport_kg: Number(tr), flyg_kg: Number(fl), offentlig_kg: Number(off), investeringar_kg: Number(inv)})),
+  nybyggnad: Object.fromEntries(csv('nybyggnadsandel.csv').map(([post, , v]) => [post, Number(v)]))};
 const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, (msg || '') + ' ' + a + ' ≠ ' + b);
 let passed = 0; const test = (n, f) => { f(); passed++; console.log('✓ ' + n); };
 const D = {deso: read('data/kalla/deso_2025_malmo.geojson'), energi: read('data/energi_deklarationer.json'), mob: read('data/mobilitet_vagvis.json'), expl: read('data/exploatering_op2023.json')};
@@ -52,12 +53,24 @@ test('budget.py ger samma andel per person', () => {
   for (const [y, v] of Object.entries(a)) near(j[y], v, 1e-9, 'år ' + y);
 });
 test('budgetandelar enligt Konsumtionskompassen (Malmö 2022) mot hela fotavtrycket', () => {
-  const a = RZ.standardAndelar(B, 'Malmö'), F = 5754.14 + 830 + 2090;
-  near(a.boende, 1066.46 / F, 1e-12); near(a.investeringar, 2090 / F, 1e-12); near(a.transport, (1749.27 - 848) / F, 1e-12);
-  near(100 * a.boende, 12.3, 0.05); near(100 * a.investeringar, 24.1, 0.05); near(100 * a.transport, 10.4, 0.05);
+  const a1 = RZ.standardAndelar(B, 'Malmö', 1), F = 5754.14 + 830 + 2090;
+  near(a1.boende, 1066.46 / F, 1e-12); near(a1.investeringar, 2090 / F, 1e-12); near(a1.transport, (1749.27 - 848) / F, 1e-12);
+  near(100 * a1.boende, 12.3, 0.05); near(100 * a1.investeringar, 24.1, 0.05); near(100 * a1.transport, 10.4, 0.05);
   near(RZ.standardAndelar(B, 'Malmö', 0.5).investeringar, 0.5 * 2090 / F, 1e-12);
+  const n = RZ.standardByggandel(B), a = RZ.standardAndelar(B, 'Malmö');
+  near(a.investeringar, n * 2090 / F, 1e-12, 'standard: nybyggnationens andel av investeringarna');
+  near(100 * a.investeringar, 5.1, 0.05); near(100 * (a.boende + a.investeringar + a.transport), 27.8, 0.05);
   assert.deepStrictEqual(B.andelar.map(r => r.omrade), ['Malmö', 'Skåne', 'Sverige']);
   assert.deepStrictEqual(RZ.BUDGETGRUPPER.flatMap(g => g.kat).sort(), RZ.KATEGORIER.slice().sort(), 'varje kategori i exakt en grupp');
+});
+test('nybyggnationens andel av investeringarna ur SCB, Byggföretagen och Boverket', () => {
+  const d = RZ.nybyggnadsdelar(B);
+  near(d.bygg, 9507646 / 22451346, 1e-12, 'byggprodukter F41–F43 / fasta bruttoinvesteringar 2023');
+  near(d.hus, (235.9 + 273.6) / (235.9 + 273.6 + 143.2), 1e-12, 'bostäder + lokaler / bygginvesteringar 2023');
+  near(d.ny, 7240 / (7240 + 4129), 1e-12, 'nybyggnad / (nybyggnad + ombyggnad) 2015');
+  near(d.n, d.bygg * d.hus * d.ny, 1e-15); near(100 * d.n, 21.1, 0.05);
+  assert.strictEqual(RZ.standardByggandel({}), 1, 'utan underlag: hela investeringsandelen');
+  near(RZ.budgetFaktor(B, {...alla, tilldelning: 'Malmö', byggandel: null}), RZ.budgetFaktor(B, {...alla, tilldelning: 'Malmö'}), 1e-15);
 });
 test('budgetfaktorn är summan av andelarna för grupper med valda kategorier', () => {
   const a = RZ.standardAndelar(B, 'Malmö'), u = {...alla, tilldelning: 'Malmö'};
@@ -65,7 +78,7 @@ test('budgetfaktorn är summan av andelarna för grupper med valda kategorier', 
   near(RZ.budgetFaktor(B, {...u, kat: ['Energi']}), a.boende, 1e-12);
   near(RZ.budgetFaktor(B, {...u, kat: ['Byggnad']}), a.investeringar, 1e-12);
   near(RZ.budgetFaktor(B, {...u, kat: ['Byggnad', 'Förändrad markanvändning', 'Mobilitet och transport']}), a.investeringar + a.transport, 1e-12);
-  near(RZ.budgetFaktor(B, {...u, byggandel: 40}), a.boende + 0.4 * a.investeringar + a.transport, 1e-12);
+  near(RZ.budgetFaktor(B, {...u, byggandel: 40}), a.boende + 0.4 * RZ.standardAndelar(B, 'Malmö', 1).investeringar + a.transport, 1e-12);
   assert.strictEqual(RZ.budgetFaktor(B, alla), 1, 'utan tilldelning: hela budgeten');
   near(RZ.budgetFaktor(B, {...alla, tilldelning: 'egen', andelar: {boende: 10, investeringar: 5, transport: 20}}), 0.35, 1e-12);
 });
