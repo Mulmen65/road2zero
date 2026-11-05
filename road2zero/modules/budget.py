@@ -43,11 +43,14 @@ def bana(B: float, E0: float, n: int, y0: int = 2026) -> tuple[list[float], str]
 
 def andel_per_person(fb, B: float, E0: float, kf: float, ar: list[int]) -> tuple[dict[int, float], str]:
     """Andel per person och år (t CO2e, med påslag kf för andra växthusgaser) av en global budget B, för åren i ar.
-    År före 2026 får ingen budget."""
+    År före 2026 får ingen budget. Banan börjar alltid 2026 och indexeras med år − 2026, så att ett projekt som startar
+    senare får samma andel per person för ett visst år som ett projekt som startar 2026."""
     pop = Kurva({float(a): float(v) for a, v in zip(fb.befolkning["ar"], fb.befolkning["miljarder"])})
     ar_bana = [y for y in ar if y >= 2026]
-    E, text = bana(B, E0, len(ar_bana))
-    return {y: E[i] * kf / pop(y) for i, y in enumerate(ar_bana)}, text
+    if not ar_bana:
+        return {}, bana(B, E0, 0)[1]
+    E, text = bana(B, E0, max(ar_bana) - 2026 + 1)
+    return {y: E[y - 2026] * kf / pop(y) for y in ar_bana}, text
 
 
 def berakna(k: Kontext, invanare: dict[int, float], netto: pd.DataFrame) -> dict:

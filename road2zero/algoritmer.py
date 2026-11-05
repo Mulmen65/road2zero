@@ -200,7 +200,9 @@ ALGORITMER = [
             r"B_{\mathrm{stadsdel}} = \sum_t N(t) \cdot b(t)",
         ],
         "steg": ["Budgeten är förbrukad det första år då kumulativa nettoutsläpp överstiger stadsdelens hela budget.",
-                 "Banan börjar 2026. År före 2026 får ingen budgetandel men deras utsläpp räknas in i den kumulativa summan."],
+                 "Banan börjar 2026. År före 2026 får ingen budgetandel men deras utsläpp räknas in i den kumulativa summan.",
+                 "Banan räknas från 2026 även när projektet startar senare: år t får alltid E(t), så att ett projekt som startar 2030 "
+                 "börjar med andelen för 2030."],
         "parametrar": ["budget.e0", "budget.k"],
         "tabeller": ["budget_forster2026", "befolkning_unwpp2024"],
     },

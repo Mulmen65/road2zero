@@ -346,6 +346,32 @@ def test_tidigt_startar_och_egen_dokumentation():
     assert r.invanare[2003] > 0
 
 
+def test_budgetbanan_borjar_2026_aven_vid_senare_start():
+    """Ett projekt som startar 2030 får samma andel per person för 2030 som ett projekt som startar 2026: E(t) = E0(1 − E0/B)^(t − 2026)."""
+    fb = ladda()
+    B = global_gt(fb, "1,5", 50)
+    E0, kf = fb.param("budget.e0"), fb.param("budget.k")
+    fran_2026, _ = andel_per_person(fb, B, E0, kf, list(range(2026, 2051)))
+    fran_2030, _ = andel_per_person(fb, B, E0, kf, list(range(2030, 2051)))
+    assert set(fran_2030) == set(range(2030, 2051))
+    for y in range(2030, 2051):
+        assert fran_2030[y] == pytest.approx(fran_2026[y])
+    r = E0 / B
+    from road2zero.factlib import Kurva
+    pop = Kurva({float(a): float(v) for a, v in zip(fb.befolkning["ar"], fb.befolkning["miljarder"])})
+    assert fran_2030[2030] == pytest.approx(kf * E0 * (1 - r) ** 4 / pop(2030))
+    assert andel_per_person(fb, B, E0, kf, list(range(2000, 2026)))[0] == {}
+
+
+def test_jagersro_smt_budget_fran_2030():
+    """Jägersro SMT (2030–2050): budgeten för 1,5 °C räknas med banans värden för 2030–2050, inte för 2026–2046."""
+    fb = ladda()
+    s = fran_json(json.dumps(json.loads((Path(__file__).resolve().parents[1] / "fall" / "jagersro_smt.json").read_text(encoding="utf-8"))), fb)
+    b = berakna(s, fb).budget
+    assert b["stadsdel_t"] == pytest.approx(2143, rel=0.01)
+    assert b["slutar"][3] == 2032
+
+
 def test_excelexport_rymmer_stora_indata():
     import io
 
