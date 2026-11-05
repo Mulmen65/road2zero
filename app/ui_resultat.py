@@ -23,8 +23,23 @@ def excel(res) -> bytes:
         res.spar.to_excel(w, sheet_name="Mellanled", index=False)
         if not res.utanfor.empty:
             res.utanfor.to_excel(w, sheet_name="Undvikna utsläpp", index=False)
-        pd.DataFrame({"indata_json": [till_json(res.scen)]}).to_excel(w, sheet_name="Indata", index=False)
+        pd.DataFrame(indata_rader(till_json(res.scen)), columns=["indata_json", "fortsatter"]).to_excel(w, sheet_name="Indata", index=False)
     return buf.getvalue()
+
+
+def indata_rader(text: str, max_tecken: int = 30000) -> list[tuple[str, int]]:
+    """Indata-JSON som rader för Excel, där en cell rymmer högst 32 767 tecken. En rad per JSON-rad; längre rader delas och
+    får fortsatter = 1. Indatafilen fås tillbaka som "".join(t + ("" if f else "\\n") for t, f in rader)."""
+    ut = []
+    for rad in text.splitlines():
+        while len(rad) > max_tecken:
+            i = max_tecken
+            while rad[i] == "=":                 # en cell som börjar med = blir en formel i Excel
+                i -= 1
+            ut.append((rad[:i], 1))
+            rad = rad[i:]
+        ut.append((rad, 0))
+    return ut
 
 
 def visa(res):

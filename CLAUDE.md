@@ -10,6 +10,7 @@ och skriver svenska; svara och skriv all text i gränssnittet på svenska.
 pip install -r requirements.txt
 python -m pytest -q                                   # ska alltid vara grönt innan commit
 python -m streamlit run streamlit_app.py --server.port 8501
+python -m streamlit run scenario_app.py --server.port 8502   # road2zero-scenario
 python verktyg/las_tabell_a.py                        # läser underlag/tabell_a_utokad.xlsx till faktabiblioteket
 ```
 
@@ -26,6 +27,13 @@ Efter en ändring i gränssnittet: starta appen, öppna den i webbläsaren och t
 - `app/` – en fil per flik. `common.py` har `fmt()` (svenskt talformat), `editor()` och `senare()`.
 - `verktyg/las_tabell_a.py` – läser Tabell A utökad till `byggschabloner.csv`, `reduktionskurvor.csv` och byggraderna i `utveckling.csv`.
 - `underlag/` – källfiler som skripten läser. Visas aldrig i gränssnittet.
+- `fall/` – färdiga fall (Västra hamnen, Varvsstaden, Jägersro SMT) byggda av `verktyg/bygg_malmofall.py` med samma schabloner.
+  Ändra skriptet, inte JSON-filerna. Fallen visas i rullistan Färdigt fall i road2zero-scenario.
+- `scenario_app.py` – road2zero-scenario: tre scenarier (A, B, C) med alla indataflikar; `app/scenarier.py` håller scenarierna
+  (ss.scen pekar på det som ändras, eget nummerområde för ss.v per scenario), `app/ui_jamforelse.py` har jämförelseflikarna.
+- `road2zero/jamforelse.py` – rättvis jämförelse (används av scenario_app och `verktyg/jamfor_stadsdelar.py`).
+- `verktyg/jamfor_stadsdelar.py` – jämför fall: funktionsuppdelning (boende per invånare, verksamheter per arbetsplats), lika
+  förutsättningar (faktorer på 2026 års nivå), livscykel per år (engångsutsläpp / 50 år + drift) och standardiserad blandning.
 - `tests/test_motor.py` – regressionstester, källkonsistens och test för rent gränssnitt.
 
 ## Grundregler
@@ -33,20 +41,25 @@ Efter en ändring i gränssnittet: starta appen, öppna den i webbläsaren och t
 1. **Inga siffror i beräkningskoden.** Alla faktorer ligger i `road2zero/data/` med källa. Ny källa läggs in i `referenser.csv`.
    Värden utan extern källa får källan `MODELLVAL` och statusen Modellval eller Antagande.
 2. **Rent gränssnitt.** Gränssnittet, faktabiblioteket och koden får inte hänvisa till internt eller tidigare bilagt underlag
-   (Klimatanalys 3.0, Jägersro, Vägvis, Oceanhamnen, QA-underlag). Hänvisa till de publicerade källorna. `test_rent_granssnitt` kontrollerar.
+   (Klimatanalys 3.0, Jägersro-modellen, Vägvis, Oceanhamnen, QA-underlag). Hänvisa till de publicerade källorna.
+   `test_rent_granssnitt` kontrollerar app/, road2zero/ och startfilerna. Undantag: färdiga fall i `fall/` och skriptet som bygger
+   dem får namnge verkliga stadsdelar, även Jägersro SMT, när fallen bygger på publicerade källor.
 3. **Appen startar med ett tomt projekt.** `scenario.exempel()` är ett påhittat testfall och används bara av testerna.
 4. **Allt indata som påverkar resultatet har ett förifyllt värde med källa** som användaren kan ändra.
 5. **Svenskt talformat** i gränssnittet: mellanslag som tusentalsavgränsare och decimalkomma (`fmt()`).
 6. **Indataflikar som visar resultat** använder `senare()` så att tabeller och diagram fylls efter att alla indata lästs.
 7. **Diagram**: följ paletten i `app/ui_illustration.py` och `app/ui_utveckling.py`; aldrig två y-axlar.
 8. **Sparade indata** ska fortsätta gå att öppna. Ändras datamodellen: lägg migrering i `scenario.fran_json()` och ett test.
+9. **Val i st.radio och st.selectbox:** Streamlit sparar valet som etikettens text. Etiketter som kan ändras (namn, parametervärden)
+   ska inte användas som `format_func`; använd fasta etiketter och kör värdet genom `common.giltigt()`.
 
 ## Modellbeslut (ändras bara om användaren ber om det)
 
 - **Kategorier och nivåer:** Byggnad, Energi, Anläggning, Förändrad markanvändning (nivå 1); Mobilitet och transport, Flygresor,
   Matkonsumtion, Övrig konsumtion (nivå 2); Offentliga investeringar (nivå 3); Negativa utsläpp dras av på alla nivåer.
   Undvikna utsläpp från exporterad solel redovisas utanför nettot.
-- **Tid:** hela år, standard 2026–2076. Byggskedet bokförs det år BTA:n blir klar. Drift och invånare med halvårsregel.
+- **Tid:** hela år, standard 2026–2076. Startår från 1990 går att välja för befintliga stadsdelar; år före 2026 använder startvärdena
+  (ingen bakåtskrivning) och får ingen budgetandel. Byggskedet bokförs det år BTA:n blir klar. Drift och invånare med halvårsregel.
 - **Emissionsfaktorer över tid:** startvärdet gäller 2026; från 2027 till 2100 årlig förändring i procent per period
   (2027–2030, 2031–2035, 2036–2040, 2041–2045, 2046–2050, 2051–2060, 2061–2070, 2071–2100). Elbilar och laddhybrider i procentenheter.
 - **Byggbestånd som andelar:** varje andel har byggnadstyp, en stomme, BTA, utbyggnadstakt och egna energival:

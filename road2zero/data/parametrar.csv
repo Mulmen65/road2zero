@@ -65,3 +65,5 @@ off.investeringar;Offentliga investeringar;Investeringar, offentliga och privata
 off.andel;Offentliga investeringar;Offentlig andel av investeringarna;0.18;andel;Härlett;REGERINGEN2015;4,2 % av BNP av totalt 23,1 % år 2014
 budget.e0;Klimatbudget;Globala CO2-utsläpp 2025;43.0;Gt CO2;Litteraturvärde;FORSTER2026;38,9 fossilt och industri plus 4,1 markanvändning
 budget.k;Klimatbudget;Påslag för andra växthusgaser (alla gaser / CO2, 2024);1.314815;kvot;Litteraturvärde;FORSTER2026;56,8 / 43,2
+jmf.livslangd;Jämförelse;Referensstudieperiod för engångsutsläpp;50;år;Modellval;MODELLVAL;"Engångsutsläpp fördelas per år i jämförelsen; 50 år är en vanlig referensstudieperiod i livscykelanalyser av byggnader (till exempel EU:s Level(s))"
+jmf.m2_per_arbetsplats;Jämförelse;BTA per arbetsplats i verksamheter;20;m² BTA per arbetsplats;Antagande;MODELLVAL;Används för att räkna verksamheternas utsläpp per arbetsplats i jämförelsen

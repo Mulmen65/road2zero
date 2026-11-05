@@ -142,7 +142,10 @@ def sammanhang(res):
     fig.add_scatter(x=ar, y=[res.invanare.get(y, 0) for y in ar], mode="lines", line=dict(color=INK, width=2), row=1, col=3,
                     hovertemplate="%{x}: %{y:,.0f} invånare<extra></extra>")
     fig.update_layout(showlegend=False)
-    fig = _layout(fig, "Förutsättningar över tid", "Elens klimatfaktor, laddbara bilars andel och antalet invånare enligt fliken Emissionsfaktorer över tid", 300, yt=None)
+    fig = _layout(fig, "Förutsättningar över tid", "Elens klimatfaktor, laddbara bilars andel och antalet invånare enligt fliken Emissionsfaktorer över tid", 340, yt=None)
+    # delrubrikerna ligger ovanför ritytan; större toppmarginal så att de inte krockar med undertiteln
+    fig.update_layout(margin=dict(t=110))
+    fig.update_annotations(font=dict(size=12, color=INK))
     fig.update_yaxes(tickformat=",.0f")
     return fig
 

@@ -254,10 +254,18 @@ def till_json(s: dict) -> str:
     return json.dumps(s, ensure_ascii=False, indent=2)
 
 
+SCENARIOSET = "road2zero-scenarier"     # filtyp för tre scenarier i road2zero-scenario
+
+
 def fran_json(text: str, fb: Faktabibliotek | None = None) -> dict:
     """Läser sparade indata och fyller på nycklar som saknas med standardvärden.
     Byggnadsrader i det äldre formatet delas upp i andelar med en stomme var."""
     data = json.loads(text)
+    if isinstance(data, dict) and data.get("typ") == SCENARIOSET:
+        raise ValueError("Filen innehåller tre scenarier (A, B och C) och öppnas i road2zero-scenario. "
+                         "Spara ett scenario i taget där om du vill öppna det här.")
+    if not isinstance(data, dict) or not ({"projekt", "byggnader"} & set(data)):
+        raise ValueError("Filen innehåller inga indata från Road2Zero.")
     bas = tomt(fb)
 
     def fyll(d, b):

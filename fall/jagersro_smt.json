@@ -1,0 +1,1281 @@
+{
+  "modellversion": "0.5.4",
+  "projekt": {
+    "namn": "Jägersro SMT, Malmö",
+    "kommun": "Malmö",
+    "fas": "Planprogram",
+    "startar": 2030,
+    "slutar": 2050
+  },
+  "fjarrvarme": {
+    "startvarde": 55.3
+  },
+  "utveckling": {
+    "takt": {
+      "bygg.betong_bau": [
+        -5.71,
+        -5.98,
+        -1.44,
+        -1.53,
+        -1.23,
+        -0.89,
+        -0.72,
+        0.0
+      ],
+      "bygg.betong_bast": [
+        -9.24,
+        -5.92,
+        -1.65,
+        -1.8,
+        -0.97,
+        -1.05,
+        -0.87,
+        0.0
+      ],
+      "bygg.stal_bau": [
+        -5.71,
+        -5.98,
+        -2.18,
+        -2.0,
+        -1.76,
+        -1.23,
+        -0.82,
+        0.0
+      ],
+      "bygg.stal_bast": [
+        -9.24,
+        -5.92,
+        -4.36,
+        -3.2,
+        -2.47,
+        -1.42,
+        -0.39,
+        0.0
+      ],
+      "bygg.tra_bau": [
+        -5.71,
+        -5.98,
+        -1.08,
+        -1.12,
+        -0.78,
+        -0.41,
+        -0.42,
+        0.0
+      ],
+      "bygg.tra_bast": [
+        -9.24,
+        -5.92,
+        -1.65,
+        -1.34,
+        -1.44,
+        -0.51,
+        -0.54,
+        0.0
+      ],
+      "anl": [
+        -5.71,
+        -5.98,
+        -1.44,
+        -1.53,
+        -1.23,
+        -0.89,
+        -0.72,
+        0.0
+      ],
+      "el": [
+        -3.54,
+        -2.52,
+        -2.88,
+        -2.09,
+        -2.33,
+        -2.33,
+        -2.33,
+        -2.33
+      ],
+      "fjv": [
+        -1.63,
+        -1.75,
+        -1.92,
+        -2.13,
+        -2.38,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bilprod": [
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7
+      ],
+      "forbranning": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bev": [
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0
+      ],
+      "phev": [
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7
+      ],
+      "bilar_hh": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "km_bil": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mat": [
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3
+      ],
+      "ovrig": [
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7
+      ],
+      "flyg": [
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8
+      ],
+      "offentlig": [
+        -5.74,
+        -13.96,
+        -13.96,
+        -13.96,
+        -13.96,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "anl_foljer_betong": true,
+    "ovrig_foljer_bilprod": true
+  },
+  "hushall": {
+    "personer_per_hushall": 2.07,
+    "bta_per_hushall": 102.3
+  },
+  "byggnader": [
+    {
+      "namn": "Bostäder etapp 1",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 102300.0,
+      "forsta_ar": 2032,
+      "sista_ar": 2035,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Bostäder etapp 2",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 102300.0,
+      "forsta_ar": 2036,
+      "sista_ar": 2040,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Bostäder etapp 3",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 102300.0,
+      "forsta_ar": 2041,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Bostäder etapp 4",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 102300.0,
+      "forsta_ar": 2046,
+      "sista_ar": 2050,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Verksamheter och stadsdelscentrum (2 000 arbetsplatser)",
+      "typ": "kontor",
+      "stomme": "generisk",
+      "bta": 40000.0,
+      "forsta_ar": 2034,
+      "sista_ar": 2050,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Förskola 1",
+      "typ": "skola",
+      "stomme": "generisk",
+      "bta": 1300.0,
+      "forsta_ar": 2033,
+      "sista_ar": 2033,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Förskola 2",
+      "typ": "skola",
+      "stomme": "generisk",
+      "bta": 1300.0,
+      "forsta_ar": 2037,
+      "sista_ar": 2037,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Förskola 3",
+      "typ": "skola",
+      "stomme": "generisk",
+      "bta": 1300.0,
+      "forsta_ar": 2041,
+      "sista_ar": 2041,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Förskola 4",
+      "typ": "skola",
+      "stomme": "generisk",
+      "bta": 1300.0,
+      "forsta_ar": 2045,
+      "sista_ar": 2045,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Förskola 5",
+      "typ": "skola",
+      "stomme": "generisk",
+      "bta": 1300.0,
+      "forsta_ar": 2049,
+      "sista_ar": 2049,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Grundskola",
+      "typ": "skola",
+      "stomme": "generisk",
+      "bta": 9000.0,
+      "forsta_ar": 2038,
+      "sista_ar": 2038,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Mobilitetshus 1",
+      "typ": "mobilitetshus",
+      "stomme": "generisk",
+      "bta": 6429.0,
+      "forsta_ar": 2032,
+      "sista_ar": 2032,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Mobilitetshus 2",
+      "typ": "mobilitetshus",
+      "stomme": "generisk",
+      "bta": 6429.0,
+      "forsta_ar": 2035,
+      "sista_ar": 2035,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Mobilitetshus 3",
+      "typ": "mobilitetshus",
+      "stomme": "generisk",
+      "bta": 6429.0,
+      "forsta_ar": 2038,
+      "sista_ar": 2038,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Mobilitetshus 4",
+      "typ": "mobilitetshus",
+      "stomme": "generisk",
+      "bta": 6429.0,
+      "forsta_ar": 2041,
+      "sista_ar": 2041,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Mobilitetshus 5",
+      "typ": "mobilitetshus",
+      "stomme": "generisk",
+      "bta": 6429.0,
+      "forsta_ar": 2044,
+      "sista_ar": 2044,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Mobilitetshus 6",
+      "typ": "mobilitetshus",
+      "stomme": "generisk",
+      "bta": 6429.0,
+      "forsta_ar": 2047,
+      "sista_ar": 2047,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Mobilitetshus 7",
+      "typ": "mobilitetshus",
+      "stomme": "generisk",
+      "bta": 6429.0,
+      "forsta_ar": 2050,
+      "sista_ar": 2050,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    }
+  ],
+  "anlaggning": {
+    "ytor": [
+      {
+        "typ": "huvudgata",
+        "utforande": "standard",
+        "yta_m2": 11070.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2048
+      },
+      {
+        "typ": "lokalgata",
+        "utforande": "standard",
+        "yta_m2": 41000.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2050
+      },
+      {
+        "typ": "gc_vag",
+        "utforande": "standard",
+        "yta_m2": 11070.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2050
+      },
+      {
+        "typ": "torg",
+        "utforande": "standard",
+        "yta_m2": 8610.0,
+        "forsta_ar": 2034,
+        "sista_ar": 2045
+      },
+      {
+        "typ": "park",
+        "utforande": "standard",
+        "yta_m2": 50000.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2034
+      },
+      {
+        "typ": "bostadsgard",
+        "utforande": "standard",
+        "yta_m2": 40000.0,
+        "forsta_ar": 2032,
+        "sista_ar": 2050
+      },
+      {
+        "typ": "lekplats",
+        "utforande": "standard",
+        "yta_m2": 2000.0,
+        "forsta_ar": 2032,
+        "sista_ar": 2050
+      },
+      {
+        "typ": "skolgard",
+        "utforande": "standard",
+        "yta_m2": 15500.0,
+        "forsta_ar": 2033,
+        "sista_ar": 2049
+      }
+    ],
+    "massor": [
+      {
+        "typ": "Schakt",
+        "volym_m3": 123000.0,
+        "transport_km": 10.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2050
+      },
+      {
+        "typ": "Sanering",
+        "volym_m3": 10000.0,
+        "transport_km": 15.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2035
+      }
+    ],
+    "betong": [],
+    "ledningar": [
+      {
+        "meter": 16400.0,
+        "forsta_ar": 2030,
+        "sista_ar": 2050
+      }
+    ],
+    "engangsvarden": []
+  },
+  "mark": {
+    "overgangar": [
+      {
+        "fran": "Urban grönyta",
+        "till": "Park",
+        "ha": 5.0,
+        "ar": 2030,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Urban grönyta",
+        "till": "Bebyggd kvartersmark",
+        "ha": 1.25,
+        "ar": 2030,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Urban grönyta",
+        "till": "Kvartersmark gård",
+        "ha": 0.5,
+        "ar": 2030,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Bebyggd kvartersmark",
+        "ha": 3.75,
+        "ar": 2030,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Gata och torg",
+        "ha": 1.75,
+        "ar": 2030,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Kvartersmark gård",
+        "ha": 0.5,
+        "ar": 2030,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Urban grönyta",
+        "till": "Bebyggd kvartersmark",
+        "ha": 1.25,
+        "ar": 2035,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Urban grönyta",
+        "till": "Kvartersmark gård",
+        "ha": 0.5,
+        "ar": 2035,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Bebyggd kvartersmark",
+        "ha": 3.75,
+        "ar": 2035,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Gata och torg",
+        "ha": 1.75,
+        "ar": 2035,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Kvartersmark gård",
+        "ha": 0.5,
+        "ar": 2035,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Urban grönyta",
+        "till": "Bebyggd kvartersmark",
+        "ha": 1.25,
+        "ar": 2040,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Urban grönyta",
+        "till": "Kvartersmark gård",
+        "ha": 0.5,
+        "ar": 2040,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Bebyggd kvartersmark",
+        "ha": 3.75,
+        "ar": 2040,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Gata och torg",
+        "ha": 1.75,
+        "ar": 2040,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Kvartersmark gård",
+        "ha": 0.5,
+        "ar": 2040,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Urban grönyta",
+        "till": "Bebyggd kvartersmark",
+        "ha": 1.25,
+        "ar": 2045,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Urban grönyta",
+        "till": "Kvartersmark gård",
+        "ha": 0.5,
+        "ar": 2045,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Bebyggd kvartersmark",
+        "ha": 3.75,
+        "ar": 2045,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Gata och torg",
+        "ha": 1.75,
+        "ar": 2045,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Kvartersmark gård",
+        "ha": 0.5,
+        "ar": 2045,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      }
+    ],
+    "pooler": {},
+    "bevarande": {}
+  },
+  "mobilitet": {
+    "kommunvarden": true,
+    "bilar_per_hushall": 0.581,
+    "km_per_bil": 11892.0,
+    "mix": {
+      "petrol": 0.37,
+      "diesel": 0.36,
+      "hev": 0.05,
+      "bev": 0.11,
+      "phev": 0.1,
+      "biogas": 0.01
+    },
+    "phev_eldrift": 0.35,
+    "bensin_fossil": 0.92,
+    "diesel_fossil": 0.93
+  },
+  "mat": {
+    "andelar": {
+      "vegan": 0.037,
+      "vegetarian": 0.284,
+      "fisk": 0.146,
+      "kott_lag": 0.168,
+      "kott_medel": 0.216,
+      "kott_hog": 0.149
+    },
+    "avtryck": {
+      "vegan": 2.47,
+      "vegetarian": 4.16,
+      "fisk": 2.74,
+      "kott_lag": 5.37,
+      "kott_medel": 7.04,
+      "kott_hog": 10.24
+    },
+    "kalibrering": false,
+    "omstallning": false,
+    "mal_andelar": {
+      "vegan": 0.037,
+      "vegetarian": 0.284,
+      "fisk": 0.146,
+      "kott_lag": 0.168,
+      "kott_medel": 0.216,
+      "kott_hog": 0.149
+    },
+    "malar": 2045
+  },
+  "ovrig": {
+    "varden": {
+      "fritid": 0.4314,
+      "ovrigt": 0.2696,
+      "klader": 0.2157,
+      "mobler": 0.2157,
+      "restaurang": 0.2157,
+      "kommunikation": 0.1618,
+      "alkohol": 0.1078
+    }
+  },
+  "flyg": {
+    "per_inv": 1.1
+  },
+  "offentlig": {
+    "konsumtion": 0.83,
+    "investeringar": 2.09,
+    "andel": 0.18
+  },
+  "negativa": {
+    "biokol": [],
+    "trad": [
+      {
+        "antal": 250,
+        "planteringsar": 2032
+      },
+      {
+        "antal": 250,
+        "planteringsar": 2037
+      },
+      {
+        "antal": 250,
+        "planteringsar": 2042
+      },
+      {
+        "antal": 250,
+        "planteringsar": 2047
+      }
+    ]
+  },
+  "budget": {
+    "temperatur": "1,5",
+    "sannolikhet": 50,
+    "niva": 3
+  },
+  "parametrar": {},
+  "dokumentation": {
+    "beskrivning": "Jägersro SMT från första spadtaget 2030 till 2050, med samma schabloner som fallen för Västra hamnen och Varvsstaden.",
+    "avgransning": "SMT:s del av Jägersro, 41 ha, 4 000 bostäder och 2 000 arbetsplatser. Tidplanen (inflyttning 2032–2050 i fyra etapper) är ett antagande.",
+    "kalibrering": {
+      "personer_per_hushall": "2,07 (FÖP: 8 900 invånare på 4 300 bostäder)",
+      "bta_per_hushall": "102,3 m² (FÖP: 440 000 m² på 4 300 bostäder)",
+      "bilar_per_hushall": "Malmös 0,581 (SCB). Byt gärna mot ett värde för området när ett sådant finns.",
+      "arbetsplatser": "2 000 × 20 m² BTA"
+    },
+    "kategorier": {
+      "Energi": [
+        "Fjärrvärmens klimatfaktor 55.3 g CO2e/kWh: Energiföretagens medelvärde för levererad fjärrvärme 2024 (riksgenomsnitt). E.ON:s lokala miljövärde för Malmönätet kunde inte läsas (tabellen finns som Excel hos Energiföretagen). Byt till ortens värde och använd samma värde i alla fall som jämförs.",
+        "Elens klimatfaktor: modellens standard (Boverket 37 g CO2e/kWh) och utveckling enligt fliken Emissionsfaktorer över tid.",
+        "Andel fjärrvärme 100 % för uppvärmda byggnader: i princip alla bostäder i området är anslutna till fjärrvärme (Bo01:s lokala system med akviferlager, värmepump och solfångare levererar till nätet).",
+        "Energiklass efter byggår (antagande): D för 2001–2015 (byggregler före BBR 2015/2020 och uppföljda avvikelser mot Bo01:s mål), C från 2016 (nybyggnadskrav), B för Svanenmärkta hus i Varvsstaden."
+      ],
+      "Tid": [
+        "Modellen räknar inte bakåt: startvärdena 2026 gäller för alla år före 2026 (byggpåverkan, el, fjärrvärme, drivlinemix, konsumtion). Faktiska utsläpp före 2026 var högre (äldre byggmetoder, mer fossil el och fjärrvärme, nästan inga elbilar), så resultaten före 2026 är en undre skattning.",
+        "Klimatbudgeten (Forster m.fl. 2026) börjar 2026. År före 2026 har ingen budgetandel men deras utsläpp räknas in i den kumulativa summan. Jämför därför också perioden 2026–2050 eller 2030–2050."
+      ],
+      "Konsumtion": [
+        "Mat, övrig konsumtion, flyg och offentlig sektor: modellens standardvärden per invånare (Sverige). Ingen justering för inkomstnivå, så att fallen kan jämföras med samma antaganden."
+      ],
+      "Byggnad": [
+        "Stomme Generisk och energiklass C (inga beslut ännu). Ingen pålning (antagande om lermorän)."
+      ],
+      "Anläggning": [
+        "huvudgata: Huvudgator, 2,7 % av 41 ha (samma andel som i Västra hamnen).",
+        "lokalgata: Lokalgator, 10 % av 41 ha.",
+        "gc_vag: Gång- och cykelvägar, 2,7 % av ytan.",
+        "torg: Torg vid stadsdelscentrum och kollektivtrafiknod, 2,1 % av ytan.",
+        "park: Stadsdelspark på travbanans innerplan, minst 5 ha enligt planen; 5 ha används.",
+        "bostadsgard: Bostadsgårdar, 10 m² per bostad (Västra hamnen 11, Varvsstaden 8).",
+        "lekplats: Lekplatser.",
+        "skolgard: Skol- och förskolegårdar, 1 m² per m² BTA närservice (samma i alla fall).",
+        "Schakt: 3 000 m³ per ha för grundläggning och ledningar (antagande; Västra hamnen cirka 2 100, Varvsstaden 8 300 med garage och utfyllnad).",
+        "Sanering: Begränsad sanering av travbana, stall och parkeringar (antagande).",
+        ": 0,4 km ledningar per ha (Västra hamnen 0,32, Varvsstaden 0,56); antagande."
+      ],
+      "Förändrad markanvändning": [
+        "Före (antagande): 12 ha gräs på travbanornas innerplan och kringytor (urban grönyta), 24 ha banor, stall och parkering (hårdgjord), 5 ha oförändrat. Parken behåller markkolet; grönyta som bebyggs förlorar markkol och biomassa."
+      ],
+      "Negativa utsläpp": [
+        "1 000 stadsträd, 25 per ha (antagande)."
+      ]
+    },
+    "andelar": [
+      {
+        "namn": "Bostäder etapp 1",
+        "bta_m2": 102300.0,
+        "ar": "2032–2035",
+        "status": "Uppgift",
+        "underlag": "1 000 bostäder × 102.3 m² BTA. 4 000 bostäder i fyra lika etapper; första spadtag 2030 och första inflyttning 2032 (antagande om tidplan). 102,3 m² BTA per bostad enligt FÖP:s genomsnitt. Stomme ej vald (Generisk). Ingen pålning (lermorän, antagande).",
+        "kallor": [
+          "SMT_AVGRANSNING",
+          "FOP_JAGERSRO",
+          "MALMO_JAGERSRO_2024"
+        ]
+      },
+      {
+        "namn": "Bostäder etapp 2",
+        "bta_m2": 102300.0,
+        "ar": "2036–2040",
+        "status": "Uppgift",
+        "underlag": "1 000 bostäder × 102.3 m² BTA. 4 000 bostäder i fyra lika etapper; första spadtag 2030 och första inflyttning 2032 (antagande om tidplan). 102,3 m² BTA per bostad enligt FÖP:s genomsnitt. Stomme ej vald (Generisk). Ingen pålning (lermorän, antagande).",
+        "kallor": [
+          "SMT_AVGRANSNING",
+          "FOP_JAGERSRO",
+          "MALMO_JAGERSRO_2024"
+        ]
+      },
+      {
+        "namn": "Bostäder etapp 3",
+        "bta_m2": 102300.0,
+        "ar": "2041–2045",
+        "status": "Uppgift",
+        "underlag": "1 000 bostäder × 102.3 m² BTA. 4 000 bostäder i fyra lika etapper; första spadtag 2030 och första inflyttning 2032 (antagande om tidplan). 102,3 m² BTA per bostad enligt FÖP:s genomsnitt. Stomme ej vald (Generisk). Ingen pålning (lermorän, antagande).",
+        "kallor": [
+          "SMT_AVGRANSNING",
+          "FOP_JAGERSRO",
+          "MALMO_JAGERSRO_2024"
+        ]
+      },
+      {
+        "namn": "Bostäder etapp 4",
+        "bta_m2": 102300.0,
+        "ar": "2046–2050",
+        "status": "Uppgift",
+        "underlag": "1 000 bostäder × 102.3 m² BTA. 4 000 bostäder i fyra lika etapper; första spadtag 2030 och första inflyttning 2032 (antagande om tidplan). 102,3 m² BTA per bostad enligt FÖP:s genomsnitt. Stomme ej vald (Generisk). Ingen pålning (lermorän, antagande).",
+        "kallor": [
+          "SMT_AVGRANSNING",
+          "FOP_JAGERSRO",
+          "MALMO_JAGERSRO_2024"
+        ]
+      },
+      {
+        "namn": "Verksamheter och stadsdelscentrum (2 000 arbetsplatser)",
+        "bta_m2": 40000.0,
+        "ar": "2034–2050",
+        "status": "Antagande",
+        "underlag": "2 000 arbetsplatser × 20 m² BTA per arbetsplats (samma antagande som i de andra fallen).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024"
+        ]
+      },
+      {
+        "namn": "Förskola 1",
+        "bta_m2": 1300.0,
+        "ar": "2033",
+        "status": "Antagande",
+        "underlag": "Fem förskolor enligt planen; 1 300 m² per förskola (antagande, samma schablon som i de andra fallen).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024",
+          "SBN_JAGERSRO_2025"
+        ]
+      },
+      {
+        "namn": "Förskola 2",
+        "bta_m2": 1300.0,
+        "ar": "2037",
+        "status": "Antagande",
+        "underlag": "Fem förskolor enligt planen; 1 300 m² per förskola (antagande, samma schablon som i de andra fallen).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024",
+          "SBN_JAGERSRO_2025"
+        ]
+      },
+      {
+        "namn": "Förskola 3",
+        "bta_m2": 1300.0,
+        "ar": "2041",
+        "status": "Antagande",
+        "underlag": "Fem förskolor enligt planen; 1 300 m² per förskola (antagande, samma schablon som i de andra fallen).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024",
+          "SBN_JAGERSRO_2025"
+        ]
+      },
+      {
+        "namn": "Förskola 4",
+        "bta_m2": 1300.0,
+        "ar": "2045",
+        "status": "Antagande",
+        "underlag": "Fem förskolor enligt planen; 1 300 m² per förskola (antagande, samma schablon som i de andra fallen).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024",
+          "SBN_JAGERSRO_2025"
+        ]
+      },
+      {
+        "namn": "Förskola 5",
+        "bta_m2": 1300.0,
+        "ar": "2049",
+        "status": "Antagande",
+        "underlag": "Fem förskolor enligt planen; 1 300 m² per förskola (antagande, samma schablon som i de andra fallen).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024",
+          "SBN_JAGERSRO_2025"
+        ]
+      },
+      {
+        "namn": "Grundskola",
+        "bta_m2": 9000.0,
+        "ar": "2038",
+        "status": "Antagande",
+        "underlag": "En grundskola enligt planen; 9 000 m² (antagande, samma schablon som i de andra fallen).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024",
+          "SBN_JAGERSRO_2025"
+        ]
+      },
+      {
+        "namn": "Mobilitetshus 1",
+        "bta_m2": 6429.0,
+        "ar": "2032",
+        "status": "Antagande",
+        "underlag": "Sju mobilitetshus enligt planen; 0 4 platser per bostad och 0 1 per arbetsplats  1 800 platser × 25 m² (samma regel som i Västra hamnen efter 2016).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024"
+        ]
+      },
+      {
+        "namn": "Mobilitetshus 2",
+        "bta_m2": 6429.0,
+        "ar": "2035",
+        "status": "Antagande",
+        "underlag": "Sju mobilitetshus enligt planen; 0 4 platser per bostad och 0 1 per arbetsplats  1 800 platser × 25 m² (samma regel som i Västra hamnen efter 2016).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024"
+        ]
+      },
+      {
+        "namn": "Mobilitetshus 3",
+        "bta_m2": 6429.0,
+        "ar": "2038",
+        "status": "Antagande",
+        "underlag": "Sju mobilitetshus enligt planen; 0 4 platser per bostad och 0 1 per arbetsplats  1 800 platser × 25 m² (samma regel som i Västra hamnen efter 2016).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024"
+        ]
+      },
+      {
+        "namn": "Mobilitetshus 4",
+        "bta_m2": 6429.0,
+        "ar": "2041",
+        "status": "Antagande",
+        "underlag": "Sju mobilitetshus enligt planen; 0 4 platser per bostad och 0 1 per arbetsplats  1 800 platser × 25 m² (samma regel som i Västra hamnen efter 2016).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024"
+        ]
+      },
+      {
+        "namn": "Mobilitetshus 5",
+        "bta_m2": 6429.0,
+        "ar": "2044",
+        "status": "Antagande",
+        "underlag": "Sju mobilitetshus enligt planen; 0 4 platser per bostad och 0 1 per arbetsplats  1 800 platser × 25 m² (samma regel som i Västra hamnen efter 2016).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024"
+        ]
+      },
+      {
+        "namn": "Mobilitetshus 6",
+        "bta_m2": 6429.0,
+        "ar": "2047",
+        "status": "Antagande",
+        "underlag": "Sju mobilitetshus enligt planen; 0 4 platser per bostad och 0 1 per arbetsplats  1 800 platser × 25 m² (samma regel som i Västra hamnen efter 2016).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024"
+        ]
+      },
+      {
+        "namn": "Mobilitetshus 7",
+        "bta_m2": 6429.0,
+        "ar": "2050",
+        "status": "Antagande",
+        "underlag": "Sju mobilitetshus enligt planen; 0 4 platser per bostad och 0 1 per arbetsplats  1 800 platser × 25 m² (samma regel som i Västra hamnen efter 2016).",
+        "kallor": [
+          "MALMO_JAGERSRO_2024"
+        ]
+      }
+    ],
+    "kallor": [
+      {
+        "id": "SMT_AVGRANSNING",
+        "titel": "Användarens avgränsning av SMT: 4 000 bostäder och 41 ha",
+        "url": ""
+      },
+      {
+        "id": "FOP_JAGERSRO",
+        "titel": "Malmö stad: Översiktsplan för Jägersro, granskningshandling (s. 14–15: 4 300 bostäder, 440 000 m² bostads-BTA, 8 900 invånare, park > 5 ha)",
+        "url": "https://malmo.se/Stadsutveckling/Det-har-ar-pa-gang-i-Malmo/Fordjupad-oversiktsplan-for-Jagersro.html"
+      },
+      {
+        "id": "MALMO_JAGERSRO_2024",
+        "titel": "Malmö stad: Nya Jägersro blir en hållbar stadsdel i absoluta framkant (pressmeddelande)",
+        "url": "https://www.mynewsdesk.com/se/malmo/pressreleases/nya-jaegersro-blir-en-haallbar-stadsdel-i-absoluta-framkant-3325882"
+      },
+      {
+        "id": "SBN_JAGERSRO_2025",
+        "titel": "Malmö stad: Tjänsteskrivelse SBN 2025-06-19, Översiktsplan för Jägersro (fem förskolor, en grundskola; travbanan flyttar 2028)",
+        "url": "https://motenmedborgarportal.malmo.se/welcome-sv/namnder-styrelser/stadsbyggnadsnamnden/mote-2025-06-19/agenda/g-tjansteskrivelse-sbn-2025-06-19-oversiktsplan-for-jagersropdf?downloadMode=open"
+      },
+      {
+        "id": "EF_HIST_2024",
+        "titel": "Energiföretagen: Miljövärden, historiska medelvärden (fjärrvärme 2024)",
+        "url": "https://www.energiforetagen.se/49dccf/globalassets/energiforetagen/statistik/fjarrvarme/miljovardering-av-fjarrvarme/2024/miljovarden-historiska-medelvarden.pdf"
+      },
+      {
+        "id": "EF_LOKALA",
+        "titel": "Energiföretagen: Fjärrvärmens lokala miljövärden",
+        "url": "https://www.energiforetagen.se/statistik/fjarrvarmestatistik/miljovardering-av-fjarrvarme/"
+      },
+      {
+        "id": "SCB_TRAFA_MALMO",
+        "titel": "Road2Zero faktabibliotek: Malmö, bilar per hushåll och körsträcka (SCB, Trafikanalys)",
+        "url": ""
+      },
+      {
+        "id": "MALMO_PARKERING",
+        "titel": "Malmö stad: Policy och norm för mobilitet och parkering",
+        "url": "https://malmo.se/Stadsutveckling/Sa-utvecklar-vi-staden/Resande-och-infrastruktur/Policy-och-norm-for-mobilitet-och-parkering.html"
+      }
+    ],
+    "nyckeltal": {
+      "modellversion": "0.5.4",
+      "kommentar": "Beräknat när filen skapades; ändras när indata eller faktabibliotek ändras.",
+      "bta_m2": 509703,
+      "invanare_2050": 8073,
+      "byggnad_kg_per_m2_bta": 197,
+      "2030_2050": {
+        "netto_t": {
+          "niva1": 118148,
+          "niva2": 408254,
+          "niva3": 420555
+        },
+        "personar": 81765,
+        "t_per_personar": {
+          "niva1": 1.44,
+          "niva2": 4.99,
+          "niva3": 5.14
+        },
+        "per_kategori_t": {
+          "Byggnad": 100343,
+          "Energi": 12254,
+          "Anläggning": 3615,
+          "Förändrad markanvändning": 2042,
+          "Mobilitet och transport": 23916,
+          "Flygresor": 65122,
+          "Matkonsumtion": 132855,
+          "Övrig konsumtion": 68213,
+          "Offentliga investeringar": 12301,
+          "Negativa utsläpp": -106
+        }
+      }
+    }
+  }
+}

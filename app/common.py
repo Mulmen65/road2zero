@@ -86,6 +86,21 @@ def editor(namn: str, bygg, **kw) -> pd.DataFrame:
     return st.data_editor(ss[bas], key=nyckel, width="stretch", **kw)
 
 
+def giltigt(v, alternativ: list, reserv=None, etikett=None):
+    """Ett giltigt alternativ för ett val i st.radio eller st.selectbox.
+
+    Streamlit sparar valet som etikettens text. Om etiketten eller alternativen har ändrats sedan sidan ritades (till exempel
+    när ett scenario byter namn medan appen räknar) lämnar Streamlit tillbaka texten i stället för alternativet. Då mappas
+    texten tillbaka via etiketten eller början av texten, annars används reserven eller första alternativet."""
+    if v in alternativ:
+        return v
+    s = str(v)
+    for a in alternativ:
+        if (etikett and s == str(etikett(a))) or s.startswith(str(a)):
+            return a
+    return reserv if reserv in alternativ else (alternativ[0] if alternativ else None)
+
+
 def kalla_text(ids: str) -> str:
     """Kortnamn med länk för en kommaseparerad lista med käll-id."""
     out = []
