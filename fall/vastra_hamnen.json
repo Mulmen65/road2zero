@@ -1,0 +1,1514 @@
+{
+  "modellversion": "0.5.4",
+  "projekt": {
+    "namn": "Västra hamnen väster om Stora Varvsgatan, Malmö",
+    "kommun": "Malmö",
+    "fas": "Genomförande",
+    "startar": 2000,
+    "slutar": 2050
+  },
+  "fjarrvarme": {
+    "startvarde": 55.3
+  },
+  "utveckling": {
+    "takt": {
+      "bygg.betong_bau": [
+        -5.71,
+        -5.98,
+        -1.44,
+        -1.53,
+        -1.23,
+        -0.89,
+        -0.72,
+        0.0
+      ],
+      "bygg.betong_bast": [
+        -9.24,
+        -5.92,
+        -1.65,
+        -1.8,
+        -0.97,
+        -1.05,
+        -0.87,
+        0.0
+      ],
+      "bygg.stal_bau": [
+        -5.71,
+        -5.98,
+        -2.18,
+        -2.0,
+        -1.76,
+        -1.23,
+        -0.82,
+        0.0
+      ],
+      "bygg.stal_bast": [
+        -9.24,
+        -5.92,
+        -4.36,
+        -3.2,
+        -2.47,
+        -1.42,
+        -0.39,
+        0.0
+      ],
+      "bygg.tra_bau": [
+        -5.71,
+        -5.98,
+        -1.08,
+        -1.12,
+        -0.78,
+        -0.41,
+        -0.42,
+        0.0
+      ],
+      "bygg.tra_bast": [
+        -9.24,
+        -5.92,
+        -1.65,
+        -1.34,
+        -1.44,
+        -0.51,
+        -0.54,
+        0.0
+      ],
+      "anl": [
+        -5.71,
+        -5.98,
+        -1.44,
+        -1.53,
+        -1.23,
+        -0.89,
+        -0.72,
+        0.0
+      ],
+      "el": [
+        -3.54,
+        -2.52,
+        -2.88,
+        -2.09,
+        -2.33,
+        -2.33,
+        -2.33,
+        -2.33
+      ],
+      "fjv": [
+        -1.63,
+        -1.75,
+        -1.92,
+        -2.13,
+        -2.38,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bilprod": [
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7
+      ],
+      "forbranning": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bev": [
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0
+      ],
+      "phev": [
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7
+      ],
+      "bilar_hh": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "km_bil": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mat": [
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3,
+        -1.3
+      ],
+      "ovrig": [
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7,
+        -3.7
+      ],
+      "flyg": [
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8,
+        -1.8
+      ],
+      "offentlig": [
+        -5.74,
+        -13.96,
+        -13.96,
+        -13.96,
+        -13.96,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "anl_foljer_betong": true,
+    "ovrig_foljer_bilprod": true
+  },
+  "hushall": {
+    "personer_per_hushall": 1.7,
+    "bta_per_hushall": 110.0
+  },
+  "byggnader": [
+    {
+      "namn": "Bo01, bomässan och första etappen",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 112640.0,
+      "forsta_ar": 2001,
+      "sista_ar": 2005,
+      "fordelning": "egen",
+      "takt": {
+        "2001": 44000,
+        "2002": 16500,
+        "2003": 16500,
+        "2004": 16500,
+        "2005": 19140
+      },
+      "manuellt_kg_m2": null,
+      "energiklass": "D",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 120.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Turning Torso, bostäder",
+      "typ": "flerbostadshus",
+      "stomme": "betong_bau",
+      "bta": 16170.0,
+      "forsta_ar": 2005,
+      "sista_ar": 2005,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "D",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Bo01-området, kompletteringar",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 44110.0,
+      "forsta_ar": 2007,
+      "sista_ar": 2010,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "D",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Flagghusen",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 71500.0,
+      "forsta_ar": 2007,
+      "sista_ar": 2008,
+      "fordelning": "egen",
+      "takt": {
+        "2007": 33000,
+        "2008": 38500
+      },
+      "manuellt_kg_m2": null,
+      "energiklass": "D",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Fullriggaren",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 70950.0,
+      "forsta_ar": 2010,
+      "sista_ar": 2013,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Dockan m.fl. 2010–2013",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 128370.0,
+      "forsta_ar": 2010,
+      "sista_ar": 2013,
+      "fordelning": "egen",
+      "takt": {
+        "2010": 4400,
+        "2011": 7700,
+        "2012": 55000,
+        "2013": 61270
+      },
+      "manuellt_kg_m2": null,
+      "energiklass": "D",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Kvarter 2014–2022 (kalibrerat mot befolkningen)",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 358600.0,
+      "forsta_ar": 2014,
+      "sista_ar": 2022,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Masthusen, bostäder",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 209000.0,
+      "forsta_ar": 2021,
+      "sista_ar": 2032,
+      "fordelning": "egen",
+      "takt": {
+        "2021": 11000,
+        "2022": 22000,
+        "2023": 17600,
+        "2024": 17600,
+        "2025": 17600,
+        "2026": 17600,
+        "2027": 17600,
+        "2028": 17600,
+        "2029": 17600,
+        "2030": 17600,
+        "2031": 17600,
+        "2032": 17600
+      },
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Masthusen, studentbostäder",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 23600.0,
+      "forsta_ar": 2025,
+      "sista_ar": 2026,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Hamnporten",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 18700.0,
+      "forsta_ar": 2026,
+      "sista_ar": 2027,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Tampen",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 24200.0,
+      "forsta_ar": 2029,
+      "sista_ar": 2030,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Citadellsfogen, Galeonen och sista kvarteren",
+      "typ": "flerbostadshus",
+      "stomme": "generisk",
+      "bta": 110000.0,
+      "forsta_ar": 2031,
+      "sista_ar": 2037,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Turning Torso, kontor",
+      "typ": "kontor",
+      "stomme": "betong_bau",
+      "bta": 4200.0,
+      "forsta_ar": 2005,
+      "sista_ar": 2005,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "D",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Kontor 2002–2010",
+      "typ": "kontor",
+      "stomme": "generisk",
+      "bta": 70000.0,
+      "forsta_ar": 2002,
+      "sista_ar": 2010,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "D",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Kontor 2011–2024 (Dockan m.fl.)",
+      "typ": "kontor",
+      "stomme": "generisk",
+      "bta": 111800.0,
+      "forsta_ar": 2011,
+      "sista_ar": 2024,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Masthusen, kontor (1 200 arbetsplatser)",
+      "typ": "kontor",
+      "stomme": "generisk",
+      "bta": 24000.0,
+      "forsta_ar": 2023,
+      "sista_ar": 2032,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Kontor 2026–2037 (Citadellsfogen, Hamnporten, Galeonen)",
+      "typ": "kontor",
+      "stomme": "generisk",
+      "bta": 76000.0,
+      "forsta_ar": 2026,
+      "sista_ar": 2037,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Förskolor och grundskolor 2006–2015",
+      "typ": "skola",
+      "stomme": "generisk",
+      "bta": 18437.0,
+      "forsta_ar": 2006,
+      "sista_ar": 2015,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "D",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Förskolor och grundskolor 2016–2037",
+      "typ": "skola",
+      "stomme": "generisk",
+      "bta": 22576.0,
+      "forsta_ar": 2016,
+      "sista_ar": 2037,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Lokaler i bottenvåningar 2001–2015",
+      "typ": "lokaler",
+      "stomme": "generisk",
+      "bta": 20000.0,
+      "forsta_ar": 2001,
+      "sista_ar": 2015,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "D",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Lokaler i bottenvåningar 2016–2037",
+      "typ": "lokaler",
+      "stomme": "generisk",
+      "bta": 25000.0,
+      "forsta_ar": 2016,
+      "sista_ar": 2037,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "C",
+      "fjv_andel": 100.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": true,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Garage under kvarter 2002–2015",
+      "typ": "underjordisk_parkering",
+      "stomme": "generisk",
+      "bta": 71400.0,
+      "forsta_ar": 2002,
+      "sista_ar": 2015,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    },
+    {
+      "namn": "Mobilitetshus 2017–2036",
+      "typ": "mobilitetshus",
+      "stomme": "generisk",
+      "bta": 58300.0,
+      "forsta_ar": 2017,
+      "sista_ar": 2036,
+      "fordelning": "jämn",
+      "takt": {},
+      "manuellt_kg_m2": null,
+      "energiklass": "Ouppvärmt",
+      "fjv_andel": 0.0,
+      "egen_fjv_kwh": null,
+      "egen_el_kwh": null,
+      "sol_m2": 0.0,
+      "palning": false,
+      "paln_andel": 100.0,
+      "spont_m2": 0.0,
+      "virke_m3_m2": null,
+      "virkesprodukt": "Använd schablon"
+    }
+  ],
+  "anlaggning": {
+    "ytor": [
+      {
+        "typ": "huvudgata",
+        "utforande": "standard",
+        "yta_m2": 44000.0,
+        "forsta_ar": 2001,
+        "sista_ar": 2035
+      },
+      {
+        "typ": "lokalgata",
+        "utforande": "standard",
+        "yta_m2": 159000.0,
+        "forsta_ar": 2001,
+        "sista_ar": 2037
+      },
+      {
+        "typ": "gc_vag",
+        "utforande": "standard",
+        "yta_m2": 44000.0,
+        "forsta_ar": 2001,
+        "sista_ar": 2037
+      },
+      {
+        "typ": "torg",
+        "utforande": "standard",
+        "yta_m2": 35000.0,
+        "forsta_ar": 2001,
+        "sista_ar": 2037
+      },
+      {
+        "typ": "park",
+        "utforande": "standard",
+        "yta_m2": 150000.0,
+        "forsta_ar": 2001,
+        "sista_ar": 2037
+      },
+      {
+        "typ": "bostadsgard",
+        "utforande": "standard",
+        "yta_m2": 120000.0,
+        "forsta_ar": 2001,
+        "sista_ar": 2037
+      },
+      {
+        "typ": "lekplats",
+        "utforande": "standard",
+        "yta_m2": 6000.0,
+        "forsta_ar": 2001,
+        "sista_ar": 2037
+      },
+      {
+        "typ": "skolgard",
+        "utforande": "standard",
+        "yta_m2": 41013.0,
+        "forsta_ar": 2006,
+        "sista_ar": 2037
+      },
+      {
+        "typ": "markparkering",
+        "utforande": "standard",
+        "yta_m2": 15000.0,
+        "forsta_ar": 2001,
+        "sista_ar": 2015
+      }
+    ],
+    "massor": [
+      {
+        "typ": "Sanering",
+        "volym_m3": 130000.0,
+        "transport_km": 10.0,
+        "forsta_ar": 2000,
+        "sista_ar": 2035
+      },
+      {
+        "typ": "Schakt",
+        "volym_m3": 350000.0,
+        "transport_km": 10.0,
+        "forsta_ar": 2000,
+        "sista_ar": 2037
+      }
+    ],
+    "betong": [
+      {
+        "namn": "Kajer och strandpromenader",
+        "utforande": "standard",
+        "volym_m3": 24000.0,
+        "forsta_ar": 2001,
+        "sista_ar": 2035
+      }
+    ],
+    "ledningar": [
+      {
+        "meter": 53000.0,
+        "forsta_ar": 2000,
+        "sista_ar": 2037
+      }
+    ],
+    "engangsvarden": []
+  },
+  "mark": {
+    "overgangar": [
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Bebyggd kvartersmark",
+        "ha": 18.0,
+        "ar": 2001,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Gata och torg",
+        "ha": 6.75,
+        "ar": 2001,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Park",
+        "ha": 3.75,
+        "ar": 2001,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Kvartersmark gård",
+        "ha": 3.0,
+        "ar": 2001,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Bebyggd kvartersmark",
+        "ha": 21.6,
+        "ar": 2010,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Gata och torg",
+        "ha": 8.1,
+        "ar": 2010,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Park",
+        "ha": 4.5,
+        "ar": 2010,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Kvartersmark gård",
+        "ha": 3.6,
+        "ar": 2010,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Bebyggd kvartersmark",
+        "ha": 21.6,
+        "ar": 2020,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Gata och torg",
+        "ha": 8.1,
+        "ar": 2020,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Park",
+        "ha": 4.5,
+        "ar": 2020,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Kvartersmark gård",
+        "ha": 3.6,
+        "ar": 2020,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Bebyggd kvartersmark",
+        "ha": 10.8,
+        "ar": 2030,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Gata och torg",
+        "ha": 4.05,
+        "ar": 2030,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Park",
+        "ha": 2.25,
+        "ar": 2030,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      },
+      {
+        "fran": "Hårdgjord mark",
+        "till": "Kvartersmark gård",
+        "ha": 1.8,
+        "ar": 2030,
+        "tradslag": "Blandskog (gran/bok)",
+        "skotsel": "Fri utveckling",
+        "skogsalder": 40
+      }
+    ],
+    "pooler": {},
+    "bevarande": {}
+  },
+  "mobilitet": {
+    "kommunvarden": false,
+    "bilar_per_hushall": 0.5,
+    "km_per_bil": 11892.0,
+    "mix": {
+      "petrol": 0.37,
+      "diesel": 0.36,
+      "hev": 0.05,
+      "bev": 0.11,
+      "phev": 0.1,
+      "biogas": 0.01
+    },
+    "phev_eldrift": 0.35,
+    "bensin_fossil": 0.92,
+    "diesel_fossil": 0.93
+  },
+  "mat": {
+    "andelar": {
+      "vegan": 0.037,
+      "vegetarian": 0.284,
+      "fisk": 0.146,
+      "kott_lag": 0.168,
+      "kott_medel": 0.216,
+      "kott_hog": 0.149
+    },
+    "avtryck": {
+      "vegan": 2.47,
+      "vegetarian": 4.16,
+      "fisk": 2.74,
+      "kott_lag": 5.37,
+      "kott_medel": 7.04,
+      "kott_hog": 10.24
+    },
+    "kalibrering": false,
+    "omstallning": false,
+    "mal_andelar": {
+      "vegan": 0.037,
+      "vegetarian": 0.284,
+      "fisk": 0.146,
+      "kott_lag": 0.168,
+      "kott_medel": 0.216,
+      "kott_hog": 0.149
+    },
+    "malar": 2045
+  },
+  "ovrig": {
+    "varden": {
+      "fritid": 0.4314,
+      "ovrigt": 0.2696,
+      "klader": 0.2157,
+      "mobler": 0.2157,
+      "restaurang": 0.2157,
+      "kommunikation": 0.1618,
+      "alkohol": 0.1078
+    }
+  },
+  "flyg": {
+    "per_inv": 1.1
+  },
+  "offentlig": {
+    "konsumtion": 0.83,
+    "investeringar": 2.09,
+    "andel": 0.18
+  },
+  "negativa": {
+    "biokol": [],
+    "trad": [
+      {
+        "antal": 400,
+        "planteringsar": 2001
+      },
+      {
+        "antal": 400,
+        "planteringsar": 2008
+      },
+      {
+        "antal": 500,
+        "planteringsar": 2013
+      },
+      {
+        "antal": 600,
+        "planteringsar": 2020
+      },
+      {
+        "antal": 600,
+        "planteringsar": 2030
+      }
+    ]
+  },
+  "budget": {
+    "temperatur": "1,5",
+    "sannolikhet": 50,
+    "niva": 3
+  },
+  "parametrar": {},
+  "dokumentation": {
+    "beskrivning": "Västra hamnen i Malmö väster om Stora Varvsgatan, från första spadtaget för Bo01 (2000) till 2050. Varvsstaden och Universitetsholmen ligger öster om gatan och ingår inte.",
+    "avgransning": "Allt väster om Stora Varvsgatan, cirka 165 ha (antagande: Malmö stads 187 ha för Västra hamnen minus Varvsstaden och Universitetsholmens del): Bo01, Dockan, Flagghusen, Fullriggaren, Masthusen, Hamnporten, Tampen, Citadellsfogen och Galeonen. Universitetsholmen (Orkanen, Niagara, Malmö Live, Neptunigymnasiet) och Varvsstaden ingår inte. Befintliga äldre byggnader (Kockums kontor m.m.) ingår inte; deras arbetsplatser dras av vid kalibreringen.",
+    "kalibrering": {
+      "invanare_statistik": {
+        "2006": 1555,
+        "2011": 4512,
+        "2013": 6857,
+        "2022": 12909
+      },
+      "invanare_prognos": {
+        "2028": 16380,
+        "2033": 19161,
+        "kommentar": "Prognosen antas omfatta även Varvsstaden; Varvsstadens beräknade invånare (cirka 800 år 2028 och 1 900 år 2033) är avdragna i kalibreringen."
+      },
+      "hushall_2006": 988,
+      "bostader_2006": 1171,
+      "bilar_2006": 496,
+      "personer_per_hushall": "1,70 (antagande mellan 1,57 år 2006 och Malmös 2,11)",
+      "bilar_per_hushall": "0,50 (496 bilar på 988 hushåll år 2006)",
+      "bta_per_hushall": "110 m² (modellens schablon)",
+      "arbetsplatser": "cirka 16 000 i dag och 25 000 enligt visionen för hela Västra hamnen; arbetsplatser öster om Stora Varvsgatan dras av; 20 m² BTA per arbetsplats (antagande)"
+    },
+    "kategorier": {
+      "Energi": [
+        "Fjärrvärmens klimatfaktor 55.3 g CO2e/kWh: Energiföretagens medelvärde för levererad fjärrvärme 2024 (riksgenomsnitt). E.ON:s lokala miljövärde för Malmönätet kunde inte läsas (tabellen finns som Excel hos Energiföretagen). Byt till ortens värde och använd samma värde i alla fall som jämförs.",
+        "Elens klimatfaktor: modellens standard (Boverket 37 g CO2e/kWh) och utveckling enligt fliken Emissionsfaktorer över tid.",
+        "Andel fjärrvärme 100 % för uppvärmda byggnader: i princip alla bostäder i området är anslutna till fjärrvärme (Bo01:s lokala system med akviferlager, värmepump och solfångare levererar till nätet).",
+        "Energiklass efter byggår (antagande): D för 2001–2015 (byggregler före BBR 2015/2020 och uppföljda avvikelser mot Bo01:s mål), C från 2016 (nybyggnadskrav), B för Svanenmärkta hus i Varvsstaden."
+      ],
+      "Tid": [
+        "Modellen räknar inte bakåt: startvärdena 2026 gäller för alla år före 2026 (byggpåverkan, el, fjärrvärme, drivlinemix, konsumtion). Faktiska utsläpp före 2026 var högre (äldre byggmetoder, mer fossil el och fjärrvärme, nästan inga elbilar), så resultaten före 2026 är en undre skattning.",
+        "Klimatbudgeten (Forster m.fl. 2026) börjar 2026. År före 2026 har ingen budgetandel men deras utsläpp räknas in i den kumulativa summan. Jämför därför också perioden 2026–2050 eller 2030–2050."
+      ],
+      "Konsumtion": [
+        "Mat, övrig konsumtion, flyg och offentlig sektor: modellens standardvärden per invånare (Sverige). Ingen justering för inkomstnivå, så att fallen kan jämföras med samma antaganden."
+      ],
+      "Byggnad": [
+        "Stomme Generisk (= Betong BAU) där stomval saknas; Turning Torso Betong BAU. Pålning för alla byggnader på utfylld hamnmark utom Turning Torso (berggrundläggning).",
+        "Parkering: garage under kvarter till 2015 och mobilitetshus därefter (antaganden om platser per bostad)."
+      ],
+      "Anläggning": [
+        "Ytor uppskattade som andelar av 165 ha. Kajernas betong räknas separat. Sanering och schakt är antaganden.",
+        "huvudgata: Huvudgator, cirka 2,7 % av 165 ha.",
+        "lokalgata: Lokalgator, cirka 10 % av 165 ha.",
+        "gc_vag: Gång- och cykelvägar.",
+        "torg: Torg och kajpromenader (bland annat Sundspromenaden).",
+        "park: Parker cirka 15 ha (bland annat Ankarparken, Daniaparken, Scaniaparken, Stapelbäddsparken).",
+        "bostadsgard: Bostadsgårdar.",
+        "lekplats: Lekplatser.",
+        "skolgard: Skol- och förskolegårdar, 1 m² per m² BTA närservice (antagande, samma i alla fall).",
+        "markparkering: Markparkering under utbyggnaden.",
+        "Kajer och strandpromenader: Cirka 3 km kajkant × 8 m³ betong per meter. Kajernas yta har ingen schablon i modellen (0 kg/m²), därför räknas betongen.",
+        "Sanering: Förorenad hamn- och varvsmark; volymen är ett antagande.",
+        "Schakt: Schakt för grundläggning, garage och ledningar; antagande.",
+        ": Vatten, avlopp, dagvatten, fjärrvärme, el och fiber; cirka 53 km. Faktorn för ledningar ska verifieras i faktabiblioteket."
+      ],
+      "Förändrad markanvändning": [
+        "Före: hamn- och industrimark, räknad som hårdgjord mark utan kolförråd. Efter: bebyggd kvartersmark 72 ha, gator och torg 27 ha, parker 15 ha, gårdar 12 ha. Förgröning av parker och gårdar ger ett litet upptag."
+      ],
+      "Mobilitet och transport": [
+        "Bilar per hushåll 0,50 (2006) och Malmös körsträcka 11 892 km per bil. Drivlinemix enligt modellens standard 2025, ökning enligt fliken Emissionsfaktorer över tid."
+      ],
+      "Negativa utsläpp": [
+        "Cirka 2 500 stadsträd planterade i fem omgångar (antagande)."
+      ]
+    },
+    "andelar": [
+      {
+        "namn": "Bo01, bomässan och första etappen",
+        "bta_m2": 112640.0,
+        "ar": "2001–2005",
+        "status": "Uppgift",
+        "underlag": "1 024 bostäder × 110 m² BTA. Bo01 (22 ha) byggdes från 2000 med bomässan 2001. Antalet bostäder t.o.m. 2005 är 1 171 (delområdesstatistik 2006) minus Turning Torsos 147. Fördelningen per år är ett antagande. 120 m² solceller på Bo01; solfångarna (1 400 m²) levererar till fjärrvärmenätet och räknas inte här.",
+        "kallor": [
+          "WIKI_BO01",
+          "MMO_DELOMR_2006",
+          "CTCN_VH"
+        ]
+      },
+      {
+        "namn": "Turning Torso, bostäder",
+        "bta_m2": 16170.0,
+        "ar": "2005",
+        "status": "Uppgift",
+        "underlag": "147 bostäder × 110 m² BTA. 147 lägenheter, invigt 2005. Betongstomme. Grundlagt på berg (ingen pålning). BTA per lägenhet som för området.",
+        "kallor": [
+          "WIKI_VH",
+          "MMO_DELOMR_2006"
+        ]
+      },
+      {
+        "namn": "Bo01-området, kompletteringar",
+        "bta_m2": 44110.0,
+        "ar": "2007–2010",
+        "status": "Kalibrerat",
+        "underlag": "401 bostäder × 110 m² BTA. Bo01-området har totalt 1 425 bostäder; resterande 401 efter 2006. År är ett antagande.",
+        "kallor": [
+          "WIKI_BO01"
+        ]
+      },
+      {
+        "namn": "Flagghusen",
+        "bta_m2": 71500.0,
+        "ar": "2007–2008",
+        "status": "Uppgift",
+        "underlag": "650 bostäder × 110 m² BTA. Cirka 650 lägenheter, inflyttning till och med 2008.",
+        "kallor": [
+          "MALMO_VH_HIST",
+          "WIKI_VH"
+        ]
+      },
+      {
+        "namn": "Fullriggaren",
+        "bta_m2": 70950.0,
+        "ar": "2010–2013",
+        "status": "Uppgift",
+        "underlag": "645 bostäder × 110 m² BTA. 645 bostäder 2010–2013.",
+        "kallor": [
+          "MALMO_VH_HIST",
+          "WIKI_VH"
+        ]
+      },
+      {
+        "namn": "Dockan m.fl. 2010–2013",
+        "bta_m2": 128370.0,
+        "ar": "2010–2013",
+        "status": "Kalibrerat",
+        "underlag": "1 167 bostäder × 110 m² BTA. Kalibrerad rest: antalet bostäder som behövs för att modellens invånare ska träffa statistiken 2011 (4 512) och 2013 (6 857) med 1,70 personer per hushåll.",
+        "kallor": [
+          "NEWSWORTHY_REGSO",
+          "MMO_PROGNOS_2023"
+        ]
+      },
+      {
+        "namn": "Kvarter 2014–2022 (kalibrerat mot befolkningen)",
+        "bta_m2": 358600.0,
+        "ar": "2014–2022",
+        "status": "Kalibrerat",
+        "underlag": "3 260 bostäder × 110 m² BTA. Kalibrerad rest mot 12 909 invånare 2022, efter Masthusens första 300 bostäder.",
+        "kallor": [
+          "NEWSWORTHY_REGSO",
+          "MMO_PROGNOS_2023"
+        ]
+      },
+      {
+        "namn": "Masthusen, bostäder",
+        "bta_m2": 209000.0,
+        "ar": "2021–2032",
+        "status": "Uppgift",
+        "underlag": "1 900 bostäder × 110 m² BTA. Masthusen: 1 900 bostäder och 590 studentbostäder. Fördelningen per år är ett antagande (sista etappen omkring 2032).",
+        "kallor": [
+          "MALMO_VH",
+          "WIKI_VH"
+        ]
+      },
+      {
+        "namn": "Masthusen, studentbostäder",
+        "bta_m2": 23600.0,
+        "ar": "2025–2026",
+        "status": "Uppgift",
+        "underlag": "590 studentbostäder × 40 m² BTA (antagande om storlek). Modellen räknar invånare med samma BTA per hushåll som övriga bostäder, så studenterna blir färre i modellen än i verkligheten.",
+        "kallor": [
+          "MALMO_VH"
+        ]
+      },
+      {
+        "namn": "Hamnporten",
+        "bta_m2": 18700.0,
+        "ar": "2026–2027",
+        "status": "Uppgift",
+        "underlag": "170 bostäder × 110 m² BTA. Cirka 170 bostäder; år är ett antagande.",
+        "kallor": [
+          "MALMO_VH"
+        ]
+      },
+      {
+        "namn": "Tampen",
+        "bta_m2": 24200.0,
+        "ar": "2029–2030",
+        "status": "Uppgift",
+        "underlag": "220 bostäder × 110 m² BTA. Cirka 220 bostäder, byggstart 2027.",
+        "kallor": [
+          "SKANDIA_TAMPEN"
+        ]
+      },
+      {
+        "namn": "Citadellsfogen, Galeonen och sista kvarteren",
+        "bta_m2": 110000.0,
+        "ar": "2031–2037",
+        "status": "Kalibrerat",
+        "underlag": "1 000 bostäder × 110 m² BTA. Kalibrerat mot prognosen 2033 och en färdig stadsdel omkring 2035–2037 (Galeonen sist). Prognosens invånare minus Varvsstadens. Citadellsfogen (cirka 7 ha) är Västra hamnens sydvästra entré med bostäder, kontor, förskola och parkeringshus.",
+        "kallor": [
+          "MALMO_VH",
+          "MMO_PROGNOS_2023",
+          "REJLERS_CITADELLSFOGEN"
+        ]
+      },
+      {
+        "namn": "Turning Torso, kontor",
+        "bta_m2": 4200.0,
+        "ar": "2005",
+        "status": "Antagande",
+        "underlag": "De nedre kuberna är kontor; ytan cirka 4 200 m² är en uppskattning.",
+        "kallor": [
+          "WIKI_VH"
+        ]
+      },
+      {
+        "namn": "Kontor 2002–2010",
+        "bta_m2": 70000.0,
+        "ar": "2002–2010",
+        "status": "Kalibrerat",
+        "underlag": "Kalibrerat mot cirka 16 000 arbetsplatser i dag: arbetsplatser i nya kontor × 20 m² BTA per arbetsplats (antagande). Avdrag för arbetsplatser öster om Stora Varvsgatan (universitetet, Malmö Live och kontor på Universitetsholmen), skolor, handel och cirka 2 500 arbetsplatser i äldre byggnader.",
+        "kallor": [
+          "MALMO_VH"
+        ]
+      },
+      {
+        "namn": "Kontor 2011–2024 (Dockan m.fl.)",
+        "bta_m2": 111800.0,
+        "ar": "2011–2024",
+        "status": "Kalibrerat",
+        "underlag": "Som ovan, minus cirka 1 500 arbetsplatser (30 000 m²) i nya kontor på Universitetsholmen; totalt cirka 186 000 m² nya kontor 2002–2024 väster om Stora Varvsgatan inklusive Turning Torso.",
+        "kallor": [
+          "MALMO_VH"
+        ]
+      },
+      {
+        "namn": "Masthusen, kontor (1 200 arbetsplatser)",
+        "bta_m2": 24000.0,
+        "ar": "2023–2032",
+        "status": "Antagande",
+        "underlag": "1 200 arbetsplatser × 20 m² BTA (antagande).",
+        "kallor": [
+          "MALMO_VH"
+        ]
+      },
+      {
+        "namn": "Kontor 2026–2037 (Citadellsfogen, Hamnporten, Galeonen)",
+        "bta_m2": 76000.0,
+        "ar": "2026–2037",
+        "status": "Kalibrerat",
+        "underlag": "Visionen 25 000 arbetsplatser minus 16 000 i dag, minus Varvsstadens 4 000 och Masthusens 1 200, × 20 m² BTA.",
+        "kallor": [
+          "MALMO_VH",
+          "CISION_VARV",
+          "REJLERS_CITADELLSFOGEN"
+        ]
+      },
+      {
+        "namn": "Förskolor och grundskolor 2006–2015",
+        "bta_m2": 18437.0,
+        "ar": "2006–2015",
+        "status": "Antagande",
+        "underlag": "Cirka 4 760 bostäder byggda till 2015. Samma schablon per bostad i alla jämförda fall: en förskola på 1 300 m² per 800 bostäder och en grundskola på 9 000 m² per 4 000 bostäder, 3,9 m² BTA per bostad (antagande). Skolgård 1 m² per m² BTA.",
+        "kallor": []
+      },
+      {
+        "namn": "Förskolor och grundskolor 2016–2037",
+        "bta_m2": 22576.0,
+        "ar": "2016–2037",
+        "status": "Antagande",
+        "underlag": "Cirka 5 830 bostäder från 2016 (utan studentbostäder). Samma schablon per bostad i alla jämförda fall: en förskola på 1 300 m² per 800 bostäder och en grundskola på 9 000 m² per 4 000 bostäder, 3,9 m² BTA per bostad (antagande). Skolgård 1 m² per m² BTA.",
+        "kallor": [
+          "REJLERS_CITADELLSFOGEN"
+        ]
+      },
+      {
+        "namn": "Lokaler i bottenvåningar 2001–2015",
+        "bta_m2": 20000.0,
+        "ar": "2001–2015",
+        "status": "Antagande",
+        "underlag": "Handel och service, cirka 4 % av bostadsytan.",
+        "kallor": []
+      },
+      {
+        "namn": "Lokaler i bottenvåningar 2016–2037",
+        "bta_m2": 25000.0,
+        "ar": "2016–2037",
+        "status": "Antagande",
+        "underlag": "Som ovan.",
+        "kallor": []
+      },
+      {
+        "namn": "Garage under kvarter 2002–2015",
+        "bta_m2": 71400.0,
+        "ar": "2002–2015",
+        "status": "Antagande",
+        "underlag": "0,5 bilplatser per bostad × 30 m² BTA per plats för bostäder byggda till 2015 (cirka 4 760).",
+        "kallor": []
+      },
+      {
+        "namn": "Mobilitetshus 2017–2036",
+        "bta_m2": 58300.0,
+        "ar": "2017–2036",
+        "status": "Antagande",
+        "underlag": "0,4 bilplatser per bostad × 25 m² BTA per plats för bostäder från 2016 (cirka 5 830, utan studentbostäder). Malmös parkeringspolicy styr mot färre platser och gemensamma mobilitetshus.",
+        "kallor": [
+          "MALMO_PARKERING",
+          "MALMO_POLICY_2026"
+        ]
+      }
+    ],
+    "kallor": [
+      {
+        "id": "WIKI_BO01",
+        "titel": "Wikipedia: Bo01",
+        "url": "https://en.wikipedia.org/wiki/Bo01"
+      },
+      {
+        "id": "MMO_DELOMR_2006",
+        "titel": "Malmö stad: Områdesfakta delområden 2006",
+        "url": "https://mmostatfiler.malmo.se/delomraden/delomraden_2006.pdf"
+      },
+      {
+        "id": "CTCN_VH",
+        "titel": "CTCN: Western Harbour, Malmö (energisystemet i Bo01)",
+        "url": "https://www.ctc-n.org/"
+      },
+      {
+        "id": "WIKI_VH",
+        "titel": "Wikipedia: Västra hamnen",
+        "url": "https://en.wikipedia.org/wiki/V%C3%A4stra_hamnen"
+      },
+      {
+        "id": "MALMO_VH_HIST",
+        "titel": "Malmö stad: Västra hamnen, platser och byggnader",
+        "url": "https://malmo.se/Uppleva-och-gora/Arkitektur-och-kulturarv/Malmos-historia/Platser-och-byggnader/Stadsdelar-och-omraden/Vastra-hamnen.html"
+      },
+      {
+        "id": "NEWSWORTHY_REGSO",
+        "titel": "Newsworthy: befolkning per RegSO, Västra hamnen",
+        "url": "https://newsworthy.se/"
+      },
+      {
+        "id": "MMO_PROGNOS_2023",
+        "titel": "Malmö stad: Befolkningsprognos 2023–2033",
+        "url": "https://motenmedborgarportal.malmo.se/"
+      },
+      {
+        "id": "MALMO_VH",
+        "titel": "Malmö stad: Västra Hamnen (stadsutvecklingsområde)",
+        "url": "https://malmo.se/Stadsutveckling/Stadsutvecklingsomraden/Vastra-Hamnen.html"
+      },
+      {
+        "id": "SKANDIA_TAMPEN",
+        "titel": "Skandia Fastigheter: kvarteret Tampen i Västra hamnen",
+        "url": "https://skandiafastigheter.mynewsdesk.com/"
+      },
+      {
+        "id": "REJLERS_CITADELLSFOGEN",
+        "titel": "Rejlers: Malmö stad anlitar Rejlers för infrastrukturen i Västra Hamnen (Citadellsfogen, 2024)",
+        "url": "https://www.rejlers.com/newsroom/news/2024/07/the-city-of-malmo-appoints-rejlers-for-the-reconstruction-and-expansion-of-infrastructure-in-vastra-hamnen/"
+      },
+      {
+        "id": "CISION_VARV",
+        "titel": "Varvsstaden: underlag till Planpriset",
+        "url": "https://mb.cision.com/Main/20015/4130926/3367853.pdf"
+      },
+      {
+        "id": "MALMO_PARKERING",
+        "titel": "Malmö stad: Policy och norm för mobilitet och parkering",
+        "url": "https://malmo.se/Stadsutveckling/Sa-utvecklar-vi-staden/Resande-och-infrastruktur/Policy-och-norm-for-mobilitet-och-parkering.html"
+      },
+      {
+        "id": "MALMO_POLICY_2026",
+        "titel": "Malmö stad: Ny policy ska göra det enklare att leva, röra sig och trivas i Malmö (2026)",
+        "url": "https://www.mynewsdesk.com/se/malmo/pressreleases/ny-policy-ska-goera-det-enklare-att-leva-roera-sig-och-trivas-i-malmoe-3429463"
+      },
+      {
+        "id": "EF_HIST_2024",
+        "titel": "Energiföretagen: Miljövärden, historiska medelvärden (fjärrvärme 2024)",
+        "url": "https://www.energiforetagen.se/49dccf/globalassets/energiforetagen/statistik/fjarrvarme/miljovardering-av-fjarrvarme/2024/miljovarden-historiska-medelvarden.pdf"
+      },
+      {
+        "id": "EF_LOKALA",
+        "titel": "Energiföretagen: Fjärrvärmens lokala miljövärden",
+        "url": "https://www.energiforetagen.se/statistik/fjarrvarmestatistik/miljovardering-av-fjarrvarme/"
+      },
+      {
+        "id": "SCB_TRAFA_MALMO",
+        "titel": "Road2Zero faktabibliotek: Malmö, bilar per hushåll och körsträcka (SCB, Trafikanalys)",
+        "url": ""
+      }
+    ],
+    "nyckeltal": {
+      "modellversion": "0.5.4",
+      "kommentar": "Beräknat när filen skapades; ändras när indata eller faktabibliotek ändras.",
+      "bta_m2": 1689553,
+      "invanare_2050": 18358,
+      "byggnad_kg_per_m2_bta": 346,
+      "2000_2050": {
+        "netto_t": {
+          "niva1": 842133,
+          "niva2": 3544341,
+          "niva3": 3919576
+        },
+        "personar": 598721,
+        "t_per_personar": {
+          "niva1": 1.41,
+          "niva2": 5.92,
+          "niva3": 6.55
+        },
+        "per_kategori_t": {
+          "Byggnad": 583808,
+          "Energi": 189881,
+          "Anläggning": 70110,
+          "Förändrad markanvändning": 0,
+          "Mobilitet och transport": 320485,
+          "Flygresor": 564595,
+          "Matkonsumtion": 1097100,
+          "Övrig konsumtion": 720028,
+          "Offentliga investeringar": 375235,
+          "Negativa utsläpp": -1666
+        }
+      },
+      "2030_2050": {
+        "netto_t": {
+          "niva1": 177917,
+          "niva2": 1660058,
+          "niva3": 1773368
+        },
+        "personar": 376541,
+        "t_per_personar": {
+          "niva1": 0.47,
+          "niva2": 4.41,
+          "niva3": 4.71
+        },
+        "per_kategori_t": {
+          "Byggnad": 66303,
+          "Energi": 103902,
+          "Anläggning": 8783,
+          "Förändrad markanvändning": 0,
+          "Mobilitet och transport": 150601,
+          "Flygresor": 321979,
+          "Matkonsumtion": 643635,
+          "Övrig konsumtion": 365926,
+          "Offentliga investeringar": 113310,
+          "Negativa utsläpp": -1071
+        }
+      }
+    }
+  }
+}

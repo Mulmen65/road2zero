@@ -2,9 +2,11 @@
 
 Starta lokalt med:  streamlit run streamlit_app.py
 """
+from pathlib import Path
+
 import streamlit as st
 
-st.set_page_config(page_title="Road2Zero", page_icon="app/logo.svg", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Road2Zero", page_icon=str(Path(__file__).parent / "app" / "logo.svg"), layout="wide", initial_sidebar_state="expanded")
 
 from app import ui_berakningar, ui_faktorer, ui_indata, ui_referenser, ui_resultat, ui_utveckling  # noqa: E402
 from app.common import init, kor_senare, resultat, sidopanel  # noqa: E402

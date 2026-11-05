@@ -284,7 +284,7 @@ def test_rent_granssnitt():
                       re.IGNORECASE)
     kallid = re.compile(r"\b(KA30|JAGERSRO|VAGVIS\w*|HOLMQVIST2024|ANTAGANDE)\b")
     filer = list((ROT / "app").glob("*.py")) + list((ROT / "road2zero").rglob("*.py")) + list((ROT / "road2zero" / "data").glob("*.csv")) \
-        + list((ROT / "road2zero" / "data").glob("*.json")) + [ROT / "streamlit_app.py"]
+        + list((ROT / "road2zero" / "data").glob("*.json")) + [ROT / "streamlit_app.py", ROT / "scenario_app.py"]
     for f in filer:
         if f.name in ("skogskol_kurvbibliotek.csv", "standardprojekt_jagersro.json"):   # standardprojektet får bära sitt namn
             continue
@@ -325,3 +325,155 @@ def test_standardprojekt():
     assert {(r["forsta_ar"], r["sista_ar"]) for r in s["anlaggning"]["ytor"]} == {(2030, 2045)}
     r = berakna(s)
     assert r.totalt_per_kategori()["Byggnad"] > 0
+
+
+def test_tidigt_startar_och_egen_dokumentation():
+    """Fall som började byggas före 2026: startvärdena gäller bakåt, ingen budget före 2026 och egna nycklar behålls."""
+    fb = ladda()
+    s = tomt(fb)
+    s["projekt"].update(startar=2000, slutar=2050)
+    s["byggnader"] = [ny_andel("flerbostadshus", "generisk", 11000, 2001, sista_ar=2005)]
+    s["dokumentation"] = {"beskrivning": "test"}
+    s2 = fran_json(till_json(s), fb)
+    assert s2["dokumentation"] == {"beskrivning": "test"}
+    assert not [f for f in validera(s2, fb) if f[0] == "fel"]
+    r = berakna(s2, fb)
+    p = r.per_ar_och_kategori()["Byggnad"]
+    assert p[2001] == pytest.approx(p[2005])            # samma nivå 2026 alla år före 2026
+    b = r.budget["tabell"].set_index("ar")
+    assert b.loc[2025, "budget_t"] == 0 and b.loc[2026, "budget_t"] > 0
+    assert r.invanare[2003] > 0
+
+
+def test_excelexport_rymmer_stora_indata():
+    import io
+
+    import openpyxl
+
+    from app.ui_resultat import excel
+    fb = ladda()
+    s = exempel(fb)
+    s["dokumentation"] = {"text": "x" * 40000}            # större än en Excel-cell
+    wb = openpyxl.load_workbook(io.BytesIO(excel(berakna(s, fb), {})), read_only=True)
+    rader = list(wb["Indata"].iter_rows(min_row=2, values_only=True))
+    assert all(len(t or "") <= 32767 for t, _ in rader)
+    text = "".join((t or "") + ("" if f else "\n") for t, f in rader)
+    assert fran_json(text, fb)["dokumentation"]["text"] == "x" * 40000
+
+
+def test_jamforelse_fordelning_gar_jamnt_ut():
+    """Jämförelseverktyget: boende, verksamheter, parkering och gemensamt summerar till hela stadsdelens nivå 1."""
+    from road2zero import jamforelse as jm
+    fb = ladda()
+    a = jm.analys(exempel(fb), fb, lika=True)
+    hel = sum(a["per_kategori_t"][k] for k in ("Byggnad", "Anläggning", "Förändrad markanvändning", "Negativa utsläpp"))
+    delar = sum(d["engang"] for d in a["delar"].values())
+    assert delar == pytest.approx(hel, rel=1e-6)
+    assert 0 < a["andel_boende"] < 1 and a["invanare"] > 0
+    # lika förutsättningar: samma byggvärde oavsett år
+    assert a["bygg_kg_m2_boende"] > 0 and a["lc_kg_m2_ar_boende"] > a["drift_kg_m2_ar_boende"]
+
+
+def test_jamforelse_forklaring_ar_exakt():
+    """Skillnaden per invånare delas exakt på yta per invånare och utsläpp per m²; komponenterna summerar till intensiteten."""
+    from road2zero import jamforelse as jm
+    fb = ladda()
+    s1 = exempel(fb)
+    s2 = exempel(fb)
+    s2["hushall"]["personer_per_hushall"] = 2.5
+    s2["byggnader"][0]["stomme"] = "betong_bau"
+    a1, a2 = jm.analys(s1, fb), jm.analys(s2, fb)
+    f = jm.forklaring(a1, a2)
+    assert f["yta"] + f["intensitet"] == pytest.approx(f["totalt"], abs=1e-9)
+    assert sum(f["komponenter"].values()) == pytest.approx(f["intensitet"], abs=1e-9)
+    assert f["yta"] < 0 < f["intensitet"]          # fler personer per hushåll ger mindre yta; betong i stället för trä ger mer per m²
+
+
+def test_scenarioappen_med_tre_scenarier():
+    """road2zero-scenario startar tom och med tre scenarier utan fel, och jämförelsen förklarar skillnaderna."""
+    from streamlit.testing.v1 import AppTest
+    app = str(ROT / "scenario_app.py")
+    at = AppTest.from_file(app, default_timeout=300)
+    at.run()
+    assert not at.exception
+    fb = ladda()
+    at = AppTest.from_file(app, default_timeout=300)
+    at.session_state["scenarier"] = {"A": fran_json((ROT / "fall" / "vastra_hamnen.json").read_text(encoding="utf-8"), fb),
+                                     "B": fran_json((ROT / "fall" / "varvsstaden.json").read_text(encoding="utf-8"), fb),
+                                     "C": exempel(fb)}
+    at.session_state["versioner"] = {"A": 1_000_000, "B": 2_000_000, "C": 3_000_000}
+    at.session_state["aktiv"] = "B"
+    at.run()
+    assert not at.exception and not at.error
+    assert any(m.value.startswith("**Scenario C**") for m in at.markdown)
+
+
+def test_val_med_andrade_etiketter_blir_giltiga():
+    """Streamlit sparar ett val som etikettens text. Ändras etiketten (t.ex. ett scenario byter namn medan appen räknar)
+    lämnar Streamlit tillbaka den gamla texten. giltigt() ska då ge ett giltigt alternativ i stället för att appen kraschar."""
+    from app.common import giltigt
+    from app.scenarier import NAMN, kort
+    from streamlit.elements.widgets.radio import RadioSerde
+    gamla = [f"{n} · Scenario {n}" for n in NAMN]
+    serde = RadioSerde(NAMN, formatted_options=[kort(n) for n in NAMN],
+                       formatted_option_to_option_index={kort(n): i for i, n in enumerate(NAMN)}, default_option_index=0, format_func=kort)
+    assert serde.deserialize(gamla[1]) == gamla[1]                     # så uppstod felet: texten i stället för "B"
+    assert giltigt(serde.deserialize(gamla[1]), NAMN, "A", kort) == "B"
+    assert giltigt(serde.deserialize("Scenario C"), NAMN, "A", kort) == "C"
+    assert giltigt("okänt", NAMN, "A", kort) == "A"
+    assert giltigt("Stomvirke (720,7 kg CO2/m³)", ["Använd schablon", "Stomvirke", "Limträ/glulam", "KL-trä"], "Använd schablon") == "Stomvirke"
+    assert giltigt("scenario C", ["A", "B", "Medel"], "A", lambda n: n if n == "Medel" else f"scenario {n}") == "A"
+
+
+def test_fel_filtyp_ger_tydligt_fel():
+    """En fil med tre scenarier eller en fil utan Road2Zero-indata läses inte tyst in som ett tomt projekt."""
+    from road2zero.scenario import SCENARIOSET
+    fb = ladda()
+    with pytest.raises(ValueError, match="tre scenarier"):
+        fran_json(json.dumps({"typ": SCENARIOSET, "scenarier": {"A": exempel(fb)}}), fb)
+    with pytest.raises(ValueError, match="inga indata"):
+        fran_json(json.dumps({"annat": 1}), fb)
+
+
+def test_scenarioappen_laser_fil_med_tre_scenarier():
+    """Öppna fil i road2zero-scenario: en fil med tre scenarier fyller A, B och C; en fil med ett scenario fyller det valda."""
+    import streamlit as st
+    from road2zero.scenario import SCENARIOSET
+    from app import scenarier
+    fb = ladda()
+    st.session_state.clear()
+    scenarier.init()
+    vh = json.loads((ROT / "fall" / "vastra_hamnen.json").read_text(encoding="utf-8"))
+    paket = {"typ": SCENARIOSET, "scenarier": {"A": vh, "B": exempel(fb), "C": tomt(fb)}}
+    text = scenarier.oppna(json.dumps(paket), "B")
+    assert "A: Västra hamnen" in text
+    assert len(st.session_state.scenarier["A"]["byggnader"]) == len(vh["byggnader"])
+    assert st.session_state.scenarier["B"]["projekt"]["namn"] == "Testfall"
+    scenarier.oppna(json.dumps(exempel(fb)), "C")
+    assert st.session_state.scenarier["C"]["byggnader"]
+    st.session_state.clear()
+
+
+def test_fardiga_fall_finns_och_gar_att_rakna():
+    """De färdiga fallen i fall/ visas i rullistan i road2zero-scenario och kan räknas utan fel."""
+    from app.scenarier import fardiga_fall
+    fb = ladda()
+    fall = fardiga_fall()
+    assert {"Västra hamnen väster om Stora Varvsgatan, Malmö", "Varvsstaden, Malmö", "Jägersro SMT, Malmö"} <= set(fall)
+    for f in fall.values():
+        s = fran_json(f.read_text(encoding="utf-8"), fb)
+        assert not [x for x in validera(s, fb) if x[0] == "fel"]
+        assert berakna(s, fb).netto(3) > 0
+
+
+def test_fardigt_paket_med_tre_scenarier():
+    """fall/malmofallen.json läses med en knapp till A, B och C."""
+    import streamlit as st
+    from app import scenarier
+    paket = scenarier.fardiga_paket()
+    assert paket, "fall/ saknar en fil med tre scenarier"
+    st.session_state.clear()
+    scenarier.init()
+    text = scenarier.oppna(next(iter(paket.values())).read_text(encoding="utf-8"), "A")
+    assert all(st.session_state.scenarier[n]["byggnader"] for n in scenarier.NAMN), text
+    st.session_state.clear()

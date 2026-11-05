@@ -16,7 +16,7 @@ from road2zero.scenario import (etikett, ny_andel, standard_fjv_andel, standard_
                                 validera)
 from road2zero.utveckling import Utveckling
 
-from .common import editor, eget_param, fb, fmt, k, kalla_kort, kalla_text, ny_version, param_info, senare, ss
+from .common import editor, eget_param, fb, fmt, giltigt, k, kalla_kort, kalla_text, ny_version, param_info, senare, ss
 
 COL = st.column_config
 
@@ -46,6 +46,7 @@ def sel(label, path, options, fmt_func=None, **kw):
     cur = _get(path)
     idx = options.index(cur) if cur in options else 0
     v = st.selectbox(label, options, index=idx, key=k("/".join(map(str, path))), format_func=fmt_func or str, **kw)
+    v = giltigt(v, options, cur, fmt_func)
     _set(path, v)
     return v
 
@@ -107,9 +108,9 @@ def projekt():
     with c3:
         a, b = st.columns(2)
         with a:
-            num("Startår", ("projekt", "startar"), min_value=2015, max_value=2100, step=1)
+            num("Startår", ("projekt", "startar"), min_value=1990, max_value=2100, step=1)
         with b:
-            num("Slutår", ("projekt", "slutar"), min_value=2016, max_value=2150, step=1)
+            num("Slutår", ("projekt", "slutar"), min_value=1991, max_value=2150, step=1)
         st.caption(f"{s['projekt']['slutar'] - s['projekt']['startar']} år. Standard är innevarande år och 50 år framåt, som EU:s referensperiod för livscykel-GWP.")
 
     st.info("Elens och fjärrvärmens klimatfaktor och hur alla emissionsfaktorer utvecklas över tid anges i fliken **Emissionsfaktorer över tid**.")
@@ -169,8 +170,8 @@ def _byggare():
         c1, c2, c3, c4, c5 = st.columns([2.2, 1.3, 1, 1, 1.3])
         typ = c1.selectbox("Byggnadstyp", list(BYGGNADSTYPER), format_func=lambda t: BYGGNADSTYPER[t][0], key=k("nb_typ"))
         bta = c2.number_input("BTA totalt (m²)", min_value=0.0, value=10000.0, step=500.0, format="%.0f", key=k("nb_bta"))
-        a0 = int(c3.number_input("Första år klar", min_value=2015, max_value=2150, value=p0 + 2, step=1, key=k("nb_a0")))
-        a1 = int(c4.number_input("Sista år klar", min_value=2015, max_value=2150, value=max(a0, p0 + 2), step=1, key=k("nb_a1")))
+        a0 = int(c3.number_input("Första år klar", min_value=1990, max_value=2150, value=p0 + 2, step=1, key=k("nb_a0")))
+        a1 = int(c4.number_input("Sista år klar", min_value=1990, max_value=2150, value=max(a0, p0 + 2), step=1, key=k("nb_a1")))
         ford = c5.selectbox("Fördelning över åren", FORDELNINGAR[:3], key=k("nb_ford"),
                             help="Hur BTA:n blir klar mellan första och sista år. Egen takt per år anges i tabellen efteråt.")
         klasser = fb().energiklasser_for(typ)
@@ -210,6 +211,7 @@ def _byggare():
                                    format_func=lambda p: f"{p}: {_produkt_text()}" if p == SCHABLON_PRODUKT else
                                    f"{p} ({fmt(eget_param(VIRKESPRODUKTER[p]), 1)} kg CO2/m³)",
                                    help="Schablon: stomvirke för Trä BAU och limträ/glulam för Trä BÄST")
+            produkt = giltigt(produkt, [SCHABLON_PRODUKT] + list(VIRKESPRODUKTER), SCHABLON_PRODUKT)
             virke = c2.number_input("Mängd virke (m³/m² BTA)", min_value=0.0, max_value=1.0, value=float(eget_param("bygg.virke_m3_m2")),
                                     step=0.01, format="%.2f", key=k("nb_virke"), disabled=not tra_valda,
                                     help=f"Mängd inbyggt stomvirke per m² BTA. Schablonvärde {fmt(eget_param('bygg.virke_m3_m2'), 2)} m³/m² BTA "
@@ -331,8 +333,8 @@ def _bygg_kolumner() -> dict:
         "Byggnadstyp": COL.SelectboxColumn(options=[v[0] for v in BYGGNADSTYPER.values()], required=True),
         "Stomme": COL.SelectboxColumn(options=list(STOMMAR.values()), required=True, help="Byggpåverkan per typ och stomme visas i tabellen Härledda värden"),
         "BTA (m²)": COL.NumberColumn(min_value=0, step=100, format="%d", required=True),
-        "Första år klar": COL.NumberColumn(min_value=2015, max_value=2150, step=1, format="%d"),
-        "Sista år klar": COL.NumberColumn(min_value=2015, max_value=2150, step=1, format="%d"),
+        "Första år klar": COL.NumberColumn(min_value=1990, max_value=2150, step=1, format="%d"),
+        "Sista år klar": COL.NumberColumn(min_value=1990, max_value=2150, step=1, format="%d"),
         "Fördelning": COL.SelectboxColumn(options=FORDELNINGAR, help="Hur BTA fördelas på åren. Egen: skriv in BTA per år nedan."),
         "Energiklass": COL.SelectboxColumn(options=ALLA_KLASSER, help="A–G för bostäder och lokaler; uppvärmt eller ouppvärmt för garage, industri och övriga byggnader"),
         "Fjärrvärme (%)": COL.NumberColumn(min_value=0, max_value=100, step=10, format="%d %%", help="Andel av fastighetsvärmen från fjärrvärme; resten är värmepump (el)"),

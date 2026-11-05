@@ -70,15 +70,18 @@ streamlit run streamlit_app.py
 ```
 CLAUDE.md                 instruktioner och modellbeslut för Claude Code
 streamlit_app.py          start och flikar
+scenario_app.py           road2zero-scenario: tre scenarier mot varandra
 app/                      gränssnittet, en fil per flik
 road2zero/                beräkningsmotorn (oberoende av Streamlit)
   engine.py               berakna(indata) -> Resultat
+  jamforelse.py           rättvis jämförelse av scenarier
   scenario.py             indatamodell, standardvärden, validering, JSON
   modules/                en modul per indatamodul och klimatbudget
   algoritmer.py           formler och text för fliken Beräkningar
   data/                   faktabiblioteket (CSV och JSON)
 tests/                    regressionstester
-verktyg/                  skript som läser underlag till faktabiblioteket
+verktyg/                  skript som läser underlag till faktabiblioteket och bygger färdiga fall
+fall/                     färdiga fall att öppna i appen (Västra hamnen, Varvsstaden och Jägersro SMT i Malmö)
 underlag/                 källfiler (Tabell A utökad), visas inte i appen
 ```
 
@@ -95,4 +98,28 @@ Testerna kontrollerar ett påhittat testfall, att andelar med olika stommar och 
 
 ## Spara och öppna indata
 
-Indata sparas som JSON från sidopanelen och kan öppnas igen. Filen innehåller modellversionen. Nycklar som saknas fylls med standardvärden när filen öppnas.
+Indata sparas som JSON från sidopanelen och kan öppnas igen. Filen innehåller modellversionen. Nycklar som saknas fylls med standardvärden när filen öppnas. Egna nycklar, till exempel en `dokumentation` med källor och antaganden, behålls när filen sparas igen. Excel-exporten har indata i bladet Indata, en JSON-rad per rad (`fortsatter` = 1 betyder att raden fortsätter på nästa).
+
+## Färdiga fall
+
+`fall/vastra_hamnen.json` (2000–2050), `fall/varvsstaden.json` (2020–2050) och `fall/jagersro_smt.json` (2030–2050) öppnas från sidopanelen; i road2zero-scenario finns de i rullistan **Färdigt fall**, och knappen **Hämta Malmöfallen till A, B och C** läser `fall/malmofallen.json` med alla tre på en gång. Alla tre har samma schabloner för arbetsplatser, närservice, mobilitetshus, gator och fjärrvärme, så att de kan jämföras. Varje fil har en `dokumentation` med källor, kalibrering och status per andel (Uppgift, Kalibrerat eller Antagande). Filerna byggs av `python verktyg/bygg_malmofall.py`; ändra skriptet och kör det igen för att uppdatera fallen.
+
+## road2zero-scenario: tre scenarier mot varandra
+
+```bash
+streamlit run scenario_app.py
+```
+
+Ett eget verktyg i samma repo. Välj överst vilket av scenario A, B och C du ändrar; alla indataflikar, emissionsfaktorer över tid och egna parametrar från Road2Zero gäller det valda scenariot. Flikarna **Jämförelse** och **Rättvis jämförelse** visar alla tre sida vid sida och uppdateras direkt när indata ändras. I sidopanelen läser **Öppna fil** en fil med alla tre scenarier till A, B och C, eller en fil med ett scenario (samma JSON-format som Road2Zero) till det valda scenariot. Där sparar du också alla tre eller ett scenario i taget, kopierar ett scenario till ett annat och hämtar ett färdigt fall ur `fall/`. En fil med tre scenarier kan inte öppnas i Road2Zero, som bara har ett scenario; appen säger då till. På Streamlit Community Cloud skapar du en ny app från samma repo med huvudfilen `scenario_app.py`.
+
+## Jämföra stadsdelar
+
+```bash
+python verktyg/jamfor_stadsdelar.py fall/a.json fall/b.json fall/c.json --referens 3 --ut jamforelse.xlsx
+```
+
+Samma beräkning som fliken Rättvis jämförelse i road2zero-scenario. Verktyget delar nivå 1 på funktion: bostäder och närservice (skolor) per invånare, verksamheter per arbetsplats (20 m² BTA per arbetsplats); parkering, anläggning, mark och stadsträd fördelas efter BTA. Det räknar både med lika förutsättningar (alla emissionsfaktorer på 2026 års nivå, så att bara utformningen skiljer) och med faktisk tidpunkt. Engångsutsläpp fördelas på 50 år och läggs till ett års drift vid full utbyggnad. Den standardiserade stadsdelen väger varje stadsdels intensitet per m² med referensfallets fördelning mellan bostäder och verksamheter.
+
+## Befintliga stadsdelar
+
+Startåret kan sättas från 1990, så att en stadsdel kan räknas från första spadtaget. År före 2026 använder startvärdena 2026 för alla emissionsfaktorer (ingen bakåtskrivning), så utsläppen före 2026 blir en undre skattning. Klimatbudgeten börjar 2026; jämför därför också perioden från 2026 när fall med olika startår jämförs.
