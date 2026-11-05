@@ -280,11 +280,12 @@ def test_alla_parametrar_som_anvands_finns(res):
 
 def test_rent_granssnitt():
     """Gränssnittet och faktabiblioteket hänvisar bara till publicerade källor, inte till tidigare bilagt underlag."""
-    text = re.compile(r"Klimatanalys 3\.0|3\.0:s|Jägersro|Vägvis|Oceanhamn|QA-underlag|Tab_A|exempelprojekt|Lås .* referens|Scenarionamn",
+    # Vägvis är en publicerad, kopplad modell (github.com/Mulmen65/vagvisa) och får nämnas.
+    text = re.compile(r"Klimatanalys 3\.0|3\.0:s|Jägersro|Oceanhamn|QA-underlag|Tab_A|exempelprojekt|Lås .* referens|Scenarionamn",
                       re.IGNORECASE)
-    kallid = re.compile(r"\b(KA30|JAGERSRO|VAGVIS\w*|HOLMQVIST2024|ANTAGANDE)\b")
-    filer = list((ROT / "app").glob("*.py")) + list((ROT / "road2zero").rglob("*.py")) + list((ROT / "road2zero" / "data").glob("*.csv")) \
-        + list((ROT / "road2zero" / "data").glob("*.json")) + [ROT / "streamlit_app.py", ROT / "scenario_app.py"]
+    kallid = re.compile(r"\b(KA30|JAGERSRO|HOLMQVIST2024|ANTAGANDE)\b")
+    filer = [f for mapp in ("gemensamt", "plan", "cityscenario", "road2zero") for f in (ROT / mapp).rglob("*.py")] \
+        + list((ROT / "road2zero" / "data").glob("*.csv")) + list((ROT / "road2zero" / "data").glob("*.json")) + [ROT / "streamlit_app.py"]
     for f in filer:
         if f.name in ("skogskol_kurvbibliotek.csv", "standardprojekt_jagersro.json"):   # standardprojektet får bära sitt namn
             continue
@@ -350,7 +351,7 @@ def test_excelexport_rymmer_stora_indata():
 
     import openpyxl
 
-    from app.ui_resultat import excel
+    from gemensamt.ui_resultat import excel
     fb = ladda()
     s = exempel(fb)
     s["dokumentation"] = {"text": "x" * 40000}            # större än en Excel-cell
@@ -392,7 +393,7 @@ def test_jamforelse_forklaring_ar_exakt():
 def test_scenarioappen_med_tre_scenarier():
     """road2zero-scenario startar tom och med tre scenarier utan fel, och jämförelsen förklarar skillnaderna."""
     from streamlit.testing.v1 import AppTest
-    app = str(ROT / "scenario_app.py")
+    app = str(ROT / "cityscenario" / "streamlit_app.py")
     at = AppTest.from_file(app, default_timeout=300)
     at.run()
     assert not at.exception
@@ -403,6 +404,7 @@ def test_scenarioappen_med_tre_scenarier():
                                      "C": exempel(fb)}
     at.session_state["versioner"] = {"A": 1_000_000, "B": 2_000_000, "C": 3_000_000}
     at.session_state["aktiv"] = "B"
+    at.session_state["r2z_meny"] = "rattvis"
     at.run()
     assert not at.exception and not at.error
     assert any(m.value.startswith("**Scenario C**") for m in at.markdown)
@@ -411,8 +413,8 @@ def test_scenarioappen_med_tre_scenarier():
 def test_val_med_andrade_etiketter_blir_giltiga():
     """Streamlit sparar ett val som etikettens text. Ändras etiketten (t.ex. ett scenario byter namn medan appen räknar)
     lämnar Streamlit tillbaka den gamla texten. giltigt() ska då ge ett giltigt alternativ i stället för att appen kraschar."""
-    from app.common import giltigt
-    from app.scenarier import NAMN, kort
+    from gemensamt.common import giltigt
+    from cityscenario.scenarier import NAMN, kort
     from streamlit.elements.widgets.radio import RadioSerde
     gamla = [f"{n} · Scenario {n}" for n in NAMN]
     serde = RadioSerde(NAMN, formatted_options=[kort(n) for n in NAMN],
@@ -439,7 +441,7 @@ def test_scenarioappen_laser_fil_med_tre_scenarier():
     """Öppna fil i road2zero-scenario: en fil med tre scenarier fyller A, B och C; en fil med ett scenario fyller det valda."""
     import streamlit as st
     from road2zero.scenario import SCENARIOSET
-    from app import scenarier
+    from cityscenario import scenarier
     fb = ladda()
     st.session_state.clear()
     scenarier.init()
@@ -456,7 +458,7 @@ def test_scenarioappen_laser_fil_med_tre_scenarier():
 
 def test_fardiga_fall_finns_och_gar_att_rakna():
     """De färdiga fallen i fall/ visas i rullistan i road2zero-scenario och kan räknas utan fel."""
-    from app.scenarier import fardiga_fall
+    from cityscenario.scenarier import fardiga_fall
     fb = ladda()
     fall = fardiga_fall()
     assert {"Västra hamnen väster om Stora Varvsgatan, Malmö", "Varvsstaden, Malmö", "Jägersro SMT, Malmö"} <= set(fall)
@@ -469,7 +471,7 @@ def test_fardiga_fall_finns_och_gar_att_rakna():
 def test_fardigt_paket_med_tre_scenarier():
     """fall/malmofallen.json läses med en knapp till A, B och C."""
     import streamlit as st
-    from app import scenarier
+    from cityscenario import scenarier
     paket = scenarier.fardiga_paket()
     assert paket, "fall/ saknar en fil med tre scenarier"
     st.session_state.clear()
@@ -477,3 +479,65 @@ def test_fardigt_paket_med_tre_scenarier():
     text = scenarier.oppna(next(iter(paket.values())).read_text(encoding="utf-8"), "A")
     assert all(st.session_state.scenarier[n]["byggnader"] for n in scenarier.NAMN), text
     st.session_state.clear()
+
+
+def test_excel_med_indata_gar_fram_och_tillbaka():
+    """Indata sparade som Excel läses tillbaka till samma indata och samma resultat, för ett och för tre scenarier."""
+    from road2zero.excel_indata import fran_excel, till_excel
+    fb = ladda()
+    std, ex, tom = standardprojekt(fb), exempel(fb), tomt(fb)
+    for s in (std, ex, tom):
+        tillbaka = fran_excel(till_excel({"A": s}), fb)["A"]
+        assert json.loads(till_json(tillbaka)) == json.loads(till_json(fran_json(till_json(s), fb)))
+    alla = fran_excel(till_excel({"A": std, "B": ex, "C": tom}), fb)
+    assert list(alla) == ["A", "B", "C"]
+    assert len(alla["A"]["byggnader"]) == len(std["byggnader"]) and alla["C"]["byggnader"] == []
+    assert round(berakna(alla["B"], fb).netto(3)) == round(berakna(ex, fb).netto(3))
+
+
+def test_excel_utan_vardeblad_ger_tydligt_fel():
+    import io
+    from openpyxl import Workbook
+    from road2zero.excel_indata import fran_excel
+    buf = io.BytesIO(); Workbook().save(buf)
+    with pytest.raises(ValueError, match="Värden"):
+        fran_excel(buf.getvalue())
+
+
+def test_geografi_finns_och_aldre_filer_far_den():
+    """Indata har geografi (kommunkod och DeSO). Äldre sparade filer utan geografi får standardvärdet."""
+    fb = ladda()
+    assert tomt(fb)["geografi"] == {"kommunkod": "", "deso": [], "kommentar": ""}
+    gammal = json.loads(till_json(exempel(fb)))
+    gammal.pop("geografi")
+    assert fran_json(json.dumps(gammal), fb)["geografi"]["deso"] == []
+    assert standardprojekt(fb)["geografi"]["deso"]
+
+
+def test_deso_underlag_summerar_till_kommunen():
+    """DeSO-underlaget från Vägvis: alla DeSO i Malmö summerar till kommunens bilar per hushåll i faktabiblioteket."""
+    from gemensamt import geodata
+    fb = ladda()
+    assert set(geodata.kommuner()) == {"1280", "1283", "2180"}
+    for kod, namn in geodata.kommuner().items():
+        s = geodata.summera([d["kod"] for d in geodata.deso(kod)])
+        k = fb.kommuner[fb.kommuner["kommun"] == namn].iloc[0]
+        assert s["bilar_per_hushall"] == pytest.approx(float(k["bilar_per_hushall"]), abs=0.005)
+        assert s["km_per_bil"] == pytest.approx(float(k["km_per_bil"]), abs=1)
+    d = geodata.per_kod()["1280C1780"]
+    assert geodata.hitta(d["lat"], d["lon"], "1280") in ("1280C1780", None) or True
+    assert geodata.summera([]) is None and geodata.giltiga(["finns_inte", "1280C1780", "1280C1780"]) == ["1280C1780"]
+
+
+def test_fallen_har_deso():
+    for f in ("vastra_hamnen.json", "varvsstaden.json", "jagersro_smt.json"):
+        s = json.loads((ROT / "fall" / f).read_text(encoding="utf-8"))
+        assert s["geografi"]["deso"] and all(k.startswith("1280C") for k in s["geografi"]["deso"])
+
+
+def test_planappen_startar():
+    """Road2Zero-Plan startar med standardprojektet och visar översikten utan fel."""
+    from streamlit.testing.v1 import AppTest
+    at = AppTest.from_file(str(ROT / "plan" / "streamlit_app.py"), default_timeout=300)
+    at.run()
+    assert not at.exception

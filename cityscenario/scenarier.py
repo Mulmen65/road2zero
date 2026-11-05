@@ -1,4 +1,4 @@
-"""Tre scenarier i samma session för road2zero-scenario.
+"""Tre scenarier i samma session för Road2Zero-CityScenario.
 
 Indataflikarna från Road2Zero arbetar på ss.scen och widgetnycklar med ss.v. Här pekar ss.scen på det scenario som ändras,
 och varje scenario har ett eget nummerområde för ss.v, så att fälten alltid läser om värdena när man byter scenario.
@@ -11,13 +11,15 @@ from pathlib import Path
 import streamlit as st
 
 from road2zero import __version__
+from road2zero.excel_indata import fran_excel, till_excel
 from road2zero.scenario import SCENARIOSET, fran_json, till_json, tomt
 
-from .common import LOGO, fb, giltigt, ss
+from gemensamt.common import fb, giltigt, ss
 
 NAMN = ["A", "B", "C"]
 FARG = {"A": "#2a78d6", "B": "#eb6834", "C": "#1baf7a"}   # de tre första kategorifärgerna; validerade för alla par
 STEG = 1_000_000                                          # nummerområde per scenario för widgetnycklarna
+XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 FALL = Path(__file__).resolve().parents[1] / "fall"
 
 
@@ -54,6 +56,10 @@ def _ny_version(n: str):
         del ss[nyckel]
 
 
+def _excel_alla() -> bytes:
+    return till_excel({n: ss.scenarier[n] for n in NAMN})
+
+
 def kort(n: str) -> str:
     """Fast etikett: ändras aldrig, så att valet alltid kan läsas tillbaka."""
     return f"Scenario {n}"
@@ -71,6 +77,20 @@ def satt(n: str, s: dict):
     if n == ss.aktiv:
         ss.scen = s
         ss.v = ss.versioner[n]
+
+
+def oppna_excel(data: bytes, mal: str) -> str:
+    """Läser en Excel-arbetsbok från Road2Zero. Scenarier som heter A, B eller C läses dit; annars läses de i tur och ordning
+    till A, B och C, och en arbetsbok med ett scenario läses till mal."""
+    delar = fran_excel(data, fb())
+    if len(delar) == 1:
+        s = next(iter(delar.values()))
+        satt(mal, s)
+        return f"Läste in {s['projekt']['namn']} till scenario {mal}."
+    mal_for = {sid: sid for sid in delar if sid in NAMN} if all(sid in NAMN for sid in delar) else dict(zip(delar, NAMN))
+    for sid, n in mal_for.items():
+        satt(n, delar[sid])
+    return "Läste in " + "; ".join(f"{n}: {ss.scenarier[n]['projekt']['namn']}" for n in mal_for.values()) + "."
 
 
 def oppna(text: str, mal: str) -> str:
@@ -136,29 +156,27 @@ def fardiga_paket() -> dict[str, Path]:
 
 def sidopanel(resultat: dict):
     sb = st.sidebar
-    sb.markdown(
-        f'<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">'
-        f'<div style="width:46px;height:46px">{LOGO}</div>'
-        f'<div><div style="font-size:20px;font-weight:700;line-height:1.1">Road2Zero scenario</div>'
-        f'<div style="font-size:12px;color:#56635E">version {__version__}</div></div></div>', unsafe_allow_html=True)
-    sb.caption("Tre scenarier med alla indata, beräknade med Road2Zero och jämförda med varandra.")
+    sb.divider()
     sb.markdown("##### Nettoutsläpp, nivå 1 / 2 / 3")
     for n in NAMN:
         r = resultat.get(n)
         txt = (" · " + " / ".join(f"{r.netto(L)/1000:,.0f}".replace(",", " ") for L in (1, 2, 3)) + " kt") if r else " · inga byggnader"
-        sb.markdown(f"<div style='font-size:13px;margin-bottom:4px'>{markering(n, txt)}</div>", unsafe_allow_html=True)
+        sb.markdown(f"<div style='font-size:13px;margin-bottom:4px;color:#d9e9df'>{markering(n, txt)}</div>", unsafe_allow_html=True)
 
     a = ss.aktiv
     sb.divider()
     sb.markdown("##### Öppna och spara")
     if ss.get("_meddelande"):
         sb.success(ss.pop("_meddelande"))
-    fil = sb.file_uploader("Öppna fil", type=["json"], key=f"upp_{sum(ss.versioner.values())}",
-                           help=f"En fil med alla tre scenarier läses till A, B och C. En fil med ett scenario (från Road2Zero eller "
-                                f"Spara scenario) läses till scenario {a}.")
+    fil = sb.file_uploader("Öppna fil (JSON eller Excel)", type=["json", "xlsx"], key=f"upp_{sum(ss.versioner.values())}",
+                           help=f"En fil med alla tre scenarier läses till A, B och C. En fil med ett scenario (från Road2Zero-Plan eller "
+                                f"Spara scenario) läses till scenario {a}. Excel: spara en arbetsbok härifrån och använd den som mall.")
     if fil is not None:
         try:
-            ss["_meddelande"] = oppna(fil.getvalue().decode("utf-8"), a)
+            if fil.name.lower().endswith(".xlsx"):
+                ss["_meddelande"] = oppna_excel(fil.getvalue(), a)
+            else:
+                ss["_meddelande"] = oppna(fil.getvalue().decode("utf-8"), a)
             st.rerun()
         except Exception as e:  # noqa: BLE001
             sb.error(f"Filen kunde inte läsas: {e}")
@@ -166,14 +184,19 @@ def sidopanel(resultat: dict):
         if sb.button(f"Hämta {namn.split(':')[0]} till A, B och C", width="stretch", help=namn):
             ss["_meddelande"] = oppna(f.read_text(encoding="utf-8"), a); st.rerun()
     paket = {"typ": SCENARIOSET, "modellversion": __version__, "aktiv": a, "scenarier": ss.scenarier}
-    sb.download_button("Spara alla tre (JSON)", data=json.dumps(paket, ensure_ascii=False, indent=2).encode("utf-8"),
+    c1, c2 = sb.columns(2)
+    c1.download_button("Alla tre (JSON)", data=json.dumps(paket, ensure_ascii=False, indent=2).encode("utf-8"),
                        file_name="road2zero_scenarier.json", mime="application/json", width="stretch")
+    c2.download_button("Alla tre (Excel)", data=_excel_alla(), file_name="road2zero_scenarier.xlsx", mime=XLSX, width="stretch")
 
     sb.divider()
     sb.markdown(f"##### Scenario {a}")
     p = ss.scenarier[a]["projekt"]
-    sb.download_button(f"Spara scenario {a} (JSON)", data=till_json(ss.scenarier[a]).encode("utf-8"),
+    c1, c2 = sb.columns(2)
+    c1.download_button(f"Spara {a} (JSON)", data=till_json(ss.scenarier[a]).encode("utf-8"),
                        file_name=f"road2zero_{a}_{p['namn']}.json".replace(" ", "_"), mime="application/json", width="stretch")
+    c2.download_button(f"Spara {a} (Excel)", data=till_excel({a: ss.scenarier[a]}),
+                       file_name=f"road2zero_{a}_{p['namn']}.xlsx".replace(" ", "_"), mime=XLSX, width="stretch")
     fall = fardiga_fall()
     if fall:
         val = giltigt(sb.selectbox("Färdigt fall", ["Välj …"] + list(fall), key="fall_val",

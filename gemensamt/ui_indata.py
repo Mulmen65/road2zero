@@ -37,7 +37,10 @@ def _set(path, v):
 
 
 def num(label, path, **kw):
-    v = st.number_input(label, value=_get(path), key=k("/".join(map(str, path))), **kw)
+    v0 = _get(path)
+    if any(isinstance(kw.get(x), float) for x in ("min_value", "max_value", "step")) and isinstance(v0, int) and not isinstance(v0, bool):
+        v0 = float(v0)            # heltal ur en sparad fil eller Excel får inte blandas med decimala gränser
+    v = st.number_input(label, value=v0, key=k("/".join(map(str, path))), **kw)
     _set(path, v)
     return v
 
@@ -113,7 +116,7 @@ def projekt():
             num("Slutår", ("projekt", "slutar"), min_value=1991, max_value=2150, step=1)
         st.caption(f"{s['projekt']['slutar'] - s['projekt']['startar']} år. Standard är innevarande år och 50 år framåt, som EU:s referensperiod för livscykel-GWP.")
 
-    st.info("Elens och fjärrvärmens klimatfaktor och hur alla emissionsfaktorer utvecklas över tid anges i fliken **Emissionsfaktorer över tid**.")
+    st.info("Elens och fjärrvärmens klimatfaktor och hur alla emissionsfaktorer utvecklas över tid anges under **Antaganden & scenario → Emissionsfaktorer över tid**.")
 
     st.markdown("##### Hushåll")
     c1, c2, c3 = st.columns(3)
@@ -258,7 +261,7 @@ def _byggare():
                      type="primary", disabled=not ok):
             ss.scen["byggnader"].extend(nya)
             ny_version(); st.rerun()
-        kalla("Byggpåverkan: " + kalla_text("TABELL_A_UTOKAD,MALMQVIST2023,SBUF14381") + "; utvecklingen över tid styrs i fliken "
+        kalla("Byggpåverkan: " + kalla_text("TABELL_A_UTOKAD,MALMQVIST2023,SBUF14381") + "; utvecklingen över tid styrs under Antaganden & scenario → "
               "Emissionsfaktorer över tid. Energiklasser: " + kalla_text("BOVERKET_BBR") + ".")
 
 
@@ -659,10 +662,14 @@ def mobilitet():
         else:
             num("Bilar per hushåll", ("mobilitet", "bilar_per_hushall"), min_value=0.0, max_value=3.0, step=0.01)
             num("Körsträcka per bil (km/år)", ("mobilitet", "km_per_bil"), min_value=0.0, step=100.0, help=f"Riksmedel 12 753 km: {param_info('mob.km_riket')}")
+            kd = mob.get("kalla_deso")
+            if kd:
+                kalla(f"Förifyllt från {len(kd.get('deso', []))} valda DeSO ({kd.get('modell', 'Vägvis')}, SCB {kd.get('dataar', '')}). "
+                      "Se Trafik & geodata.")
     with c2:
         mob["phev_eldrift"] = st.slider("Laddhybridens eldriftsandel", 0.0, 1.0, float(mob["phev_eldrift"]), 0.05, key=k("phev"), help=param_info("mob.phev_eldrift"))
         st.caption("Ökningen av elbilar och laddhybrider, bilproduktionens klimatavtryck och förändringen av bilinnehav och körsträcka "
-                   "anges i fliken Emissionsfaktorer över tid.")
+                   "anges under Antaganden & scenario → Emissionsfaktorer över tid.")
     with c3:
         mob["bensin_fossil"] = st.slider("Fossil andel i bensin", 0.0, 1.0, float(mob["bensin_fossil"]), 0.01, key=k("bf"), help=param_info("mob.bensin.fossil"))
         mob["diesel_fossil"] = st.slider("Fossil andel i diesel", 0.0, 1.0, float(mob["diesel_fossil"]), 0.01, key=k("df"), help=param_info("mob.diesel.fossil"))
@@ -741,7 +748,7 @@ def mat():
         from road2zero.modules.konsumtion import mat_per_inv
         kx = Kontext(fb(), ss.scen)
         st.caption(f"Kost per invånare 2026: **{fmt(mat_per_inv(kx, 2026), 2)} t CO2e**, 2050: {fmt(mat_per_inv(kx, 2050), 2)} t med "
-                   "matkonsumtionens index i fliken Emissionsfaktorer över tid. Andelar och avtryck per kostprofil från EPIC-Oxford-kohorten, "
+                   "matkonsumtionens index under Antaganden & scenario → Emissionsfaktorer över tid. Andelar och avtryck per kostprofil från EPIC-Oxford-kohorten, "
                    + kalla_text("SCARBOROUGH2023") + " (tabell 3, medianer för en kost på 2 000 kcal per dag).")
     senare(_kost)
     st.markdown("##### Modulens bidrag")
@@ -764,7 +771,7 @@ def ovrig():
         for kat, r in zip(ov.index, e.to_dict("records")):
             o["varden"][kat] = float(tal(r["t per invånare"], 0))
         st.caption(f"Summa **{fmt(sum(o['varden'].values()), 2)} t** per invånare och år. Standard: {kalla_text('SEI2026')}, data för 2023. "
-                   "Värdena gäller 2026; utvecklingen därefter anges i fliken Emissionsfaktorer över tid.")
+                   "Värdena gäller 2026; utvecklingen därefter anges under Antaganden & scenario → Emissionsfaktorer över tid.")
         if st.button("Återställ standard", key=k("std_ovr")):
             ss.scen["ovrig"] = standard_ovrig(fb()); ny_version(); st.rerun()
     with c2:
@@ -772,8 +779,8 @@ def ovrig():
         num("Inrikes och utrikes flyg (t CO2e per invånare och år)", ("flyg", "per_inv"), min_value=0.0, step=0.05, format="%.2f")
         kalla(f"Standard {fmt(fb().param('flyg.per_inv'), 2)} t: {param_info('flyg.per_inv')}. Kamb och Larsson anger 1,1 t år 2017 med höghöjdseffekt "
               "(170 g CO2e per personkilometer mot 90 g CO2 från bränslet); flygresandet har sedan dess minskat till cirka 80 %. "
-              "Resultatet delas i två delposter, koldioxid från bränslet och höghöjdseffekt, och höghöjdseffekten kan väljas bort i fliken Resultat. "
-              "Utvecklingen över tid (EU:s krav på hållbart flygbränsle och bränsleeffektivitet) anges i fliken Emissionsfaktorer över tid.")
+              "Resultatet delas i två delposter, koldioxid från bränslet och höghöjdseffekt, och höghöjdseffekten kan väljas bort under Resultat. "
+              "Utvecklingen över tid (EU:s krav på hållbart flygbränsle och bränsleeffektivitet) anges under Antaganden & scenario → Emissionsfaktorer över tid.")
     st.markdown("##### Modulens bidrag")
     bidrag("6 ")
 
@@ -793,7 +800,7 @@ def offentlig():
     st.metric("Offentlig sektor per invånare och år", f"{fmt(o['konsumtion'] + o['investeringar'] * o['andel'], 2)} t CO2e")
     kalla("Bara den offentliga andelen av investeringarna räknas: offentliga myndigheters bruttoinvesteringar 4,2 % av BNP av totalt 23,1 % år 2014 ("
           + kalla_text("REGERINGEN2015") + "). Värden per invånare: " + kalla_text("NV_KONSUMTION,SEI2026") + ". Projektets egna byggnader ingår inte här. "
-          "Värdena gäller 2026 och följer därefter EU:s klimatmål enligt fliken Emissionsfaktorer över tid.")
+          "Värdena gäller 2026 och följer därefter EU:s klimatmål enligt Antaganden & scenario → Emissionsfaktorer över tid.")
     st.markdown("##### Modulens bidrag")
     bidrag("7 ")
 

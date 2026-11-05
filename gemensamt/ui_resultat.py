@@ -476,7 +476,7 @@ def forutsattningar(res):
     fig.add_scatter(x=ar, y=[res.invanare.get(y, 0) for y in ar], mode="lines", line=dict(color=PETROL, width=2), row=1, col=3,
                     hovertemplate="%{x}: %{y:,.0f} invånare<extra></extra>")
     fig.update_layout(showlegend=False)
-    fig = layout(fig, "Förutsättningar över tid", "Enligt fliken Emissionsfaktorer över tid och byggbeståndet", 330, yt=None)
+    fig = layout(fig, "Förutsättningar över tid", "Enligt Emissionsfaktorer över tid och byggbeståndet", 330, yt=None)
     fig.update_annotations(font=dict(size=12, color=INK))
     fig.update_layout(margin=dict(l=10, r=10, t=104, b=10))
     return fig
@@ -572,7 +572,7 @@ def nyckeltal(res, u: Urval, m: dict):
 
 def kallor(res, u: Urval):
     st.markdown("Så räknas de valda kategorierna: formler, parametrar med källa och mellanled för dina indata. "
-                "Alla moduler finns också i fliken Beräkningar.")
+                "Alla moduler finns också under Så räknas resultatet.")
     visade = set()
     for kat in u.kat:
         moduler = [a for pre in KATEGORI_MODULER.get(kat, []) for a in ALGORITMER if a["modul"].startswith(pre)]

@@ -183,7 +183,7 @@ def visa():
     ss.scen["fjarrvarme"]["startvarde"] = c2.number_input(
         "Ortens fjärrvärme (g CO2e/kWh)", 0.0, 1000.0, float(ss.scen["fjarrvarme"]["startvarde"]), 1.0, key=k("utv_fjv0"),
         help=f"Ange leverantörens värde enligt Energiföretagens miljövärdering. Förifyllt: {param_info('fjv.startvarde')}.")
-    c3.caption("Byggpåverkan per byggnadstyp och stomme (nivå 2026) väljs under Indata → Byggnader och visas i fliken Faktorer och "
+    c3.caption("Byggpåverkan per byggnadstyp och stomme (nivå 2026) väljs under Indata → Byggnader och visas under Antaganden & scenario → Faktorer och "
                "parametrar. Drivlinemixen 2025 anges under Indata → Mobilitet.")
 
     st.markdown("#### Byggpåverkan")

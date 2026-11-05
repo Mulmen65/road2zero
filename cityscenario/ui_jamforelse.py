@@ -13,10 +13,10 @@ from road2zero.konstanter import FARG as KATFARG
 from road2zero.konstanter import KATEGORI_NAMN, NIVA, NIVA_INNEHALL, NIVA_NAMN
 from road2zero.scenario import till_json
 
-from .common import fb, fmt, giltigt, ss
-from .scenarier import FARG, etikett, kort, markering, medtagna
-from .diagram import CONF, INK, INK2, SURF
-from .diagram import layout as _layout
+from gemensamt.common import fb, fmt, giltigt, ss
+from cityscenario.scenarier import FARG, etikett, kort, markering, medtagna
+from gemensamt.diagram import CONF, INK, INK2, SURF
+from gemensamt.diagram import layout as _layout
 
 
 @st.cache_data(max_entries=60, show_spinner=False)
@@ -74,7 +74,7 @@ def jamforelse(res: dict):
             st.metric("Budgeten förbrukad", str(slut) if slut else "Inte före slutåret")
     if len({res[n].ar()[0] for n in med}) > 1 or len({res[n].ar()[-1] for n in med}) > 1:
         st.warning("Scenarierna har olika tidsperioder. Summor över perioden går då inte att jämföra direkt; använd per invånare, "
-                   "per m² BTA eller fliken Rättvis jämförelse.")
+                   "per m² BTA eller sidan Rättvis jämförelse.")
 
     st.plotly_chart(_per_kategori(res, med, niva), width="stretch", config=CONF)
     st.plotly_chart(_per_ar(res, med, niva), width="stretch", config=CONF)

@@ -120,6 +120,9 @@ def bygg() -> dict:
                                for t, namn, a in ytor]
     per_ar = TRAD / (AR1 - AR0 + 1)
     s["negativa"]["trad"] = [{"antal": per_ar, "planteringsar": y} for y in range(AR0, AR1 + 1)]
+    # DeSO 2025 som travbanan ligger i (förslag, kontrolleras på kartan i Road2Zero-Plan)
+    s["geografi"] = {"kommunkod": "1280", "deso": ["1280C1780", "1280C2070"],
+                     "kommentar": "Förslag: de DeSO som travbanan ligger i. Kontrollera på kartan och justera vid behov."}
     return s
 
 

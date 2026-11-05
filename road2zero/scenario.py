@@ -147,6 +147,9 @@ def tomt(fb: Faktabibliotek | None = None) -> dict:
         "negativa": {"biokol": [], "trad": []},
         "budget": {"temperatur": "1,5", "sannolikhet": 50, "niva": 3},
         "parametrar": {},
+        # Var planen ligger: kommunkod och SCB:s DeSO-områden. Används för kartan och för mobilitetsdata per DeSO; påverkar inte
+        # beräkningen förrän värdena förs över till mobiliteten.
+        "geografi": {"kommunkod": "", "deso": [], "kommentar": ""},
     }
 
 

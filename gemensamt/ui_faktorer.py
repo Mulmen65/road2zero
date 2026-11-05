@@ -101,7 +101,7 @@ def tabeller():
         st.dataframe(pv, width="stretch", column_config={c: st.column_config.NumberColumn(format="%.1f") for c in pv.columns if c != "SBUF-kategori/proxy"})
         st.caption("kg CO2e per m² BTA, moduler A1–A5. BAU = SBUF 14381 Insteg, BÄST = SBUF 14381 Färdplan. Generisk = Betong BAU. "
                    "Lokaler och underjordisk parkering saknas i Tabell A utökad och använder kontorets värden. Startvärdet gäller 2026 och "
-                   "följer stommens index i fliken Emissionsfaktorer över tid.")
+                   "följer stommens index under Antaganden & scenario → Emissionsfaktorer över tid.")
         with st.expander("Anmärkning och datakvalitet per byggnadstyp"):
             an = t[t["stomme"] == "generisk"][["byggnadstyp", "datakvalitet", "anmarkning", "kalla"]].copy()
             an["byggnadstyp"] = an["byggnadstyp"].map(lambda i: BYGGNADSTYPER[i][0]); an["kalla"] = an["kalla"].map(kalla_kort)
@@ -124,7 +124,7 @@ def tabeller():
         st.plotly_chart(fig, width="stretch")
         st.caption("Tabell A utökad: SBUF 14381 Insteg (BAU, heldragen) och Färdplan (BÄST, streckad) 2025–2035, därefter försiktig "
                    "extrapolering till 2070. Ingen CCS för cement; försiktig extra reduktion för Stål BÄST efter 2030. "
-                   "Modellen använder kurvorna som standardtakt per stomme i fliken Emissionsfaktorer över tid.")
+                   "Modellen använder kurvorna som standardtakt per stomme under Antaganden & scenario → Emissionsfaktorer över tid.")
     elif val == "utveckling":
         u = f.utveckling.copy()
         from road2zero.utveckling import PERIODKOL, PERIODNAMN
@@ -135,7 +135,7 @@ def tabeller():
         st.dataframe(u[["grupp", "namn", "enhet"] + PERIODNAMN + ["status", "kalla", "kommentar"]].rename(
             columns={"grupp": "Grupp", "namn": "Faktor", "enhet": "Enhet", "status": "Status", "kalla": "Källa", "kommentar": "Kommentar"}),
             hide_index=True, width="stretch", column_config={c: st.column_config.NumberColumn(format="%.2f") for c in PERIODNAMN})
-        st.caption("Standardvärden för årlig förändring per period. Värdena med dina ändringar visas i fliken Emissionsfaktorer över tid.")
+        st.caption("Standardvärden för årlig förändring per period. Värdena med dina ändringar visas under Antaganden & scenario → Emissionsfaktorer över tid.")
     elif val == "ytschabloner":
         t = f.ytschabloner.copy(); t["kg"] = t["t_co2e_m2"].astype(float) * 1000
         pv = t.pivot(index="anlaggningstyp", columns="utforande", values="kg"); pv.index = [ANLAGGNINGSTYPER.get(i, i) for i in pv.index]
@@ -149,7 +149,7 @@ def tabeller():
                                    line=dict(color="#2c6e9e", width=2), marker=dict(size=8)))
         fig.update_layout(height=320, yaxis_title=d["enhet"].iloc[0], margin=dict(l=10, r=10, t=10, b=10), separators=", ")
         st.plotly_chart(fig, width="stretch")
-        st.caption("El- och fjärrvärmekurvorna är underlag för standardtakten i fliken Emissionsfaktorer över tid. "
+        st.caption("El- och fjärrvärmekurvorna är underlag för standardtakten under Antaganden & scenario → Emissionsfaktorer över tid. "
                    "Trädtillväxt anges per år efter plantering.")
     elif val == "skogskol_kurvbibliotek":
         kur = st.selectbox("Kurva", sorted(f.skog["kurva"].unique()), key=k("f_skog"))

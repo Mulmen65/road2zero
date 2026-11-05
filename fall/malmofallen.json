@@ -1,11 +1,11 @@
 {
   "typ": "road2zero-scenarier",
   "namn": "Malmöfallen: Västra hamnen, Varvsstaden och Jägersro SMT",
-  "modellversion": "0.5.4",
+  "modellversion": "0.8.0",
   "aktiv": "A",
   "scenarier": {
     "A": {
-      "modellversion": "0.5.4",
+      "modellversion": "0.8.0",
       "projekt": {
         "namn": "Västra hamnen väster om Stora Varvsgatan, Malmö",
         "kommun": "Malmö",
@@ -169,14 +169,14 @@
             0.0
           ],
           "mat": [
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73
           ],
           "ovrig": [
             -3.7,
@@ -189,14 +189,14 @@
             -3.7
           ],
           "flyg": [
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8
+            -1.88,
+            -2.58,
+            -2.65,
+            -2.19,
+            -4.09,
+            -1.5,
+            -1.5,
+            -1.5
           ],
           "offentlig": [
             -5.74,
@@ -1006,12 +1006,12 @@
         "avtryck": {
           "vegan": 2.47,
           "vegetarian": 4.16,
-          "fisk": 2.74,
+          "fisk": 4.74,
           "kott_lag": 5.37,
           "kott_medel": 7.04,
           "kott_hog": 10.24
         },
-        "kalibrering": false,
+        "kalibrering": true,
         "omstallning": false,
         "mal_andelar": {
           "vegan": 0.037,
@@ -1035,7 +1035,7 @@
         }
       },
       "flyg": {
-        "per_inv": 1.1
+        "per_inv": 0.88
       },
       "offentlig": {
         "konsumtion": 0.83,
@@ -1073,6 +1073,19 @@
         "niva": 3
       },
       "parametrar": {},
+      "geografi": {
+        "kommunkod": "1280",
+        "deso": [
+          "1280C2850",
+          "1280C2881",
+          "1280C2882",
+          "1280C2883",
+          "1280C2900",
+          "1280C2873",
+          "1280C2874"
+        ],
+        "kommentar": "Förslag: Västra hamnen väster om Stora Varvsgatan; Universitetsholmen (1280C2872) ingår inte. Kontrollera på kartan."
+      },
       "dokumentation": {
         "beskrivning": "Västra hamnen i Malmö väster om Stora Varvsgatan, från första spadtaget för Bo01 (2000) till 2050. Varvsstaden och Universitetsholmen ligger öster om gatan och ingår inte.",
         "avgransning": "Allt väster om Stora Varvsgatan, cirka 165 ha (antagande: Malmö stads 187 ha för Västra hamnen minus Varvsstaden och Universitetsholmens del): Bo01, Dockan, Flagghusen, Fullriggaren, Masthusen, Hamnporten, Tampen, Citadellsfogen och Galeonen. Universitetsholmen (Orkanen, Niagara, Malmö Live, Neptunigymnasiet) och Varvsstaden ingår inte. Befintliga äldre byggnader (Kockums kontor m.m.) ingår inte; deras arbetsplatser dras av vid kalibreringen.",
@@ -1460,7 +1473,7 @@
           }
         ],
         "nyckeltal": {
-          "modellversion": "0.5.4",
+          "modellversion": "0.8.0",
           "kommentar": "Beräknat när filen skapades; ändras när indata eller faktabibliotek ändras.",
           "bta_m2": 1689553,
           "invanare_2050": 18358,
@@ -1468,14 +1481,14 @@
           "2000_2050": {
             "netto_t": {
               "niva1": 842133,
-              "niva2": 3544341,
-              "niva3": 3919576
+              "niva2": 3217137,
+              "niva3": 3592372
             },
             "personar": 598721,
             "t_per_personar": {
               "niva1": 1.41,
-              "niva2": 5.92,
-              "niva3": 6.55
+              "niva2": 5.37,
+              "niva3": 6.0
             },
             "per_kategori_t": {
               "Byggnad": 583808,
@@ -1483,8 +1496,8 @@
               "Anläggning": 70110,
               "Förändrad markanvändning": 0,
               "Mobilitet och transport": 320485,
-              "Flygresor": 564595,
-              "Matkonsumtion": 1097100,
+              "Flygresor": 431191,
+              "Matkonsumtion": 903299,
               "Övrig konsumtion": 720028,
               "Offentliga investeringar": 375235,
               "Negativa utsläpp": -1666
@@ -1493,14 +1506,14 @@
           "2030_2050": {
             "netto_t": {
               "niva1": 177917,
-              "niva2": 1660058,
-              "niva3": 1773368
+              "niva2": 1448816,
+              "niva3": 1562125
             },
             "personar": 376541,
             "t_per_personar": {
               "niva1": 0.47,
-              "niva2": 4.41,
-              "niva3": 4.71
+              "niva2": 3.85,
+              "niva3": 4.15
             },
             "per_kategori_t": {
               "Byggnad": 66303,
@@ -1508,8 +1521,8 @@
               "Anläggning": 8783,
               "Förändrad markanvändning": 0,
               "Mobilitet och transport": 150601,
-              "Flygresor": 321979,
-              "Matkonsumtion": 643635,
+              "Flygresor": 237161,
+              "Matkonsumtion": 517210,
               "Övrig konsumtion": 365926,
               "Offentliga investeringar": 113310,
               "Negativa utsläpp": -1071
@@ -1519,7 +1532,7 @@
       }
     },
     "B": {
-      "modellversion": "0.5.4",
+      "modellversion": "0.8.0",
       "projekt": {
         "namn": "Varvsstaden, Malmö",
         "kommun": "Malmö",
@@ -1683,14 +1696,14 @@
             0.0
           ],
           "mat": [
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73
           ],
           "ovrig": [
             -3.7,
@@ -1703,14 +1716,14 @@
             -3.7
           ],
           "flyg": [
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8
+            -1.88,
+            -2.58,
+            -2.65,
+            -2.19,
+            -4.09,
+            -1.5,
+            -1.5,
+            -1.5
           ],
           "offentlig": [
             -5.74,
@@ -2298,12 +2311,12 @@
         "avtryck": {
           "vegan": 2.47,
           "vegetarian": 4.16,
-          "fisk": 2.74,
+          "fisk": 4.74,
           "kott_lag": 5.37,
           "kott_medel": 7.04,
           "kott_hog": 10.24
         },
-        "kalibrering": false,
+        "kalibrering": true,
         "omstallning": false,
         "mal_andelar": {
           "vegan": 0.037,
@@ -2327,7 +2340,7 @@
         }
       },
       "flyg": {
-        "per_inv": 1.1
+        "per_inv": 0.88
       },
       "offentlig": {
         "konsumtion": 0.83,
@@ -2357,6 +2370,13 @@
         "niva": 3
       },
       "parametrar": {},
+      "geografi": {
+        "kommunkod": "1280",
+        "deso": [
+          "1280C2871"
+        ],
+        "kommentar": "Förslag: Varvsstaden ligger i en DeSO som också omfattar delar av Västra hamnen öster om Stora Varvsgatan. Kontrollera på kartan."
+      },
       "dokumentation": {
         "beskrivning": "Varvsstaden i Malmö (Kockums tidigare varvsområde) från första byggstart 2020 (Gjuteriet) till 2050.",
         "avgransning": "Öster om Stora Varvsgatan (Hall 259 ligger i nordvästra hörnet längs gatan). Cirka 18 ha med 2 500 bostäder, 4 000 arbetsplatser och cirka 350 000 m² byggrätter, färdigt omkring 2041. Tre broar och 1 km kajpromenad.",
@@ -2648,7 +2668,7 @@
           }
         ],
         "nyckeltal": {
-          "modellversion": "0.5.4",
+          "modellversion": "0.8.0",
           "kommentar": "Beräknat när filen skapades; ändras när indata eller faktabibliotek ändras.",
           "bta_m2": 382688,
           "invanare_2050": 4250,
@@ -2656,14 +2676,14 @@
           "2020_2050": {
             "netto_t": {
               "niva1": 129128,
-              "niva2": 424180,
-              "niva3": 447503
+              "niva2": 380397,
+              "niva3": 403719
             },
             "personar": 77856,
             "t_per_personar": {
               "niva1": 1.66,
-              "niva2": 5.45,
-              "niva3": 5.75
+              "niva2": 4.89,
+              "niva3": 5.19
             },
             "per_kategori_t": {
               "Byggnad": 88546,
@@ -2671,8 +2691,8 @@
               "Anläggning": 23132,
               "Förändrad markanvändning": 0,
               "Mobilitet och transport": 21331,
-              "Flygresor": 66203,
-              "Matkonsumtion": 132516,
+              "Flygresor": 48572,
+              "Matkonsumtion": 106363,
               "Övrig konsumtion": 75002,
               "Offentliga investeringar": 23322,
               "Negativa utsläpp": -744
@@ -2681,14 +2701,14 @@
           "2030_2050": {
             "netto_t": {
               "niva1": 75743,
-              "niva2": 344316,
-              "niva3": 361893
+              "niva2": 303219,
+              "niva3": 320796
             },
             "personar": 72711,
             "t_per_personar": {
               "niva1": 1.04,
-              "niva2": 4.74,
-              "niva3": 4.98
+              "niva2": 4.17,
+              "niva3": 4.41
             },
             "per_kategori_t": {
               "Byggnad": 50147,
@@ -2696,8 +2716,8 @@
               "Anläggning": 8901,
               "Förändrad markanvändning": 0,
               "Mobilitet och transport": 18669,
-              "Flygresor": 60679,
-              "Matkonsumtion": 122142,
+              "Flygresor": 44157,
+              "Matkonsumtion": 97567,
               "Övrig konsumtion": 67083,
               "Offentliga investeringar": 17577,
               "Negativa utsläpp": -158
@@ -2707,7 +2727,7 @@
       }
     },
     "C": {
-      "modellversion": "0.5.4",
+      "modellversion": "0.8.0",
       "projekt": {
         "namn": "Jägersro SMT, Malmö",
         "kommun": "Malmö",
@@ -2871,14 +2891,14 @@
             0.0
           ],
           "mat": [
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3,
-            -1.3
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73,
+            -1.73
           ],
           "ovrig": [
             -3.7,
@@ -2891,14 +2911,14 @@
             -3.7
           ],
           "flyg": [
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8,
-            -1.8
+            -1.88,
+            -2.58,
+            -2.65,
+            -2.19,
+            -4.09,
+            -1.5,
+            -1.5,
+            -1.5
           ],
           "offentlig": [
             -5.74,
@@ -3606,12 +3626,12 @@
         "avtryck": {
           "vegan": 2.47,
           "vegetarian": 4.16,
-          "fisk": 2.74,
+          "fisk": 4.74,
           "kott_lag": 5.37,
           "kott_medel": 7.04,
           "kott_hog": 10.24
         },
-        "kalibrering": false,
+        "kalibrering": true,
         "omstallning": false,
         "mal_andelar": {
           "vegan": 0.037,
@@ -3635,7 +3655,7 @@
         }
       },
       "flyg": {
-        "per_inv": 1.1
+        "per_inv": 0.88
       },
       "offentlig": {
         "konsumtion": 0.83,
@@ -3669,6 +3689,14 @@
         "niva": 3
       },
       "parametrar": {},
+      "geografi": {
+        "kommunkod": "1280",
+        "deso": [
+          "1280C1780",
+          "1280C2070"
+        ],
+        "kommentar": "Förslag: De DeSO som travbanan och Svensk Travsports mark ligger i. Kontrollera på kartan."
+      },
       "dokumentation": {
         "beskrivning": "Jägersro SMT från första spadtaget 2030 till 2050, med samma schabloner som fallen för Västra hamnen och Varvsstaden.",
         "avgransning": "SMT:s del av Jägersro, 41 ha, 4 000 bostäder och 2 000 arbetsplatser. Tidplanen (inflyttning 2032–2050 i fyra etapper) är ett antagande.",
@@ -3954,7 +3982,7 @@
           }
         ],
         "nyckeltal": {
-          "modellversion": "0.5.4",
+          "modellversion": "0.8.0",
           "kommentar": "Beräknat när filen skapades; ändras när indata eller faktabibliotek ändras.",
           "bta_m2": 509703,
           "invanare_2050": 8073,
@@ -3962,14 +3990,14 @@
           "2030_2050": {
             "netto_t": {
               "niva1": 118148,
-              "niva2": 408254,
-              "niva3": 420555
+              "niva2": 361360,
+              "niva3": 373661
             },
             "personar": 81765,
             "t_per_personar": {
               "niva1": 1.44,
-              "niva2": 4.99,
-              "niva3": 5.14
+              "niva2": 4.42,
+              "niva3": 4.57
             },
             "per_kategori_t": {
               "Byggnad": 100343,
@@ -3977,8 +4005,8 @@
               "Anläggning": 3615,
               "Förändrad markanvändning": 2042,
               "Mobilitet och transport": 23916,
-              "Flygresor": 65122,
-              "Matkonsumtion": 132855,
+              "Flygresor": 46173,
+              "Matkonsumtion": 104910,
               "Övrig konsumtion": 68213,
               "Offentliga investeringar": 12301,
               "Negativa utsläpp": -106

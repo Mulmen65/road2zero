@@ -495,9 +495,20 @@ if __name__ == "__main__":
                 "byggnad_kg_per_m2_bta": round(float(p["Byggnad"].sum()) * 1000 / r.bta_totalt()),
                 f"{a0}_2050": fonster(a0), **({"2030_2050": fonster(2030)} if a0 < 2030 else {})}
 
+    # DeSO som fallen ligger i (SCB DeSO 2025), valda genom att lägga stadsdelens gräns mot DeSO-kartan. Förslag som ska
+    # kontrolleras på kartan i Road2Zero-CityScenario; de styr kartan och kan föra över bilinnehavet till mobiliteten.
+    GEOGRAFI = {
+        "vastra_hamnen.json": (["1280C2850", "1280C2881", "1280C2882", "1280C2883", "1280C2900", "1280C2873", "1280C2874"],
+                               "Västra hamnen väster om Stora Varvsgatan; Universitetsholmen (1280C2872) ingår inte."),
+        "varvsstaden.json": (["1280C2871"], "Varvsstaden ligger i en DeSO som också omfattar delar av Västra hamnen öster om Stora Varvsgatan."),
+        "jagersro_smt.json": (["1280C1780", "1280C2070"], "De DeSO som travbanan och Svensk Travsports mark ligger i."),
+    }
+
     alla = {}
     for bokstav, namn, f in (("A", "vastra_hamnen.json", vastra_hamnen), ("B", "varvsstaden.json", varvsstaden), ("C", "jagersro_smt.json", jagersro)):
         s = f()
+        deso, kommentar = GEOGRAFI[namn]
+        s["geografi"] = {"kommunkod": "1280", "deso": deso, "kommentar": "Förslag: " + kommentar + " Kontrollera på kartan."}
         s["dokumentation"]["nyckeltal"] = nyckeltal(s)
         (UT / namn).write_text(json.dumps(s, ensure_ascii=False, indent=2), encoding="utf-8")
         alla[bokstav] = s

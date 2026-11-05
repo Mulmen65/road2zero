@@ -1,5 +1,5 @@
 {
-  "modellversion": "0.5.4",
+  "modellversion": "0.8.0",
   "projekt": {
     "namn": "Jägersro SMT, Malmö",
     "kommun": "Malmö",
@@ -163,14 +163,14 @@
         0.0
       ],
       "mat": [
-        -1.3,
-        -1.3,
-        -1.3,
-        -1.3,
-        -1.3,
-        -1.3,
-        -1.3,
-        -1.3
+        -1.73,
+        -1.73,
+        -1.73,
+        -1.73,
+        -1.73,
+        -1.73,
+        -1.73,
+        -1.73
       ],
       "ovrig": [
         -3.7,
@@ -183,14 +183,14 @@
         -3.7
       ],
       "flyg": [
-        -1.8,
-        -1.8,
-        -1.8,
-        -1.8,
-        -1.8,
-        -1.8,
-        -1.8,
-        -1.8
+        -1.88,
+        -2.58,
+        -2.65,
+        -2.19,
+        -4.09,
+        -1.5,
+        -1.5,
+        -1.5
       ],
       "offentlig": [
         -5.74,
@@ -898,12 +898,12 @@
     "avtryck": {
       "vegan": 2.47,
       "vegetarian": 4.16,
-      "fisk": 2.74,
+      "fisk": 4.74,
       "kott_lag": 5.37,
       "kott_medel": 7.04,
       "kott_hog": 10.24
     },
-    "kalibrering": false,
+    "kalibrering": true,
     "omstallning": false,
     "mal_andelar": {
       "vegan": 0.037,
@@ -927,7 +927,7 @@
     }
   },
   "flyg": {
-    "per_inv": 1.1
+    "per_inv": 0.88
   },
   "offentlig": {
     "konsumtion": 0.83,
@@ -961,6 +961,14 @@
     "niva": 3
   },
   "parametrar": {},
+  "geografi": {
+    "kommunkod": "1280",
+    "deso": [
+      "1280C1780",
+      "1280C2070"
+    ],
+    "kommentar": "Förslag: De DeSO som travbanan och Svensk Travsports mark ligger i. Kontrollera på kartan."
+  },
   "dokumentation": {
     "beskrivning": "Jägersro SMT från första spadtaget 2030 till 2050, med samma schabloner som fallen för Västra hamnen och Varvsstaden.",
     "avgransning": "SMT:s del av Jägersro, 41 ha, 4 000 bostäder och 2 000 arbetsplatser. Tidplanen (inflyttning 2032–2050 i fyra etapper) är ett antagande.",
@@ -1246,7 +1254,7 @@
       }
     ],
     "nyckeltal": {
-      "modellversion": "0.5.4",
+      "modellversion": "0.8.0",
       "kommentar": "Beräknat när filen skapades; ändras när indata eller faktabibliotek ändras.",
       "bta_m2": 509703,
       "invanare_2050": 8073,
@@ -1254,14 +1262,14 @@
       "2030_2050": {
         "netto_t": {
           "niva1": 118148,
-          "niva2": 408254,
-          "niva3": 420555
+          "niva2": 361360,
+          "niva3": 373661
         },
         "personar": 81765,
         "t_per_personar": {
           "niva1": 1.44,
-          "niva2": 4.99,
-          "niva3": 5.14
+          "niva2": 4.42,
+          "niva3": 4.57
         },
         "per_kategori_t": {
           "Byggnad": 100343,
@@ -1269,8 +1277,8 @@
           "Anläggning": 3615,
           "Förändrad markanvändning": 2042,
           "Mobilitet och transport": 23916,
-          "Flygresor": 65122,
-          "Matkonsumtion": 132855,
+          "Flygresor": 46173,
+          "Matkonsumtion": 104910,
           "Övrig konsumtion": 68213,
           "Offentliga investeringar": 12301,
           "Negativa utsläpp": -106

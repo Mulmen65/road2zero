@@ -11,6 +11,7 @@ from road2zero import __version__
 from road2zero.engine import Resultat, berakna
 from road2zero.factlib import Faktabibliotek, ladda
 from road2zero.konstanter import KATEGORI_NAMN, NIVA_NAMN
+from road2zero.excel_indata import fran_excel, till_excel
 from road2zero.scenario import fran_json, standardprojekt, till_json, tomt
 
 LOGO = (Path(__file__).parent / "logo.svg").read_text(encoding="utf-8")
@@ -53,6 +54,8 @@ def kor_senare(res):
 def ny_version():
     """Ny nyckeluppsättning för alla fält, så att de läser om värdena ur scenariot."""
     ss.v = ss.get("v", 0) + 1
+    if "versioner" in ss and ss.get("aktiv") in ss.versioner:      # Road2Zero-CityScenario: eget nummerområde per scenario
+        ss.versioner[ss.aktiv] = ss.v
     for k in [k for k in ss.keys() if str(k).startswith("bas_")]:
         del ss[k]
 
@@ -126,41 +129,49 @@ def eget_param(pid: str) -> float:
 
 # ---------- sidopanel ----------
 def sidopanel(res: Resultat):
+    """Sidopanelen under menyn: resultat i korthet och filhantering."""
     sb = st.sidebar
-    sb.markdown(
-        f'<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">'
-        f'<div style="width:46px;height:46px">{LOGO}</div>'
-        f'<div><div style="font-size:22px;font-weight:700;line-height:1.1">Road2Zero</div>'
-        f'<div style="font-size:12px;color:#56635E">version {__version__}</div></div></div>', unsafe_allow_html=True)
+    sb.divider()
     p = ss.scen["projekt"]
-    sb.caption(f"**{p['namn']}** · {p['kommun']} · {p['startar']}–{p['slutar']}")
-
     nk = res.nyckeltal()
     b = res.budget
     sb.markdown("##### Resultat i korthet")
     for L in (1, 2, 3):
-        sb.markdown(f"<div style='display:flex;justify-content:space-between;font-size:14px'><span>{NIVA_NAMN[L]}</span>"
-                    f"<b>{fmt(nk['netto'][L])} t</b></div>", unsafe_allow_html=True)
+        sb.markdown(f"<div class='r2z-sb-rad'><span>{NIVA_NAMN[L]}</span><b>{fmt(nk['netto'][L])} t</b></div>", unsafe_allow_html=True)
     slut = b["slutar"].get(int(ss.scen["budget"]["niva"]))
-    sb.markdown(f"<div style='font-size:13px;color:#56635E;margin-top:6px'>{fmt(nk['bta'])} m² BTA · {fmt(nk['invanare_full'])} invånare vid full utbyggnad · "
+    sb.markdown(f"<div class='r2z-sb-not'><b>{p['namn']}</b> · {p['kommun']} · {p['startar']}–{p['slutar']}<br>"
+                f"{fmt(nk['bta'])} m² BTA · {fmt(nk['invanare_full'])} invånare vid full utbyggnad · "
                 f"budgeten förbrukad {slut or 'inte under perioden'} på nivå {ss.scen['budget']['niva']}</div>", unsafe_allow_html=True)
     fel = [x for x in res.kontroller if x[0] == "fel"]
     varn = [x for x in res.kontroller if x[0] == "varning"]
     if fel:
-        sb.error(f"{len(fel)} fel i indata. Se fliken Indata.")
+        sb.markdown(f"<div class='r2z-sb-status fel'>{len(fel)} fel i indata. Se Indata.</div>", unsafe_allow_html=True)
     elif varn:
-        sb.warning(f"{len(varn)} varningar i indata. Se fliken Indata.")
+        sb.markdown(f"<div class='r2z-sb-status varning'>{len(varn)} varningar i indata. Se Indata.</div>", unsafe_allow_html=True)
     else:
-        sb.success("Indata är kompletta.")
+        sb.markdown("<div class='r2z-sb-status ok'>Indata är kompletta.</div>", unsafe_allow_html=True)
 
     sb.divider()
     sb.markdown("##### Indata")
-    sb.download_button("Spara indata (JSON)", data=till_json(ss.scen).encode("utf-8"),
+    if ss.get("_meddelande"):
+        sb.info(ss.pop("_meddelande"))
+    c1, c2 = sb.columns(2)
+    c1.download_button("Spara (JSON)", data=till_json(ss.scen).encode("utf-8"),
                        file_name=f"road2zero_{p['namn']}.json".replace(" ", "_"), mime="application/json", width="stretch")
-    fil = sb.file_uploader("Öppna sparade indata", type=["json"], key=k("uppladdning"))
+    c2.download_button("Spara (Excel)", data=till_excel({"Plan": ss.scen}),
+                       file_name=f"road2zero_{p['namn']}.xlsx".replace(" ", "_"),
+                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", width="stretch",
+                       help="Arbetsbok med alla indata. Fyll i och öppna den här igen, eller i Road2Zero-CityScenario.")
+    fil = sb.file_uploader("Öppna sparade indata (JSON eller Excel)", type=["json", "xlsx"], key=k("uppladdning"))
     if fil is not None:
         try:
-            ladda_indata(fran_json(fil.getvalue().decode("utf-8"), fb()))
+            if fil.name.lower().endswith(".xlsx"):
+                delar = fran_excel(fil.getvalue(), fb())
+                ladda_indata(next(iter(delar.values())))
+                if len(delar) > 1:
+                    ss["_meddelande"] = f"Arbetsboken har {len(delar)} scenarier; det första ({next(iter(delar))}) lästes in."
+            else:
+                ladda_indata(fran_json(fil.getvalue().decode("utf-8"), fb()))
             st.rerun()
         except Exception as e:  # noqa: BLE001
             sb.error(f"Filen kunde inte läsas: {e}")

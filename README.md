@@ -1,25 +1,93 @@
 # Road2Zero
 
-Klimatberäkning för stadsdelar utan karta. Modellen räknar tio klimatkategorier år för år och jämför nettoutsläppen med en vetenskapligt baserad koldioxidbudget (Forster m.fl. 2026), fördelad lika per person på de invånare som faktiskt bor i området.
+<img src="gemensamt/logo.svg" width="72" align="right" alt="Road2Zero">
 
-Appen startar med standardprojektet Jägersro (Svensk Travsports del, utbyggnad 2030–2045); sidopanelen kan också börja med ett tomt projekt. Alla schabloner är förifyllda och varje värde hänvisar till en publicerad källa eller är tydligt markerat som modellval.
+Road2Zero är en familj av evidensbaserade klimatmodeller för staden. Alla tre har samma logotyp, samma mörkgröna meny och samma
+förklaringssidor (**Karta & områden, Så räknas resultatet, Antaganden & scenario, Trafik & geodata, Metod & källor**), och alla visar
+kartor med DeSO-områden och OpenStreetMap i bakgrunden.
 
-## Flikar
+| Modell | Huvudfil | Använd när du vill … |
+|---|---|---|
+| **Road2Zero-OP** | `op/streamlit_app.py` | se hela stadens klimatavtryck per DeSO enligt översiktsplanen: energi i befintliga byggnader, mobilitet och utbyggnaden 2030–2050. Ett projekt per stad i `op/projekt/`; först **Malmö_ÖP**. |
+| **Road2Zero-Plan** | `plan/streamlit_app.py` | analysera en plan i detalj (till exempel Jägersro): tio klimatkategorier år för år mot en koldioxidbudget. |
+| **Road2Zero-CityScenario** | `cityscenario/streamlit_app.py` | testa planer mot varandra, i samma eller olika stadsdelar, med rättvis jämförelse. Indata från JSON eller Excel. |
 
-| Flik | Innehåll |
-|---|---|
-| Indata | Moduler 0–8 och klimatbudget. Byggbeståndet anges som andelar med egen byggnadstyp, stomme och egna energival. |
-| Emissionsfaktorer över tid | Startvärden 2026 och årlig förändring i procent per period 2027–2100 för byggpåverkan per stomme, anläggning, el, fjärrvärme, bilproduktion, förbränningsbilar, el- och laddhybridbilar, bilinnehav, körsträcka, mat, övrig konsumtion, flyg och offentlig sektor. |
-| Resultat | Välj vilka klimatkategorier som ska ingå (förvalt efter redovisningsnivå) och om flygets höghöjdseffekt ska räknas med. Nyckeltal och underflikar: Översikt (summa per kategori, vattenfall, trädkarta med delposter, bland annat kosten per kostprofil), Över tid (per år, ackumulerat, en panel per kategori), Per person (t CO2e per person och år, ackumulerat per person och snitt för en valbar analysperiod, standard 2027–2050, jämfört med budgetandelen), Klimatbudget (snitt per person mot budgetutrymmet per person för valfri temperatur 1,5–2,0 °C och sannolikhet, inklusive andra växthusgaser, samt ackumulerat mot stadsdelens budget), Tabeller och export (t CO2e, t per person och år eller kg per m² BTA; CSV och Excel) samt Källor och beräkning för de valda kategorierna. |
-| Beräkningar | Formler, steg, parametrar och mellanled för varje modul. |
-| Faktorer och parametrar | Hela faktabiblioteket med värde, enhet, statusklass och källa. Egna värden kan anges per parameter. |
-| Referenser | Alla källor, grupperade, med länk och var de används. |
+Plan och CityScenario räknar med samma motor (`road2zero/`) och jämför nettoutsläppen med en vetenskapligt baserad
+koldioxidbudget (Forster m.fl. 2026), fördelad lika per person på de invånare som faktiskt bor i området. Alla schabloner är
+förifyllda och varje värde hänvisar till en publicerad källa eller är tydligt markerat som modellval. Road2Zero-OP bygger på
+MalmoOP 1.2 och räknar i webbläsaren.
+
+Bilinnehavet per DeSO kommer från **Vägvis 2.3.1** ([Mulmen65/vagvisa](https://github.com/Mulmen65/vagvisa)): hushåll, invånare och
+personbilar per DeSO 2024 ur SCB:s register och körsträcka per bil per kommun. I Plan och CityScenario väljer du planens DeSO på
+kartan och kan föra över bilinnehavet till mobiliteten (sidan Trafik & geodata). Vägvis ändras inte; underlaget läses in med
+`verktyg/hamta_vagvis.py`.
+
+## Mappar
+
+```
+road2zero/          beräkningsmotorn för Plan och CityScenario (oberoende av Streamlit)
+gemensamt/          gemensamt gränssnitt: logotyp, meny, förklaringssidor, karta, DeSO-underlag, indata- och resultatsidor
+plan/               Road2Zero-Plan            (streamlit_app.py)
+cityscenario/       Road2Zero-CityScenario    (streamlit_app.py, scenarier.py, ui_jamforelse.py)
+op/                 Road2Zero-OP              (streamlit_app.py, app/, projekt/malmo_op/, tools/, tests/)
+fall/               färdiga fall för CityScenario (Västra hamnen, Varvsstaden, Jägersro SMT)
+verktyg/            skript som bygger faktabibliotek, standardprojekt, fall och DeSO-underlag
+underlag/           källfiler som skripten läser; visas inte i apparna
+tests/              tester för motorn och gränssnittet
+streamlit_app.py    kör Road2Zero-Plan (för äldre publiceringar)
+```
+
+## Kör lokalt
+
+```bash
+python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+streamlit run plan/streamlit_app.py                    # eller cityscenario/streamlit_app.py eller op/streamlit_app.py
+```
+
+Startskripten tar appens namn: `./starta_mac_linux.sh cityscenario` eller `starta_windows.bat op` (standard är `plan`).
+
+## Publicera på Streamlit Community Cloud
+
+Skapa en app per modell från samma repo (`Mulmen65/road2zero`, grenen `main`), med huvudfilen `plan/streamlit_app.py`,
+`cityscenario/streamlit_app.py` eller `op/streamlit_app.py`. Python 3.12 eller senare; testat med Python 3.13 och Streamlit 1.66.
+Varje push till `main` uppdaterar alla tre.
+
+## Road2Zero-Plan
+
+Menyn: **Översikt** (nyckeltal, vägen mot noll, summa per kategori, planområdet på kartan), **Indata** (moduler 0–8 och
+klimatbudget), **Resultat** (välj redovisningsnivå, klimatkategorier, analysperiod och flygets höghöjdseffekt; översikt, över tid,
+per person, klimatbudget, tabeller och export, källor och beräkning) och förklaringssidorna. Indata sparas och öppnas som JSON eller
+Excel från sidopanelen.
+
+## Road2Zero-CityScenario
+
+Välj överst på sidorna vilket av scenario A, B och C du ändrar; alla indata, emissionsfaktorer över tid och egna parametrar gäller
+det valda scenariot. **Jämförelse** och **Rättvis jämförelse** visar alla tre sida vid sida. I sidopanelen läser **Öppna fil** en
+JSON- eller Excel-fil: en fil med alla tre scenarier läses till A, B och C, en fil med ett scenario till det valda. Spara alla tre
+eller ett i taget som JSON eller Excel, kopiera ett scenario till ett annat eller hämta ett färdigt fall ur `fall/`.
+
+**Excel:** arbetsboken har bladet *Värden* (alla enskilda värden, Scenario · Sökväg · Värde), bladet *Utveckling* (årlig förändring
+per faktor och period), ett blad per lista (till exempel *byggnader* och *anlaggning.ytor*, en rad per post) och bladet *Läs mig*.
+Spara en arbetsbok från appen och använd den som mall. Värden som saknas får standardvärden när filen läses in.
+
+## Road2Zero-OP
+
+Varje stad eller plan är ett projekt i `op/projekt/<id>/` med `projekt.json` (namn, kommun, rubriker) och `data/`. Appen visar en
+rullista när det finns fler än ett projekt. Sidan **Underlag** laddar ned underlaget eller läser in nya energideklarationer.
+
+Lägg till en stad:
+1. Kopiera `op/projekt/malmo_op/` till `op/projekt/<ny_id>/` och ändra `projekt.json`.
+2. Byt filerna i `data/kalla/` (DeSO-gränser, energideklarationer, OSM-byggnader, utbyggnadsområden, Vägvis-underlag för kommunen).
+3. Bygg underlaget med projektet valt: `R2Z_OP_PROJEKT=op/projekt/<ny_id> python op/tools/build_energi.py` (och de andra skripten i
+   `op/tools/`; `node op/tools/build_mobilitet.js` för mobiliteten).
+4. Läs igenom texterna i `op/app/app.js`, som på några ställen gäller Malmö.
 
 ## Byggbeståndet
 
 Varje rad är en andel av byggbeståndet: en byggnadstyp, en stomme och en BTA, med egen energiklass, andel fjärrvärme och värmepump för fastighetsvärmen, valfri egen köpt el och fjärrvärme per m² BTA, och solceller. Byggpåverkan och energi hör alltså alltid till samma BTA.
 
-- **Stomme:** Generisk (= Betong BAU), Betong BAU, Betong BÄST, Stål BAU, Stål BÄST, Trä BAU eller Trä BÄST. Rullistan visar förifylld byggpåverkan i kg CO2e/m² BTA för den valda byggnadstypen (A1–A5) ur Tabell A utökad, med SBUF-kategori/proxy och startankare (BAU = SBUF 14381 Insteg, BÄST = SBUF 14381 Färdplan; startvärden enligt Malmqvist m.fl. 2023). Tabellens värde gäller 2026 och följer stommens index i fliken Emissionsfaktorer över tid för året då BTA:n blir klar.
+- **Stomme:** Generisk (= Betong BAU), Betong BAU, Betong BÄST, Stål BAU, Stål BÄST, Trä BAU eller Trä BÄST. Rullistan visar förifylld byggpåverkan i kg CO2e/m² BTA för den valda byggnadstypen (A1–A5) ur Tabell A utökad, med SBUF-kategori/proxy och startankare (BAU = SBUF 14381 Insteg, BÄST = SBUF 14381 Färdplan; startvärden enligt Malmqvist m.fl. 2023). Tabellens värde gäller 2026 och följer stommens index under Antaganden & scenario → Emissionsfaktorer över tid för året då BTA:n blir klar.
 - **Kolinlagring i trästomme:** för Trä BAU och Trä BÄST räknas −(BTA × v × F_produkt) som negativt utsläpp, fördelat över byggtiden. F_produkt är bundet kol per m³ enligt EN 16449: stomvirke 720,7, limträ 786,0 och KL-trä 680,7 kg CO2/m³. Schablon: stomvirke för Trä BAU, limträ för Trä BÄST och v = 0,15 m³/m² BTA. Både träprodukt och mängd virke kan väljas.
 - **Energi:** energiklassen ger köpt fjärrvärme och el per m² Atemp för byggnadstypens kategori i Boverkets byggregler. Klass C motsvarar nybyggnadskravet och är förvald. Fastighetsvärmen delas mellan fjärrvärme och värmepump (el) i procent. Egen köpt el och egen köpt fjärrvärme anges per m² BTA och ersätter klassens värden. Garage, industri och övriga byggnader är uppvärmda eller ouppvärmda och har bara el.
 - **Utbyggnadstakt:** färdigställd BTA per år och andel; jämn, framtung, baktung eller egen tabell.
@@ -45,72 +113,28 @@ Varje faktor har ett startvärde som gäller 2026 och en årlig förändring i p
 
 ## Arbeta med Claude Code
 
-- `CLAUDE.md` innehåller modellbesluten och arbetsreglerna. Claude Code läser filen i början av varje session.
-- `.claude/skills/uppdatera-tabell-a/` är en projekt-skill: skriv `/uppdatera-tabell-a` i Claude Code när en ny version av
-  Tabell A utökad ska läsas in.
-- `verktyg/las_tabell_a.py` läser `underlag/tabell_a_utokad.xlsx` till faktabiblioteket.
-- Varje push till grenen `main` på GitHub uppdaterar appen på Streamlit Community Cloud.
-
-## Kör lokalt
-
-```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-streamlit run streamlit_app.py
-```
-
-## Publicera på Streamlit Community Cloud
-
-1. Lägg mappen i ett GitHub-repo.
-2. Gå till share.streamlit.io, välj **Create app** och sedan repot och grenen.
-3. Ange `streamlit_app.py` som huvudfil. Python 3.12 eller senare fungerar; appen är testad med Python 3.13 och Streamlit 1.66.
-
-## Struktur
-
-```
-CLAUDE.md                 instruktioner och modellbeslut för Claude Code
-streamlit_app.py          start och flikar
-scenario_app.py           road2zero-scenario: tre scenarier mot varandra
-app/                      gränssnittet, en fil per flik
-road2zero/                beräkningsmotorn (oberoende av Streamlit)
-  engine.py               berakna(indata) -> Resultat
-  jamforelse.py           rättvis jämförelse av scenarier
-  scenario.py             indatamodell, standardvärden, validering, JSON
-  modules/                en modul per indatamodul och klimatbudget
-  algoritmer.py           formler och text för fliken Beräkningar
-  data/                   faktabiblioteket (CSV och JSON)
-tests/                    regressionstester
-verktyg/                  skript som läser underlag till faktabiblioteket och bygger färdiga fall
-fall/                     färdiga fall att öppna i appen (Västra hamnen, Varvsstaden och Jägersro SMT i Malmö)
-underlag/                 källfiler (Tabell A utökad), visas inte i appen
-```
-
-Faktabiblioteket ligger i `road2zero/data/`. Varje rad har en kolumn `kalla` med id i `referenser.csv`. Byt eller lägg till ett värde genom att ändra CSV-filen; testerna kontrollerar att varje käll-id finns.
+- `CLAUDE.md` innehåller modellbesluten och arbetsreglerna för alla tre modeller. Claude Code läser filen i början av varje session.
+- `.claude/skills/uppdatera-tabell-a/` är en projekt-skill: skriv `/uppdatera-tabell-a` när en ny version av Tabell A utökad ska
+  läsas in.
+- Claude arbetar på en egen gren och pushar den; du godkänner sammanslagningen till `main`.
 
 ## Tester
 
 ```bash
-pip install pytest
-python -m pytest -q
+pip install -r requirements-dev.txt
+python -m pytest -q              # motor, gränssnitt, Excel, DeSO-underlag och Road2Zero-OP:s sidbygge
+node op/tests/test_model.js      # Road2Zero-OP:s beräkningar
 ```
-
-Testerna kontrollerar ett påhittat testfall, att andelar med olika stommar och energival räknas var för sig, att äldre sparade indata med två stommar per rad läses in som andelar, att faktabiblioteket är konsistent och att gränssnittet bara hänvisar till publicerade källor.
 
 ## Spara och öppna indata
 
-Indata sparas som JSON från sidopanelen och kan öppnas igen. Filen innehåller modellversionen. Nycklar som saknas fylls med standardvärden när filen öppnas. Egna nycklar, till exempel en `dokumentation` med källor och antaganden, behålls när filen sparas igen. Excel-exporten har indata i bladet Indata, en JSON-rad per rad (`fortsatter` = 1 betyder att raden fortsätter på nästa).
+Indata sparas som JSON eller Excel från sidopanelen och kan öppnas igen. Filen innehåller modellversionen. Nycklar som saknas fylls
+med standardvärden när filen öppnas, så att äldre filer fortsätter att fungera. Egna nycklar, till exempel en `dokumentation` med
+källor och antaganden, behålls i JSON. Resultatexporten (Excel) har också indata i bladet Indata, en JSON-rad per rad.
 
 ## Färdiga fall
 
-`fall/vastra_hamnen.json` (2000–2050), `fall/varvsstaden.json` (2020–2050) och `fall/jagersro_smt.json` (2030–2050) öppnas från sidopanelen; i road2zero-scenario finns de i rullistan **Färdigt fall**, och knappen **Hämta Malmöfallen till A, B och C** läser `fall/malmofallen.json` med alla tre på en gång. Alla tre har samma schabloner för arbetsplatser, närservice, mobilitetshus, gator och fjärrvärme, så att de kan jämföras. Varje fil har en `dokumentation` med källor, kalibrering och status per andel (Uppgift, Kalibrerat eller Antagande). Filerna byggs av `python verktyg/bygg_malmofall.py`; ändra skriptet och kör det igen för att uppdatera fallen.
-
-## road2zero-scenario: tre scenarier mot varandra
-
-```bash
-streamlit run scenario_app.py
-```
-
-Ett eget verktyg i samma repo. Välj överst vilket av scenario A, B och C du ändrar; alla indataflikar, emissionsfaktorer över tid och egna parametrar från Road2Zero gäller det valda scenariot. Flikarna **Jämförelse** och **Rättvis jämförelse** visar alla tre sida vid sida och uppdateras direkt när indata ändras. I sidopanelen läser **Öppna fil** en fil med alla tre scenarier till A, B och C, eller en fil med ett scenario (samma JSON-format som Road2Zero) till det valda scenariot. Där sparar du också alla tre eller ett scenario i taget, kopierar ett scenario till ett annat och hämtar ett färdigt fall ur `fall/`. En fil med tre scenarier kan inte öppnas i Road2Zero, som bara har ett scenario; appen säger då till. På Streamlit Community Cloud skapar du en ny app från samma repo med huvudfilen `scenario_app.py`.
+`fall/vastra_hamnen.json` (2000–2050), `fall/varvsstaden.json` (2020–2050) och `fall/jagersro_smt.json` (2030–2050) öppnas från sidopanelen; i Road2Zero-CityScenario finns de i rullistan **Färdigt fall**, och knappen **Hämta Malmöfallen till A, B och C** läser `fall/malmofallen.json` med alla tre på en gång. Alla tre har samma schabloner för arbetsplatser, närservice, mobilitetshus, gator och fjärrvärme, så att de kan jämföras. Varje fil har en `dokumentation` med källor, kalibrering och status per andel (Uppgift, Kalibrerat eller Antagande). Varje fall har också förslag på de DeSO det ligger i (kontrollera på kartan). Filerna byggs av `python verktyg/bygg_malmofall.py`; ändra skriptet och kör det igen för att uppdatera fallen.
 
 ## Jämföra stadsdelar
 
@@ -118,7 +142,7 @@ Ett eget verktyg i samma repo. Välj överst vilket av scenario A, B och C du ä
 python verktyg/jamfor_stadsdelar.py fall/a.json fall/b.json fall/c.json --referens 3 --ut jamforelse.xlsx
 ```
 
-Samma beräkning som fliken Rättvis jämförelse i road2zero-scenario. Verktyget delar nivå 1 på funktion: bostäder och närservice (skolor) per invånare, verksamheter per arbetsplats (20 m² BTA per arbetsplats); parkering, anläggning, mark och stadsträd fördelas efter BTA. Det räknar både med lika förutsättningar (alla emissionsfaktorer på 2026 års nivå, så att bara utformningen skiljer) och med faktisk tidpunkt. Engångsutsläpp fördelas på 50 år och läggs till ett års drift vid full utbyggnad. Den standardiserade stadsdelen väger varje stadsdels intensitet per m² med referensfallets fördelning mellan bostäder och verksamheter.
+Samma beräkning som sidan Rättvis jämförelse i Road2Zero-CityScenario. Verktyget delar nivå 1 på funktion: bostäder och närservice (skolor) per invånare, verksamheter per arbetsplats (20 m² BTA per arbetsplats); parkering, anläggning, mark och stadsträd fördelas efter BTA. Det räknar både med lika förutsättningar (alla emissionsfaktorer på 2026 års nivå, så att bara utformningen skiljer) och med faktisk tidpunkt. Engångsutsläpp fördelas på 50 år och läggs till ett års drift vid full utbyggnad. Den standardiserade stadsdelen väger varje stadsdels intensitet per m² med referensfallets fördelning mellan bostäder och verksamheter.
 
 ## Befintliga stadsdelar
 

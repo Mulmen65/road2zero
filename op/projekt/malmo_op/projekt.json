@@ -1,0 +1,16 @@
+{
+  "id": "malmo_op",
+  "namn": "Malmö_ÖP",
+  "kommun": "Malmö",
+  "kommunkod": "1280",
+  "plan": "Översiktsplan för Malmö 2023 (ÖP 2023)",
+  "stig": "MALMÖ ÖP 2023",
+  "rubrik": "Malmö växer.",
+  "betonad": "Hela klimatavtrycket.",
+  "ingress": "Årligt klimatavtryck per DeSO från energi i befintliga byggnader, mobilitet och utbyggnaden enligt ÖP 2023.",
+  "deso": 209,
+  "utbyggnadsomraden": 36,
+  "bostader": 38850,
+  "arbetsplatser": 37900,
+  "kommentar": "Bygger på MalmoOP 1.2: energideklarationer kopplade till DeSO, Vägvis 2.3.1 för mobilitet och ÖP 2023:s utbyggnadsområden."
+}
