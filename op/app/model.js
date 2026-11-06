@@ -35,11 +35,19 @@
   const PERIODER = [[2027, 2030], [2031, 2035], [2036, 2040], [2041, 2045], [2046, 2050]];
   const UTV = {
     el: [-3.54, -2.52, -2.88, -2.09, -2.33],
+    el_iea: [-6.68, -3.7, -3.7, -3.7, -3.7],    // IEA handelskorrigerad: EU:s och den globala elens klimatfaktor (IEA, 2026)
+    el_wem: [-8.2, -1.69, -0.91, 0, 0],         // eget startvärde: Sveriges prognos med befintliga styrmedel (Naturvårdsverket, 2025)
     fv: [-1.63, -1.75, -1.92, -2.13, -2.38],
     insteg: [-5.71, -5.98, -1.44, -1.53, -1.23],
     fardplan: [-9.24, -5.92, -1.65, -1.8, -0.97]
   };
   const TAKT = {el: 'elR', fv: 'fvR', bygg: 'byggR'};   // parameternamn elR1…elR5 osv., ett per period
+  /* Elens klimatfaktor, tre val som i Road2Zero-Plan (road2zero/data/parametrar.csv och utveckling.csv; test_model.js kontrollerar):
+       boverket  37 g CO2e/kWh, svensk elmix (Boverkets klimatdatabas), takt enligt EU:s referensscenario 2020
+       iea       26 g CO2e/kWh, IEA:s handelskorrigerade timvärden för Sverige 2025/26 med livscykel och nätförluster (härlett)
+       egen      användarens startvärde (efElEgen), takt enligt Sveriges WEM-prognos 2025 */
+  const EL_ALT = {boverket: {ef: 0.037, takt: UTV.el, namn: 'Boverket'}, iea: {ef: 0.026, takt: UTV.el_iea, namn: 'IEA handelskorrigerad'},
+    egen: {ef: null, takt: UTV.el_wem, namn: 'Eget startvärde'}};
   /* Sysavs koldioxidavskiljning (SkyZero) vid avfallskraftvärmeverket i Malmö: cirka 400 000 av 600 000 t CO2 per år
      avskiljs (Energinyheter, 2024), i drift 2030 enligt Sysav, investeringsbeslut 2027 (SVT, 2026). Sysav levererade
      2023 cirka 65 % av fjärrvärmen i Malmö och Burlöv (Sysav, 2024). Standardminskningen 0,65 × 400/600 ≈ 43 % av
@@ -51,7 +59,9 @@
     bLage: 'local',             // Vägvis modell B: 'local' (standard) eller 'gtfs' (DeSO-skattning med GTFS)
     ar: 2050,
     // Energi i befintliga byggnader
-    efEl: 0.037,                // kg CO2e/kWh, svensk elmix, Boverkets klimatdatabas (räkneexempel)
+    elVal: 'boverket',          // elens klimatfaktor: 'boverket' | 'iea' | 'egen' (EL_ALT); styr efEl och standardtakten elR1…5
+    efEl: 0.037,                // kg CO2e/kWh, startvärde för valet (räknas fram i params)
+    efElEgen: 0.037,            // kg CO2e/kWh, eget startvärde (valet 'egen'), förifyllt med Boverkets värde
     efFv: 0.056,                // kg CO2e/kWh, fjärrvärme svenskt medelvärde, Boverkets klimatdatabas
     atempLage: 'osm',           // 'osm' = skattad ur OSM-fotavtryck × våningar, 'fast' = samma yta per deklaration
     atempFaktor: 0.9,           // Atemp/BTA (antagande)
@@ -95,7 +105,7 @@
   };
 
   const LIMITS = {
-    efEl: [0, 2], efFv: [0, 2], atempFaktor: [0.3, 1.2], atempFast: [10, 1e6], elFast: [0, 1],
+    efEl: [0, 2], efElEgen: [0, 2], efFv: [0, 2], atempFaktor: [0.3, 1.2], atempFast: [10, 1e6], elFast: [0, 1],
     industriAndel: [0, 1], cvKalibrering: [0, 1], iterationer: [100, 5000], seed: [1, 2147483646],
     effektivisering2050: [-100, 100], trafikForandring2050: [-100, 200], beccsAr: [2025, 2050], beccsMinskning: [0, 100],
     ...Object.fromEntries(['elR', 'fvR', 'byggR'].flatMap(p => [1, 2, 3, 4, 5].map(k => [p + k, [-50, 50]]))),
@@ -105,7 +115,7 @@
     atempNy: [0.3, 1.2], energiNy: [0, 500], elandelNy: [0, 1], personerPerBostad: [0, 10], bilFaktor: [0, 5],
     andelKmInomMalmo: [0, 1], hardgorandel: [0, 1], kolAker: [0, 1000], kolOppen: [0, 1000], kolSkog: [0, 1000], kolBebyggd: [0, 1000]
   };
-  const ENUMS = {perspektiv: ['A', 'B'], bLage: ['local', 'gtfs'], atempLage: ['osm', 'fast'], elLage: ['kvot', 'fast'],
+  const ENUMS = {elVal: ['boverket', 'iea', 'egen'], perspektiv: ['A', 'B'], bLage: ['local', 'gtfs'], atempLage: ['osm', 'fast'], elLage: ['kvot', 'fast'],
     bestand: ['hela', 'deklarerade'], kalibrering: ['sektor', 'total', 'ingen'],
     klimatBygg: ['referens', 'gransvarde2030', 'bana', 'trappa', 'insteg', 'fardplan', 'egen'], markOkand: ['bebyggd', 'oppen', 'aker'],
     beccs: ['nej', 'ja']};
@@ -122,6 +132,13 @@
       const [lo, hi] = LIMITS[k] || [-Infinity, Infinity];
       out[k] = Math.min(hi, Math.max(lo, n));
     }
+    // Elens klimatfaktor. Äldre lägen utan val men med eget startvärde blir 'egen' med sin tidigare takt, så att resultatet består.
+    const inp = p || {}, har = k => k in inp && inp[k] !== undefined && inp[k] !== null && inp[k] !== '';
+    if (!har('elVal') && har('efEl') && Math.abs(out.efEl - DEFAULTS.efEl) > 1e-12) {
+      out.elVal = 'egen'; out.efElEgen = out.efEl;
+      for (let k = 1; k <= 5; k++) if (!har('elR' + k)) out['elR' + k] = UTV.el[k - 1];
+    } else for (let k = 1; k <= 5; k++) if (!har('elR' + k)) out['elR' + k] = EL_ALT[out.elVal].takt[k - 1];
+    out.efEl = out.elVal === 'egen' ? out.efElEgen : EL_ALT[out.elVal].ef;
     out.iterationer = Math.round(out.iterationer); out.seed = Math.round(out.seed);
     if (out.f1Slut <= out.f1Start) out.f1Slut = out.f1Start + 1;
     if (out.f2Slut <= out.f2Start) out.f2Slut = out.f2Start + 1;
@@ -353,6 +370,10 @@
     const eb = energyBase(S, P);
     const A0 = S.ids.map(id => mob.A[id] ? mob.A[id].total : 0), B0 = S.ids.map(id => mob[bKey][id] ? mob[bKey][id].total : 0);
     const cityAvkm = mob.stad.A.vkm;
+    // Elbilarnas laddel (el, ingår i Vägvis wtt) räknas om från Vägvis elfaktor till modellens elfaktor för året: sätt(y) = 1 − e + e · k(y)
+    const efV = mob.elFaktor || {}, elAndel = (x, t) => x && t > 0 ? (x.el || 0) / t : 0;
+    const eA = S.ids.map((id, i) => elAndel(mob.A[id], A0[i])), eB = S.ids.map((id, i) => elAndel(mob[bKey][id], B0[i]));
+    const eBstad = elAndel(mob.stad[bKey], mob.stad[bKey] ? mob.stad[bKey].total : 0);
     const perDeso = {cph: new Float64Array(n), km: new Float64Array(n), epv: new Float64Array(n)};
     for (let i = 0; i < n; i++) {
       const h = S.hh[i], b = mob[bKey][S.ids[i]];
@@ -383,11 +404,13 @@
       const f = ramp(y), fl = fleet(P, y), tr = 1 + P.trafikForandring2050 / 100 * f;
       const fk = faktorer(P, y), effScale = 1 - P.effektivisering2050 / 100 * f;
       const efMixNy = P.elandelNy * fk.el + (1 - P.elandelNy) * fk.fv;
+      const kA = efV.A > 0 ? fk.el * 1000 / efV.A : 1, kB = efV.B > 0 ? fk.el * 1000 / efV.B : 1;
+      const sA = i => 1 - eA[i] + eA[i] * kA, sB = i => 1 - eB[i] + eB[i] * kB;
       let newVkmCity = 0;
       const nymobB = new Float64Array(n);
       for (let i = 0; i < n; i++) {
         comp.energi[yi][i] = (eb.tEl[i] * fk.iEl + eb.tFv[i] * fk.iFv) * effScale;
-        comp.mobilitet[yi][i] = (P.perspektiv === 'A' ? A0[i] : B0[i]) * fl * tr;
+        comp.mobilitet[yi][i] = (P.perspektiv === 'A' ? A0[i] * sA(i) : B0[i] * sB(i)) * fl * tr;
         pop[yi][i] = S.hh[i].bef;
       }
       if (P.exploatering) areas.forEach((x, k) => {
@@ -399,16 +422,17 @@
           const drift = d.w * done * x.btaSum * P.atempNy * P.energiNy * efMixNy / 1000;
           comp.nydrift[yi][d.i] += drift;
           const hhNew = x.a.bostader * d.w * done, vkm = hhNew * perDeso.cph[d.i] * P.bilFaktor * perDeso.km[d.i];
-          nymobB[d.i] += vkm * perDeso.epv[d.i] * fl;
+          const sNy = mob[bKey][S.ids[d.i]] && mob[bKey][S.ids[d.i]].vkm > 0 ? sB(d.i) : 1 - eBstad + eBstad * kB;
+          nymobB[d.i] += vkm * perDeso.epv[d.i] * fl * sNy;
           newVkmCity += vkm;
           newPop[yi][d.i] += hhNew * P.personerPerBostad;
           pop[yi][d.i] += hhNew * P.personerPerBostad;
           if (y >= 2030 && y <= 2050) { areaRes[k].bygg += d.w * build * bygg; areaRes[k].mark += build * d.luc; }
-          if (y === 2050) { areaRes[k].nydrift2050 += drift; areaRes[k].nymob2050 += vkm * perDeso.epv[d.i] * fl; }
+          if (y === 2050) { areaRes[k].nydrift2050 += drift; areaRes[k].nymob2050 += vkm * perDeso.epv[d.i] * fl * sNy; }
         }
       });
       if (P.perspektiv === 'B') comp.nymob[yi].set(nymobB);
-      else if (newVkmCity > 0) { const g = P.andelKmInomMalmo * newVkmCity / cityAvkm; for (let i = 0; i < n; i++) comp.nymob[yi][i] = A0[i] * fl * tr * g; }
+      else if (newVkmCity > 0) { const g = P.andelKmInomMalmo * newVkmCity / cityAvkm; for (let i = 0; i < n; i++) comp.nymob[yi][i] = A0[i] * sA(i) * fl * tr * g; }
     });
     const fakt = years.map(y => ({year: y, ...faktorer(P, y), bygg: Object.fromEntries(Object.keys(BYGG.referens).map(t => [t, byggFaktor(P, t, y)]))}));
     return {P, years, comp, pop, newPop, areas: areaRes, energyBase: eb, perDeso, bKey, faktorer: fakt};
@@ -447,7 +471,7 @@
   }
 
   return {VERSION, BASE_YEAR, END_YEAR, YEARS, ACK, COMPONENTS, LABELS, SHORT, DEFAULTS, LIMITS, ENUMS, BYGG, P75_PROXY, SIG_LV, SYS_LV, UNC,
-    PERIODER, UTV, BECCS, TAKT, indexAr, faktorer,
+    PERIODER, UTV, EL_ALT, BECCS, TAKT, indexAr, faktorer,
     params, prepare, compute, view, cityByYear, metric, fleet, byggFaktor, energyBase, energyItems, simulateEnergy, uncertaintyKey, ramp,
     calibration, GROUP_NAMES, energyYearFactor, energyInterval};
 });

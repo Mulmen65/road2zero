@@ -80,8 +80,10 @@
     const officiellt = (id, y) => { const i = T.ar.indexOf(y); return i >= 0 ? (id ? T.sektorer[id][i] : T.totalt[i]) * 1000 : null; };
     const start = {}; for (const id of Object.keys(T.sektorer)) start[id] = officiellt(id, START);
     const P = R.P, mob = S.D.mob.A, n = S.n;
-    const ttw = new Float64Array(n), wtt = new Float64Array(n), fordon = new Float64Array(n);  // andelar av Vägvis modell A
-    S.ids.forEach((id, i) => { const a = mob[id]; if (a && a.total > 0) { ttw[i] = a.ttw / a.total; wtt[i] = a.wtt / a.total; fordon[i] = a.fordon / a.total; } });
+    const ttw = new Float64Array(n), wtt = new Float64Array(n), fordon = new Float64Array(n), el = new Float64Array(n);  // andelar av Vägvis modell A
+    S.ids.forEach((id, i) => { const a = mob[id]; if (a && a.total > 0) { ttw[i] = a.ttw / a.total; wtt[i] = a.wtt / a.total; fordon[i] = a.fordon / a.total; el[i] = (a.el || 0) / a.total; } });
+    // Mobiliteten i R räknar elbilarnas laddel (del av wtt) med modellens elfaktor; avgaserna (ttw) påverkas inte av elvalet.
+    const efVagvis = (S.D.mob.elFaktor || {}).A || 0;
     const elByggKwh = P.efEl > 0 ? summa(R.energyBase.tEl) * 1000 / P.efEl : 0;   // byggnadsel ur energideklarationerna
     const elK = B.el_scb.kategorier, elStatKwh = (B.el_scb.totalt - (elK.transporter || 0)) * 1000, elJvgKwh = (elK.transporter || 0) * 1000;
     const ovrigElKwh = Math.max(0, elStatKwh - elByggKwh);           // hushålls-, verksamhets- och industriel
@@ -94,7 +96,11 @@
     const rader = R.years.map((y, yi) => {
       const f = R.faktorer[yi];
       let vag = 0, mobWtt = 0, mobFordon = 0, mobTot = 0;
-      for (let i = 0; i < n; i++) { const m = R.comp.mobilitet[yi][i] + R.comp.nymob[yi][i]; mobTot += m; vag += m * ttw[i]; mobWtt += m * wtt[i]; mobFordon += m * fordon[i]; }
+      const kEl = efVagvis > 0 ? f.el * 1000 / efVagvis : 1;
+      for (let i = 0; i < n; i++) {
+        const m = R.comp.mobilitet[yi][i] + R.comp.nymob[yi][i], s = 1 - el[i] + el[i] * kEl, raw = s > 0 ? m / s : 0;
+        mobTot += m; vag += raw * ttw[i]; mobWtt += raw * (wtt[i] - el[i] + el[i] * kEl); mobFordon += raw * fordon[i];
+      }
       const sek = {energi: start.energi * f.iFv, vagtrafik: vag};
       for (const id of ['industri', 'sjofart', 'arbetsmaskiner', 'produkt', 'avfall', 'jordbruk']) sek[id] = start[id] * kf(id, y);
       const terr = TABELL.reduce((s, id) => s + sek[id], 0);
@@ -153,12 +159,12 @@
       {text: 'Road2Zero-OP:s klimatavtryck, perspektiv A (sidan Resultat & klimatbudget)', t: r0.op.total, summa: true},
       {text: 'Mobilitet: bränslets produktion och transport (Vägvis, uppströms)', t: -r0.mobWtt},
       {text: 'Mobilitet: fordonstillverkning (Vägvis)', t: -r0.mobFordon},
-      {text: 'Energi i befintliga och nya byggnader med Boverkets faktorer för använd el och fjärrvärme', t: -r0.op.energi},
+      {text: 'Energi i befintliga och nya byggnader med faktorerna för använd el och fjärrvärme', t: -r0.op.energi},
       {text: 'Nybyggnation A1–A5 och förändrad markanvändning', t: -(r0.bygg + r0.mark)},
       {text: 'Miljöbarometerns Energi: utsläppen vid el- och värmeproduktionen i Malmö och egen uppvärmning', t: r0.sek.energi},
       {text: 'Miljöbarometerns Industri, Jordbruk, Sjöfart/järnväg/flyg, Arbetsmaskiner, Produktanvändning och Avfall och avlopp', t: ovriga},
       {text: 'Stadens klimatbokföring, territoriellt (scope 1)', t: r0.terr, summa: true},
-      {text: 'El i scope 2: byggnader, verksamheter och transporter (SCB:s elanvändning × Boverkets elfaktor)', t: r0.s2.stat + r0.s2.jvg},
+      {text: 'El i scope 2: byggnader, verksamheter och transporter (SCB:s elanvändning × vald elfaktor)', t: r0.s2.stat + r0.s2.jvg},
       {text: 'Förändrad markanvändning (AFOLU, V.2)', t: r0.mark},
       {text: 'GHG Protocol for Cities, BASIC+ (scope 1 + 2)', t: r0.basicPlus, summa: true}];
     const fvKwh = P.efFv > 0 ? summa(R.energyBase.tFv) * 1000 / P.efFv : 0;
@@ -290,7 +296,7 @@
     return '<article class="card method-text"><h2>Så räknas GHG Protocol for Cities här</h2>' +
       '<p>GHG Protocol for Cities (GPC) delar stadens utsläpp i fem sektorer och tre scope (' + kalla(B, 'GPC2021') + '). Scope 1 är utsläpp inom stadens gräns, scope 2 kommer från el, värme och kyla från nätet som används i staden, och scope 3 är övriga utsläpp utanför gränsen som staden orsakar. Nivån BASIC omfattar scope 1 och 2 för stationär energi och transport och scope 1 för avfall; BASIC+ lägger till IPPU och AFOLU. Malmö stad redovisar inventeringen i klimatkontraktet i fem kategorier: byggnader (stationär energi), transport, avfall, IPPU och AFOLU (' + kalla(B, 'CCC') + ').</p>' +
       '<p><b>Fjärrvärmen räknas som i klimatkontraktet:</b> utsläppen där värmen produceras, i scope 1 under energiindustrin, främst förbränningen av plast i avfallet hos Sysav. I strikt GPC redovisas produktion som levereras till nätet i scope 1 men räknas inte i BASIC-summan; klimatkontraktet räknar in den, och det gör Road2Zero-OP också. Fjärrvärmen räknas därför inte en gång till i scope 2.</p>' +
-      '<p><b>El i scope 2</b> är elanvändningen ' + B.el_scb.ar + ' utom transporter enligt SCB, ' + nf(res.el.statKwh / 1e6, 0) + ' GWh: byggnadsel ur energideklarationerna, ' + nf(res.el.byggKwh / 1e6, 0) + ' GWh, som följer effektiviseringen i OP, el i nya byggnader och övrig el, ' + nf(res.el.ovrigKwh / 1e6, 0) + ' GWh, med egen årlig förändring. Elfaktorn är Boverkets ' + nf(1000 * ctx.P.efEl, 0) + ' g CO₂e/kWh med samma utveckling som i övriga Road2Zero.</p>' +
+      '<p><b>El i scope 2</b> är elanvändningen ' + B.el_scb.ar + ' utom transporter enligt SCB, ' + nf(res.el.statKwh / 1e6, 0) + ' GWh: byggnadsel ur energideklarationerna, ' + nf(res.el.byggKwh / 1e6, 0) + ' GWh, som följer effektiviseringen i OP, el i nya byggnader och övrig el, ' + nf(res.el.ovrigKwh / 1e6, 0) + ' GWh, med egen årlig förändring. Elfaktorn är den som valts under Antaganden & scenario, ' + esc(ctx.M.EL_ALT[ctx.P.elVal].namn.toLowerCase()) + ', ' + nf(1000 * ctx.P.efEl, 0) + ' g CO₂e/kWh ' + START + ', med valets utveckling över tid. Elbilarnas laddning ingår i SCB:s el och räknas med samma faktor.</p>' +
       '<p><b>Vägtrafiken</b> är Road2Zero-OP:s egen beräkning: Vägvis modell A och bara avgaserna (scope 1). <b>Övriga sektorer</b> börjar på Miljöbarometerns värden för ' + START + '. ' + esc(utanPunkt(B.territoriell.metod)) + ' (' + kalla(B, B.territoriell.kalla) + '). ' +
       'Klimatkontraktets inventering: ' + esc(utanPunkt(B.gpc_klimatkontrakt.metod)) + ' (' + kalla(B, 'CCC') + ').</p></article>';
   }
@@ -320,7 +326,7 @@
     const fv = B.fjarrvarme_malmo;
     h += '<article class="card"><h2>Från Road2Zero-OP:s klimatavtryck till stadens redovisning, ' + START + '</h2><p class="small">Road2Zero-OP har tre räknesätt. Bryggan visar steg för steg vad som skiljer klimatavtrycket på sidan Resultat &amp; klimatbudget från den territoriella bokföringen och från GHG Protocol for Cities.</p><div class="table-wrap r2zs-full"><table class="r2zs-tab"><thead><tr><th>Steg</th><th class="numeric">kt CO₂e</th></tr></thead><tbody>' +
       res.brygga.map((b, i) => '<tr' + (b.summa ? ' class="r2zs-sum"' : '') + '><td>' + (b.summa && i > 0 ? '= ' : '') + esc(b.text) + '</td><td class="numeric">' + (b.summa ? kt(b.t) : pm(b.t)) + '</td></tr>').join('') + '</tbody></table></div>' +
-      '<p class="small"><b>Varför energin skiljer:</b> klimatavtrycket räknar den el och fjärrvärme som används i byggnaderna med Boverkets svenska medelvärden, ' + nf(1000 * ctx.P.efEl, 0) + ' och ' + nf(1000 * ctx.P.efFv, 0) + ' g CO₂e/kWh, ' + kt(r0.op.energi) + ' kt. ' +
+      '<p class="small"><b>Varför energin skiljer:</b> klimatavtrycket räknar den el och fjärrvärme som används i byggnaderna med den valda elfaktorn och Boverkets medelvärde för fjärrvärme, ' + nf(1000 * ctx.P.efEl, 0) + ' och ' + nf(1000 * ctx.P.efFv, 0) + ' g CO₂e/kWh, ' + kt(r0.op.energi) + ' kt. ' +
       (fv ? 'Malmös fjärrvärme har enligt Energiföretagen ' + nf(fv.g_per_kwh, 1) + ' g CO₂e/kWh (' + fv.ar + ', med bränslets transport och produktion; ' + kalla(B, fv.kalla) + '); med den faktorn skulle OP:s fjärrvärme, ' + nf(res.el.fvKwh / 1e6, 0) + ' GWh, ge ' + kt(res.el.fvKwh * fv.g_per_kwh / 1e6) + ' kt. ' : '') +
       'Den territoriella bokföringen räknar i stället alla fossila utsläpp vid produktionen i Malmö, ' + kt(r0.sek.energi) + ' kt, även värme och el som levereras utanför Malmö och egen uppvärmning, men inte den importerade elen. ' +
       '<b>Varför mobiliteten skiljer:</b> klimatavtrycket räknar trafikens livscykel (avgaser, bränsleproduktion och fordonstillverkning), bokföringen och GPC:s scope 1 bara avgaserna.</p></article>';

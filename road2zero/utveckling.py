@@ -18,6 +18,17 @@ PROCENTENHETER = {"bev", "phev"}           # andelar som ändras i procentenhete
 MIGRERING = {"bygg.betong": "bygg.betong_bau", "bygg.klimatförbättrad_betong": "bygg.betong_bast", "bygg.stål": "bygg.stal_bau",
              "bygg.klimatförbättrat_stål": "bygg.stal_bast", "bygg.trä": "bygg.tra_bau", "bygg.klimatförbättrat_trä": "bygg.tra_bast"}
 KOPPLINGAR = {"anl": ("anl_foljer_betong", "bygg.betong_bau"), "ovrig": ("ovrig_foljer_bilprod", "bilprod")}
+# Elens klimatfaktor: tre val, vart och ett med eget startvärde (parametrar.csv) och egen kurva (utveckling.csv)
+EL_VAL = ("boverket", "iea", "egen")
+EL_RAD = {"boverket": "el", "iea": "el_iea", "egen": "el_wem"}
+EL_START = {"boverket": "el.startvarde", "iea": "el.startvarde_iea", "egen": "el.startvarde_egen"}
+EL_ETIKETT = {"boverket": "Boverket", "iea": "IEA handelskorrigerad", "egen": "Eget startvärde"}
+
+
+def el_val(scen: dict) -> str:
+    """Valt alternativ för elens klimatfaktor; Boverket om inget giltigt val finns."""
+    v = (scen.get("utveckling") or {}).get("el_val")
+    return v if v in EL_VAL else "boverket"
 
 
 def standard(fb: Faktabibliotek) -> dict:
@@ -26,6 +37,7 @@ def standard(fb: Faktabibliotek) -> dict:
         "takt": {r["faktor"]: [float(r[c]) for c in PERIODKOL] for _, r in fb.utveckling.iterrows()},
         "anl_foljer_betong": True,
         "ovrig_foljer_bilprod": True,
+        "el_val": "boverket",
     }
 
 
@@ -51,7 +63,12 @@ class Utveckling:
             if u.get(flagga, std[flagga]):
                 self.takt[f] = list(self.takt[kalla])
         self.takt["bygg.generisk"] = list(self.takt["bygg.betong_bau"])   # Generisk = Betong BAU
+        self.el_val = el_val(scen)
         self._cache: dict[str, dict[int, float]] = {}
+
+    def el_rad(self) -> str:
+        """Raden i utveckling.csv som elens klimatfaktor följer med det val som gjorts."""
+        return EL_RAD[self.el_val]
 
     def arstakt(self, faktor: str, y: int) -> float:
         i = period_for(y)

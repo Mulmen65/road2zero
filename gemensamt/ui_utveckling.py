@@ -7,10 +7,10 @@ import streamlit as st
 
 from road2zero.kontext import Kontext
 from road2zero.modules.mobilitet import mix_for_ar
-from road2zero.utveckling import BASAR, KOPPLINGAR, PERIODNAMN, PROCENTENHETER, SLUTAR, Utveckling
+from road2zero.utveckling import BASAR, EL_ETIKETT, EL_RAD, EL_START, EL_VAL, KOPPLINGAR, PERIODNAMN, PROCENTENHETER, SLUTAR, Utveckling, el_val
 from road2zero.utveckling import standard as utveckling_standard
 
-from .common import editor, eget_param, fb, k, kalla_kort, kalla_text, ny_version, param_info, senare, ss
+from .common import editor, eget_param, fb, giltigt, k, kalla_kort, kalla_text, ny_version, param_info, senare, ss
 from .diagram import CONF, GRID, INK, INK2, LINJE as AXEL, MELLANBLA, MOSSA, PETROL, SKIFFER, SURF, TURKOS
 
 COL = st.column_config
@@ -25,7 +25,7 @@ STOMLINJE = {
     "bygg.tra_bau": (AQUA, "solid"), "bygg.tra_bast": (AQUA, "dash"),
     "anl": (NEUTRAL, "dot"),
 }
-LINJE = {"el": (BLA, "solid"), "fjv": (TURKOS, "solid"),
+LINJE = {"el": (BLA, "solid"), "el_iea": (BLA, "dash"), "el_wem": (BLA, "dot"), "fjv": (TURKOS, "solid"),
          "bilprod": (BLA, "solid"), "forbranning": (ORANGE, "solid"), "bilar_hh": (AQUA, "solid"), "km_bil": (NEUTRAL, "solid"),
          "mat": (AQUA, "solid"), "ovrig": (BLA, "solid"), "flyg": (ORANGE, "solid"), "offentlig": (NEUTRAL, "solid")}
 
@@ -42,9 +42,14 @@ def _u() -> dict:
     u.setdefault("takt", {})
     for f, v in std["takt"].items():
         u["takt"].setdefault(f, list(v))
-    for flagga in ("anl_foljer_betong", "ovrig_foljer_bilprod"):
+    for flagga in ("anl_foljer_betong", "ovrig_foljer_bilprod", "el_val"):
         u.setdefault(flagga, std[flagga])
     return u
+
+
+def _vilande(u: dict, f: str) -> bool:
+    """El-kurvor som inte hör till det valda alternativet visas inte i tabellen."""
+    return f in EL_RAD.values() and f != EL_RAD[el_val({"utveckling": u})]
 
 
 def _lankad(u: dict, f: str) -> bool:
@@ -54,7 +59,7 @@ def _lankad(u: dict, f: str) -> bool:
 def _tabell(grupp: str, u: dict):
     """Redigerbar tabell: en rad per faktor i gruppen, en kolumn per period."""
     meta = _meta()
-    faktorer = [f for f in meta.index if meta.loc[f, "grupp"] == grupp and not _lankad(u, f)]
+    faktorer = [f for f in meta.index if meta.loc[f, "grupp"] == grupp and not _lankad(u, f) and not _vilande(u, f)]
     if not faktorer:
         return
 
@@ -66,7 +71,8 @@ def _tabell(grupp: str, u: dict):
             r["Källa"] = kalla_kort(meta.loc[f, "kalla"])
             rader.append(r)
         return pd.DataFrame(rader)
-    df = editor(f"utv_{grupp}", bas, hide_index=True, disabled=["Faktor", "Enhet", "Källa"], column_config={
+    namn = f"utv_{grupp}" + (f"_{el_val({'utveckling': u})}" if grupp == "Energi" else "")
+    df = editor(namn, bas, hide_index=True, disabled=["Faktor", "Enhet", "Källa"], column_config={
         "Faktor": COL.TextColumn(width="large", pinned=True),
         **{n: COL.NumberColumn(n, min_value=-100.0, max_value=100.0, step=0.01, format="%.2f",
                                help=f"Förändring per år {n}. Negativt värde = minskning.") for n in PERIODNAMN},
@@ -133,8 +139,10 @@ def _diagram(u: dict):
                         width="stretch", config=CONF)
     with c2:
         kx = Kontext(fb(), ss.scen)
-        serier = [("El (svensk elmix)", ar, [kx.el(y) for y in ar], *LINJE["el"]),
-                  ("Fjärrvärme (ortens värde)", ar, [kx.fjv(y) for y in ar], *LINJE["fjv"])]
+        serier = [("El, " + (EL_ETIKETT[v] if v != "egen" else "eget startvärde") + (" (vald)" if v == utv.el_val else ""), ar,
+                   [Kontext(fb(), {**ss.scen, "utveckling": {**ss.scen.get("utveckling", {}), "el_val": v}}).el(y) for y in ar], *LINJE[EL_RAD[v]])
+                  for v in EL_VAL]
+        serier.append(("Fjärrvärme (ortens värde)", ar, [kx.fjv(y) for y in ar], *LINJE["fjv"]))
         st.plotly_chart(_figur("Elens och fjärrvärmens klimatfaktor", "g CO2e per kWh", serier, "g CO2e/kWh"), width="stretch", config=CONF)
     c1, c2 = st.columns(2)
     with c1:
@@ -151,7 +159,7 @@ def _diagram(u: dict):
     st.plotly_chart(_figur("Konsumtion och offentlig sektor", "Index 2026 = 100", serier, "Index", legend_hoger=True), width="stretch", config=CONF)
 
     rader = []
-    for f in meta.index:
+    for f in [f for f in meta.index if not _vilande(u, f)]:
         if f in PROCENTENHETER:
             m0 = ss.scen["mobilitet"]["mix"].get(f, 0.0)
             rad = {"Faktor": namn(f) + " (% av körsträckan)", "2026": round(m0 * 100, 1)}
@@ -174,12 +182,26 @@ def visa():
 
     st.markdown("##### Startvärden 2026")
     c1, c2, c3 = st.columns(3)
-    el0 = c1.number_input("Elens klimatfaktor (g CO2e/kWh)", 0.0, 1000.0, eget_param("el.startvarde"), 1.0, key=k("utv_el0"),
-                          help=f"Svensk elmix enligt Boverket: {param_info('el.startvarde')}. Gäller byggnader, elbilar och solel.")
-    if abs(el0 - fb().param("el.startvarde")) > 1e-9:
-        ss.scen.setdefault("parametrar", {})["el.startvarde"] = el0
-    else:
-        ss.scen.get("parametrar", {}).pop("el.startvarde", None)
+    with c1:
+        val = giltigt(u.get("el_val"), list(EL_VAL), "boverket", EL_ETIKETT.get)
+        val = giltigt(st.radio("Elens klimatfaktor", list(EL_VAL), index=list(EL_VAL).index(val), format_func=EL_ETIKETT.get,
+                               key=k("utv_elval"), help="Boverket: svensk elmix enligt Boverkets klimatdatabas, kurva enligt EU:s "
+                               "referensscenario 2020. IEA handelskorrigerad: IEA:s timvärden för den el som används i Sverige, med "
+                               "livscykel och nätförluster, kurva enligt IEA. Eget startvärde: ditt värde, kurva enligt Sveriges "
+                               "prognos med befintliga styrmedel (WEM). Gäller byggnader, elbilar och solel."),
+                      list(EL_VAL), "boverket", EL_ETIKETT.get)
+        u["el_val"] = val
+        pid = EL_START[val]
+        if val == "egen":
+            el0 = st.number_input("Eget startvärde (g CO2e/kWh)", 0.0, 1000.0, eget_param(pid), 1.0, key=k("utv_el_egen"),
+                                  help=f"Förifyllt: {param_info(pid)}. Följer kurvan för Sveriges WEM-prognos.")
+            if abs(el0 - fb().param(pid)) > 1e-9:
+                ss.scen.setdefault("parametrar", {})[pid] = el0
+            else:
+                ss.scen.get("parametrar", {}).pop(pid, None)
+        else:
+            st.number_input("Startvärde (g CO2e/kWh)", value=float(eget_param(pid)), disabled=True, key=k(f"utv_el_{val}"),
+                            help=f"{fb().param_rad(pid)['namn']}: {param_info(pid)}. Välj Eget startvärde för att ange ett annat värde.")
     ss.scen["fjarrvarme"]["startvarde"] = c2.number_input(
         "Ortens fjärrvärme (g CO2e/kWh)", 0.0, 1000.0, float(ss.scen["fjarrvarme"]["startvarde"]), 1.0, key=k("utv_fjv0"),
         help=f"Ange leverantörens värde enligt Energiföretagens miljövärdering. Förifyllt: {param_info('fjv.startvarde')}.")
@@ -199,7 +221,8 @@ def visa():
         _kommentarer("Byggpåverkan", u)
 
     st.markdown("#### Energi")
-    st.caption("Elens förändring gäller i hela modellen: byggnadernas el, elbilarnas laddning och solel.")
+    st.caption("Elens förändring gäller i hela modellen: byggnadernas el, elbilarnas laddning och solel. Tabellen visar kurvan för det val "
+               "som gjorts under Startvärden 2026; källorna för alla tre kurvorna finns under tabellen.")
     _tabell("Energi", u)
     c1, c2 = st.columns([1, 3])
     with c1:

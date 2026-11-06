@@ -103,7 +103,7 @@ function renderChrome() {
   const ch = changed(); $('data-status').textContent = ch ? 'Egna antaganden' : 'Grundantaganden'; $('data-status').className = 'pill' + (ch ? ' amber' : '');
   const [eb, t, d] = HEAD[st.view]; $('eyebrow').textContent = eb; $('page-title').innerHTML = t; $('page-description').textContent = d;
   $('primary-action').innerHTML = st.view === 'map' ? 'Så räknas området <span>↗</span>' : 'Utforska kartan <span>↗</span>';
-  $('scope-footer').textContent = 'Mobilitet: ' + mobLabel() + ' · Boverkets emissionsfaktorer för el och fjärrvärme';
+  $('scope-footer').textContent = 'Mobilitet: ' + mobLabel() + ' · el: ' + M.EL_ALT[P.elVal].namn + ' · fjärrvärme: Boverket';
 }
 
 /* ---------- gemensamma byggstenar ---------- */
@@ -142,7 +142,7 @@ function drawHist(id, I, det) {
   g += vline(I.city.p025 / 1000, true, '2,5 %', 'end') + vline(I.city.p975 / 1000, true, '97,5 %', 'start') + vline(d, false, '', 'start');
   const strip = (y, lo, hi, col, txt) => '<text class="axis-label" x="' + L + '" y="' + (y - 7) + '">' + txt + '</text><line x1="' + X(lo / 1000) + '" x2="' + X(hi / 1000) + '" y1="' + y + '" y2="' + y + '" stroke="' + col + '" stroke-width="6" stroke-linecap="round"/><circle cx="' + X(d) + '" cy="' + y + '" r="4.5" fill="#fff" stroke="#103c38" stroke-width="1.6"/>';
   g += '<text class="axis-label" x="' + (W - Rm) + '" y="' + (yb + 15) + '" text-anchor="end" dx="0" dy="12">kt CO₂e</text>';
-  g += strip(yb + 50, I.city.p025, I.city.p975, COLORS.energi, '95 %-intervall · ' + kt(I.city.p025) + '–' + kt(I.city.p975) + ' kt · Boverkets emissionsfaktorer');
+  g += strip(yb + 50, I.city.p025, I.city.p975, COLORS.energi, '95 %-intervall · ' + kt(I.city.p025) + '–' + kt(I.city.p975) + ' kt · el: ' + esc(M.EL_ALT[P.elVal].namn) + ', fjärrvärme: Boverket');
   wrap.innerHTML = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' + g + '</svg>';
 }
 function drawChart({id, rows, comps, opts}) {
@@ -227,7 +227,7 @@ function uncertaintyCard() {
     h += '<div class="u-grid"><dl class="u-facts">' +
       fact('Beräknat värde', kt(det) + ' kt CO₂e', isAck() ? 'summa 2030–2050' : 'per år') +
       fact('95 %-intervall', kt(I.city.p025) + '–' + kt(I.city.p975) + ' kt', 'median ' + kt(I.city.p50) + ' kt · ' + pct(I.city.p025 / det - 1) + ' / ' + pct(I.city.p975 / det - 1) + ' mot beräknat värde') +
-      fact('Emissionsfaktorer ' + (isAck() ? '2050' : yearLabel(P.ar)), 'el ' + nf(fkAr(isAck() ? 2050 : P.ar).el, 3) + ' · fv ' + nf(fkAr(isAck() ? 2050 : P.ar).fv, 3), 'kg CO₂e/kWh · startvärden ' + nf(P.efEl, 3) + ' / ' + nf(P.efFv, 3) + (P.efEl === M.DEFAULTS.efEl && P.efFv === M.DEFAULTS.efFv ? ' (Boverkets klimatdatabas)' : ' (egna)') + ' · ingen osäkerhet') +
+      fact('Emissionsfaktorer ' + (isAck() ? '2050' : yearLabel(P.ar)), 'el ' + nf(fkAr(isAck() ? 2050 : P.ar).el, 3) + ' · fv ' + nf(fkAr(isAck() ? 2050 : P.ar).fv, 3), 'kg CO₂e/kWh · startvärden ' + nf(P.efEl, 3) + ' (' + esc(M.EL_ALT[P.elVal].namn) + ') / ' + nf(P.efFv, 3) + (P.efFv === M.DEFAULTS.efFv ? ' (Boverkets klimatdatabas)' : ' (eget)') + ' · ingen osäkerhet') +
       '<div><dt>Kalibreringsfaktor (vägd)</dt><dd>' + kTxt + '</dd></div></dl>' +
       '<div class="chart-wrap" id="u-hist" role="img" aria-label="Fördelning av energins klimatavtryck i ' + nf(U.iterationer) + ' Monte Carlo-dragningar"></div></div>';
     charts.push({id: 'u-hist', draw: () => drawHist('u-hist', I, det)});
@@ -482,8 +482,13 @@ const TRAPPOR = [
 const trappaNamn = k => (TRAPPOR.find(t => t[0] === k) || TRAPPOR[0])[1];
 const UTV_AR = [2030, 2035, 2040, 2045, 2050];
 const UTV_FARG = {el: '#2a78d6', fv: '#1baf7a', bygg: '#eb6834'};
+/* Standardtakt för en period: för elen den valda elfaktorns kurva, annars modellens standard. */
+const stdTakt = (pre, k) => pre === 'elR' ? M.EL_ALT[P.elVal].takt[k - 1] : M.DEFAULTS[pre + k];
+const EL_KALLA = {boverket: 'Boverkets klimatdatabas (Boverket, 2026a); takt enligt EU:s referensscenario 2020 (Europeiska kommissionen, 2021)',
+  iea: 'IEA:s handelskorrigerade timvärden för Sverige 2025/26 med livscykel och nätförluster (IEA, 2026a; Statistiska centralbyrån, 2026d); takt enligt EU:s och den globala elens klimatfaktor (IEA, 2026b)',
+  egen: 'Eget startvärde; takt enligt Sveriges prognos med befintliga styrmedel, WEM (Naturvårdsverket, 2025)'};
 function taktCeller(namn, pre) {
-  return [1, 2, 3, 4, 5].map(k => { const key = pre + k, ch = Number(P[key]) !== Number(M.DEFAULTS[key]);
+  return [1, 2, 3, 4, 5].map(k => { const key = pre + k, ch = Number(P[key]) !== Number(stdTakt(pre, k));
     return '<td class="numeric"><input class="input-small" type="number" step="0.1" data-p="' + key + '" value="' + P[key] + '" aria-label="' + esc(namn) + ', % per år ' + M.PERIODER[k - 1].join('–') + '"' + (ch ? ' style="border-color:#daa84d"' : '') + '></td>'; }).join('');
 }
 function utvecklingView() {
@@ -491,11 +496,14 @@ function utvecklingView() {
   const per = M.PERIODER.map(([a, b]) => '<th class="numeric">' + a + '–' + b + '<br><small>% per år</small></th>').join('');
   const varden = (fn, d) => UTV_AR.map(y => '<td class="numeric">' + nf(fn(ar(y)), d) + '</td>').join('');
   const startIn = (k, label) => '<input class="input-small" type="number" step="0.001" data-p="' + k + '" value="' + P[k] + '" aria-label="' + label + '"' + (P[k] !== M.DEFAULTS[k] ? ' style="border-color:#daa84d"' : '') + '>';
-  const plan = ['elR', 'fvR'].every(p => [1, 2, 3, 4, 5].every(k => P[p + k] === M.DEFAULTS[p + k]));
+  const plan = ['elR', 'fvR'].every(p => [1, 2, 3, 4, 5].every(k => P[p + k] === stdTakt(p, k)));
+  const elVal = '<select class="input-small" data-p="elVal" aria-label="Elens klimatfaktor" style="width:auto;min-width:210px;margin:4px 0 2px">' +
+    Object.entries(M.EL_ALT).map(([v, a]) => '<option value="' + v + '"' + (P.elVal === v ? ' selected' : '') + '>' + esc(a.namn) + '</option>').join('') + '</select>';
+  const elStart = P.elVal === 'egen' ? startIn('efElEgen', 'Elens egna startvärde') : nf(P.efEl, 3);
   let h = '<article class="card" id="utveckling"><h2>Emissionsfaktorer över tid</h2><p class="card-sub">Som i Road2Zero-Plan: startvärdet gäller till och med 2026 och från 2027 en årlig förändring i procent per period. Negativt värde betyder minskning. Värdena gäller både befintliga och nya byggnader.</p>' +
-    '<div class="button-row" style="margin-bottom:14px"><button class="secondary small-btn" data-preset="plan">El och fjärrvärme som Road2Zero-Plan (EU:s referensscenario 2020)</button><button class="secondary small-btn" data-preset="noll">Oförändrade faktorer (0 %)</button>' + (plan ? '<span class="pill">Som Road2Zero-Plan</span>' : '<span class="pill amber">Egna takter</span>') + '</div>' +
+    '<div class="button-row" style="margin-bottom:14px"><button class="secondary small-btn" data-preset="plan">El och fjärrvärme som Road2Zero-Plan (standardtakterna)</button><button class="secondary small-btn" data-preset="noll">Oförändrade faktorer (0 %)</button>' + (plan ? '<span class="pill">Som Road2Zero-Plan</span>' : '<span class="pill amber">Egna takter</span>') + '</div>' +
     '<div class="table-wrap" style="max-height:none"><table class="quality-table"><thead><tr><th>Faktor</th><th class="numeric">Startvärde<br><small>till och med 2026</small></th>' + per + UTV_AR.map(y => '<th class="numeric">' + y + '</th>').join('') + '</tr></thead><tbody>' +
-    '<tr><td><i class="dot" style="background:' + UTV_FARG.el + '"></i>El, kg CO₂e/kWh<small>Boverkets klimatdatabas (Boverket, 2026a); takt enligt EU:s referensscenario 2020 (Europeiska kommissionen, 2021)</small></td><td class="numeric">' + startIn('efEl', 'Elens startvärde') + '</td>' + taktCeller('El', 'elR') + varden(f => f.el, 3) + '</tr>' +
+    '<tr><td><i class="dot" style="background:' + UTV_FARG.el + '"></i>El, kg CO₂e/kWh<br>' + elVal + '<small>' + EL_KALLA[P.elVal] + '. Gäller byggnader, elbilarnas laddning och GPC:s scope 2.</small></td><td class="numeric">' + elStart + '</td>' + taktCeller('El', 'elR') + varden(f => f.el, 3) + '</tr>' +
     '<tr><td><i class="dot" style="background:' + UTV_FARG.fv + '"></i>Fjärrvärme, kg CO₂e/kWh<small>Svenskt medelvärde (Boverket, 2026a); takt enligt EU:s referensscenario 2020' + (P.beccs === 'ja' ? '; med Sysavs avskiljning från ' + P.beccsAr : '') + '</small></td><td class="numeric">' + startIn('efFv', 'Fjärrvärmens startvärde') + '</td>' + taktCeller('Fjärrvärme', 'fvR') + varden(f => f.fv, 3) + '</tr>' +
     '<tr><td><i class="dot" style="background:' + UTV_FARG.bygg + '"></i>Nybyggnation, flerbostadshus, kg CO₂e/m² BTA<small>Klimattrappa: ' + esc(trappaNamn(P.klimatBygg)) + (P.klimatBygg === 'egen' ? '' : '. Egen takt används bara med valet Egen takt.') + '</small></td><td class="numeric">' + nf(M.byggFaktor(P, 'bostad', 2026)) + '</td>' + (P.klimatBygg === 'egen' ? taktCeller('Egen takt för nybyggnation', 'byggR') : M.PERIODER.map(() => '<td class="numeric small">–</td>').join('')) + varden(f => f.bygg.bostad, 0) + '</tr>' +
     '</tbody></table></div>';
@@ -670,7 +678,7 @@ function csvDecl() {
 function jsonAll() {
   const I = EI(), eb = R.energyBase;
   const osak = I ? {metod: 'Monte Carlo, energi i befintliga byggnader', iterationer: U.iterationer, seed: U.seed, ar: P.ar, arsfaktor: I.f,
-    emissionsfaktorer: {el: P.efEl, fjarrvarme: P.efFv, kalla: 'Startvärden Boverket (2026a); utveckling enligt antagandena, ingen osäkerhet'},
+    emissionsfaktorer: {el: P.efEl, elval: P.elVal, fjarrvarme: P.efFv, kalla: 'El: ' + EL_KALLA[P.elVal] + '; fjärrvärme Boverket (2026a); utveckling enligt antagandena, ingen osäkerhet'},
     malmo_t: I.city, kalibreringsfaktor: U.k,
     deso_t: Object.fromEntries(S.ids.map((id, i) => [id, {p025: I.lo(i), p50: I.mid(i), p975: I.hi(i)}]))} : null;
   return JSON.stringify({app: 'Road2Zero-OP', projekt: PJ.id || '', version: M.VERSION, created: new Date().toISOString(), antaganden: P, emissionsfaktorer_per_ar: R.faktorer, malmo_per_ar: M.cityByYear(R), deso_valt_ar: cur().rows,
@@ -718,7 +726,8 @@ function trafficView() {
     '<article class="card"><h2>B · Hushållens bilar</h2><p class="card-sub">Bilinnehav × körsträcka</p><p>De boendes bilar, var de än kör: registrerade personbilar per DeSO × körsträcka per bil. Samma perspektiv som kategorin Mobilitet och transport i Road2Zero-Plan och Road2Zero-CityScenario, som använder samma DeSO-underlag. A och B är alternativa perspektiv och adderas aldrig.</p></article></section>';
   h += '<section class="card"><h2>Hela ' + esc(PJ.kommun || 'kommunen') + '</h2><p class="card-sub">t CO₂e per år · ' + esc(mob.kalla || '') + '</p><div class="table-wrap"><table class="quality-table"><thead><tr><th>Perspektiv</th><th class="numeric">Totalt</th><th class="numeric">Avgaser (TTW)</th><th class="numeric">Bränsle- och elkedja (WTT)</th><th class="numeric">Fordon och batteri</th><th class="numeric">Miljoner fordonskm</th><th class="numeric">95 %-intervall</th></tr></thead><tbody>' +
     rad('A · Trafik inom området', city.A) + rad('B · Hushållens bilar, kommunens körsträcka', city.B_local) + rad('B · Hushållens bilar, körsträcka per DeSO (kollektivtrafik)', city.B_gtfs) + '</tbody></table></div>' +
-    '<p class="small">Resultatet använder ' + (R.bKey === 'B_gtfs' ? 'körsträcka per DeSO' : 'kommunens körsträcka') + ' för modell B; ändra under Antaganden & scenario.</p></section>';
+    '<p class="small">Resultatet använder ' + (R.bKey === 'B_gtfs' ? 'körsträcka per DeSO' : 'kommunens körsträcka') + ' för modell B; ändra under Antaganden & scenario.' +
+    (mob.elFaktor && city.A.el != null ? ' Tabellen visar Vägvis egna värden, där elbilarnas laddel (' + nf(city.A.el) + ' t i modell A) räknas med ' + nf(mob.elFaktor.A) + ' g CO₂e/kWh. Road2Zero-OP räknar om laddelen med den valda elfaktorn, ' + nf(1000 * P.efEl, 0) + ' g ' + M.BASE_YEAR + ' (' + esc(M.EL_ALT[P.elVal].namn) + ').' : '') + '</p></section>';
   h += '<section class="card"><h2>Så räknas hushållens bilar</h2>' +
     steg(1, 'Hushållen och deras bilar', 'Hushåll, invånare och personbilar i trafik registrerade på de folkbokförda den 31 december, ur SCB:s registerstatistik. Privatleasing och enskild firma ingår; förmånsbilar ingår inte.', nf(H) + ' hushåll, ' + nf(BEF) + ' invånare och ' + nf(B) + ' personbilar i ' + S.n + ' DeSO.') +
     steg(2, 'Bilar per hushåll', 'Registrerade bilar delat med antalet hushåll. Ingen uppräkning görs för förmånsbilar.', nf(B) + ' ÷ ' + nf(H) + ' = <b>' + nf(H ? B / H : null, 3) + ' bilar per hushåll</b>.') +
@@ -750,10 +759,13 @@ function render() {
     $('table-filter').oninput = e => { st.filter = e.target.value; table(); }; }
   if (st.view === 'calc') $('calc-pick').onchange = e => { st.selected = e.target.value; render(); };
   if (st.view === 'parameters') {
-    view.querySelectorAll('[data-p]').forEach(el => el.onchange = () => { const k = el.dataset.p; let v = el.value; if (k === 'exploatering') v = v === 'true'; setP({[k]: v}); });
+    view.querySelectorAll('[data-p]').forEach(el => el.onchange = () => { const k = el.dataset.p; let v = el.value; if (k === 'exploatering') v = v === 'true';
+      // nytt elval: valets standardtakt ersätter tidigare takter
+      if (k === 'elVal' && M.EL_ALT[v]) { setP({elVal: v, ...Object.fromEntries(M.EL_ALT[v].takt.map((r, i) => ['elR' + (i + 1), r]))}); return; }
+      setP({[k]: v}); });
     $('reset-params').onclick = resetP;
     view.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => {
-      const pre = ['elR', 'fvR'].flatMap(p => [1, 2, 3, 4, 5].map(k => [p + k, b.dataset.preset === 'plan' ? M.DEFAULTS[p + k] : 0]));
+      const pre = ['elR', 'fvR'].flatMap(p => [1, 2, 3, 4, 5].map(k => [p + k, b.dataset.preset === 'plan' ? stdTakt(p, k) : 0]));
       setP(Object.fromEntries(pre)); });
   }
   bindExports();

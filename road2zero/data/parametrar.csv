@@ -3,7 +3,9 @@ allm.c_till_co2;Allmänt;Omräkning kol till koldioxid (44/12);3.666667;kg CO2/k
 allm.atemp_andel;Byggnader;Atemp som andel av BTA;0.9;Atemp/BTA;Branschschablon;MODELLVAL;Schablon för andelen uppvärmd yta
 allm.personer_per_hushall;Projekt;Personer per hushåll;2.1;personer;Officiell statistik;SCB_TAB6568;Malmö 2,11, Helsingborg 2,15 och Gävle 2,04 personer per hushåll år 2024
 allm.bta_per_hushall;Projekt;BTA per hushåll;110;m² BTA;Branschschablon;MODELLVAL;"Schablon; ange projektets lägenhetsfördelning när den finns"
-el.startvarde;Projekt;Elens klimatfaktor 2025, svensk elmix;37;g CO2e/kWh;Officiell statistik;BOVERKET_KLIMATDATA,KLIMATSTEGEN2023;Livscykelvärde. Gäller i hela modellen
+el.startvarde;Projekt;Elens klimatfaktor 2026, Boverket (svensk elmix);37;g CO2e/kWh;Officiell statistik;BOVERKET_KLIMATDATA,KLIMATSTEGEN2023;Livscykelvärde. Gäller i hela modellen
+el.startvarde_iea;Projekt;Elens klimatfaktor 2026, IEA handelskorrigerad med livscykel;26;g CO2e/kWh;Härlett;IEA_RT2026,SCB_TAB78,UNECE2021,IPCC2014;"IEA:s handelskorrigerade timvärden för Sverige juli 2025–juni 2026, viktade med SCB:s elanvändning per månad: 9,4 g CO2/kWh vid förbränning. Plus livscykel för vatten-, kärn-, vind- och solkraft med 2025/26 års produktionsmix (mitt mellan UNECE 2021 och IPCC 2014), 0–3 g för kraftvärmens bränslekedjor och nätförluster 7,1 % av användningen. Spann 20–31 g."
+el.startvarde_egen;Projekt;Elens klimatfaktor 2026, eget startvärde;37;g CO2e/kWh;Antagande;BOVERKET_KLIMATDATA;"Förifyllt med Boverkets värde. Ange ett eget värde; det följer Sveriges WEM-kurva."
 fjv.startvarde;Projekt;Fjärrvärmens klimatfaktor, ortens värde;83;g CO2e/kWh;Användarval;MODELLVAL;"Ange leverantörens värde; kurvform enligt EU:s referensscenario"
 sol.produktion;Byggnader;Solelproduktion per m² panel;150;kWh/m² och år;Branschschablon;MODELLVAL;
 sol.panel;Negativa utsläpp;Solpanelens klimatpåverkan per producerad kWh;30;g CO2e/kWh;Antagande;MODELLVAL;"Spann 7–44 g/kWh; används bara för undvikna utsläpp utanför nettot"

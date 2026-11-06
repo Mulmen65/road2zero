@@ -10,11 +10,12 @@ const V = require('./vagvis_engine/core.js'), H = require('./vagvis_engine/house
 const read = f => JSON.parse(fs.readFileSync(path.join(SRC, f), 'utf8'));
 const om = read('omraden.json'), hp = read('household-project.json'), dist = read('distance-indicators.json'), resA = read('result.json');
 const proj = V.unpackProject(hp, om); proj.distanceData = dist;
-const pick = r => ({total: r.central.total, ttw: r.central.ttw, wtt: r.central.wtt, fordon: r.central.vehicle + r.central.battery + r.central.maintenance + r.central.endoflife,
+/* el = elbilarnas laddel (ingår i wtt), räknad med Vägvis elfaktor (elFaktor, g CO2e/kWh); OP räknar om den med sin egen elfaktor. */
+const pick = r => ({total: r.central.total, ttw: r.central.ttw, wtt: r.central.wtt, el: r.central.electricity, fordon: r.central.vehicle + r.central.battery + r.central.maintenance + r.central.endoflife,
   vkm: r.central.vkm, p025: r.base.p025, p975: r.base.p975, mean: r.base.mean});
 (async () => {
   const out = {schema: 'malmoop-mobilitet-1', kalla: 'Vägvis 2.3.1 (Mulmen65/vagvisa), beräkningsår 2024, DeSO 2025', skapad: new Date().toISOString(),
-    A: {}, B_local: {}, B_gtfs: {}, hushall: {}, stad: {}};
+    A: {}, B_local: {}, B_gtfs: {}, hushall: {}, stad: {}, elFaktor: {A: resA.config.electricity, B: hp.config.electricity}};
   for (const r of resA.results.filter(r => r.city === '1280')) {
     if (r.level === 'deso') out.A[r.id] = pick(r); else if (r.level === 'city') out.stad.A = pick(r);
   }

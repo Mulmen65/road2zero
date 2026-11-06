@@ -33,10 +33,13 @@ ALGORITMER = [
         ],
         "steg": ["Perioder: 2027–2030, 2031–2035, 2036–2040, 2041–2045, 2046–2050, 2051–2060, 2061–2070 och 2071–2100.",
                  "Anläggning följer betongstommens kurva och övrig konsumtion bilproduktionens kurva, om inte annat väljs.",
+                 "Elens klimatfaktor har tre val med egna startvärden och kurvor: Boverket (37 g CO2e/kWh, EU:s referensscenario 2020), "
+                 "IEA handelskorrigerad (26 g CO2e/kWh med livscykel och nätförluster, sammansatt IEA-kurva) och Eget startvärde "
+                 "(användarens värde, kurva enligt Sveriges prognos med befintliga styrmedel, WEM).",
                  "Index efter 2100 hålls konstant.",
                  "År före 2026 (befintliga stadsdelar med tidigt startår) får index 1: startvärdena gäller bakåt och skrivs inte om "
                  "till historiska nivåer. Utsläppen före 2026 blir därför en undre skattning."],
-        "parametrar": ["el.startvarde", "fjv.startvarde"],
+        "parametrar": ["el.startvarde", "el.startvarde_iea", "el.startvarde_egen", "fjv.startvarde"],
         "tabeller": ["utveckling"],
     },
     {
@@ -66,12 +69,12 @@ ALGORITMER = [
         "formler": [
             r"Q_{\mathrm{fjv}} = A_{\mathrm{temp}} \cdot s \cdot q_{\mathrm{fjv}}, \qquad Q_{\mathrm{el}} = A_{\mathrm{temp}} \cdot \left(s \cdot q_{\mathrm{fel}} + (1-s) \cdot q_{\mathrm{eluppv}}\right) \quad \text{eller eget värde} \cdot \mathrm{BTA}",
             r"E_{\mathrm{energi}}(t) = \left(Q_{\mathrm{fjv}} \cdot f_{\mathrm{fjv}}(t) + \max(0, Q_{\mathrm{el}} - Q_{\mathrm{sol}}) \cdot f_{\mathrm{el}}(t)\right) / 10^6",
-            r"f_{\mathrm{el}}(t) = 37 \cdot I_{\mathrm{el}}(t), \qquad f_{\mathrm{fjv}}(t) = f_{\mathrm{fjv}}(2026) \cdot I_{\mathrm{fjv}}(t) \ \ [\mathrm{g\,CO_2e/kWh}]",
+            r"f_{\mathrm{el}}(t) = f_{\mathrm{el},v}(2026) \cdot I_{\mathrm{el},v}(t), \quad v \in \{\mathrm{Boverket}, \mathrm{IEA}, \mathrm{eget}\}, \qquad f_{\mathrm{fjv}}(t) = f_{\mathrm{fjv}}(2026) \cdot I_{\mathrm{fjv}}(t) \ \ [\mathrm{g\,CO_2e/kWh}]",
             r"E_{\mathrm{undviket}}(t) = -\max(0, Q_{\mathrm{sol}} - Q_{\mathrm{el}}) \cdot (f_{\mathrm{el}}(t) - f_{\mathrm{panel}}) / 10^6",
         ],
         "steg": ["Atemp = 0,9 × andelens BTA i drift.", "Slå upp andelens energiklass och andel fjärrvärme, eller använd egna värden per m² BTA.",
-                 "Elens index gäller i hela modellen: byggnader, elbilar och solel."],
-        "parametrar": ["allm.atemp_andel", "el.startvarde", "fjv.startvarde", "sol.produktion", "sol.panel"],
+                 "Den valda elfaktorn (startvärde och kurva) gäller i hela modellen: byggnader, elbilar och solel."],
+        "parametrar": ["allm.atemp_andel", "el.startvarde", "el.startvarde_iea", "el.startvarde_egen", "fjv.startvarde", "sol.produktion", "sol.panel"],
         "tabeller": ["energiklasser", "utveckling"],
     },
     {

@@ -102,7 +102,7 @@ Varje faktor har ett startvärde som gäller 2026 och en årlig förändring i p
 |---|---|---|
 | Byggpåverkan per stomme | Kurvorna i Tabell A utökad (SBUF 14381 till 2035, försiktig extrapolering till 2070, därefter 0 %); Generisk följer Betong BAU | Tabell A utökad, SBUF 14381 |
 | Anläggning | Samma som Betong BAU | Modellval enligt beställning |
-| El | EU:s referensscenario 2020 till 2050, därefter samma takt | EU Reference Scenario 2020 |
+| El, tre val | **Boverket** (standard): 37 g CO2e/kWh, EU:s referensscenario 2020 till 2050, därefter samma takt. **IEA handelskorrigerad**: 26 g CO2e/kWh med livscykel och nätförluster, −6,68 % per år 2027–2030 och därefter −3,7 %. **Eget startvärde**: användarens värde, Sveriges WEM-prognos (−8,2 % per år 2027–2030, −1,69 %, −0,91 %, därefter 0 %) | Boverket; EU Reference Scenario 2020; IEA timdata 2025/26 och Electricity 2026; Naturvårdsverket 2025 (WEM) |
 | Fjärrvärme | EU:s referensscenario 2020 till 2050, därefter oförändrad | EU Reference Scenario 2020 |
 | Bilproduktion och övrig konsumtion | Global elens klimatfaktor −3,7 % per år | IEA Electricity 2026 |
 | Elbilar och laddhybrider | +3,0 respektive +1,7 procentenheter per år | Trafikanalys, körsträckor 2024 och 2025 |
@@ -110,6 +110,8 @@ Varje faktor har ett startvärde som gäller 2026 och en årlig förändring i p
 | Matkonsumtion | −1,73 % per år | Naturvårdsverket: livsmedel per person −23 % 2008–2023 |
 | Flyg | −1,9 till −4,1 % per år till 2050, sedan −1,5 % | ReFuelEU Aviation (hållbart flygbränsle 6–70 %) och bränsleeffektivitet (IATA) |
 | Offentlig sektor | −5,74 % per år 2027–2030, −13,96 % per år 2031–2050, därefter 0 % | EU:s klimatlag: −55 % 2030, −90 % 2040; EEA 2025 |
+
+Elvalet görs under Antaganden & scenario → Emissionsfaktorer över tid och gäller hela modellen: byggnadernas el, elbilarnas laddning och solel. Samma tre val finns i Road2Zero-OP och i Vägvis 2.4.0. IEA-värdet bygger på IEA:s handelskorrigerade timvärden för Sverige juli 2025–juni 2026 (9,4 g CO2/kWh vid förbränning, viktat med SCB:s elanvändning) plus livscykel för vatten-, kärn-, vind- och solkraft och nätförluster. Äldre sparade filer med eget startvärde öppnas som Eget startvärde med sin tidigare kurva.
 
 ## Arbeta med Claude Code
 

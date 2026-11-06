@@ -269,6 +269,24 @@ def till_json(s: dict) -> str:
 SCENARIOSET = "road2zero-scenarier"     # filtyp för tre scenarier i road2zero-scenario
 
 
+def migrera_elval(data: dict, fb: Faktabibliotek | None = None) -> None:
+    """Äldre filer saknar val av elfaktor. Utan eget startvärde blir valet Boverket. Med eget startvärde blir valet Eget
+    startvärde, och filens kurva för el följer med till den kurvan, så att resultatet blir detsamma som tidigare."""
+    fb = fb or ladda()
+    u = data.setdefault("utveckling", {})
+    egna = data.setdefault("parametrar", {})
+    eget = egna.get("el.startvarde")
+    if eget in (None, "") or abs(float(eget) - fb.param("el.startvarde")) < 1e-9:
+        egna.pop("el.startvarde", None)
+        u["el_val"] = "boverket"
+        return
+    egna.pop("el.startvarde")
+    egna["el.startvarde_egen"] = float(eget)
+    takt = u.setdefault("takt", {})
+    takt["el_wem"] = list(takt.get("el") or utveckling_standard(fb)["takt"]["el"])
+    u["el_val"] = "egen"
+
+
 def fran_json(text: str, fb: Faktabibliotek | None = None) -> dict:
     """Läser sparade indata och fyller på nycklar som saknas med standardvärden.
     Byggnadsrader i det äldre formatet delas upp i andelar med en stomme var."""
@@ -279,6 +297,7 @@ def fran_json(text: str, fb: Faktabibliotek | None = None) -> dict:
     if not isinstance(data, dict) or not ({"projekt", "byggnader"} & set(data)):
         raise ValueError("Filen innehåller inga indata från Road2Zero.")
     bas = tomt(fb)
+    utan_elval = "el_val" not in (data.get("utveckling") or {})
 
     def fyll(d, b):
         for k, v in b.items():
@@ -294,6 +313,8 @@ def fran_json(text: str, fb: Faktabibliotek | None = None) -> dict:
     for nyckel in ("elbilsandel", "effektivisering"):
         data["mobilitet"].pop(nyckel, None)
     data["fjarrvarme"].pop("kurva", None)
+    if utan_elval:
+        migrera_elval(data, fb)
     andelar = []
     for b in data["byggnader"]:
         for a in migrera_byggnad(b):

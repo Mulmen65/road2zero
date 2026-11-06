@@ -68,10 +68,27 @@ test('Räkneexempel energi: 100 kWh/m², 1 000 m², 10 % el = 5,41 t', () => {
   near(sum(eb.t), mapped, 1e-9, 'fast läge');
 });
 
-test('Mobilitet 2024 = Vägvis Malmö-summor (A och B)', () => {
-  near(M.view(S, M.compute(S, {perspektiv: 'A'}), 2024).city.mobilitet, D.mob.stad.A.total, 1e-6, 'A');
-  near(M.view(S, M.compute(S, {perspektiv: 'B'}), 2024).city.mobilitet, D.mob.stad.B_local.total, 1e-6, 'B');
-  near(M.view(S, M.compute(S, {perspektiv: 'B', bLage: 'gtfs'}), 2024).city.mobilitet, D.mob.stad.B_gtfs.total, 1e-6, 'B gtfs');
+test('Mobilitet 2024 = Vägvis Malmö-summor, med elbilarnas el räknad med modellens elfaktor (A och B)', () => {
+  const om = (x, ef) => x.total - x.el + x.el * ef / D.mob.elFaktor.A;
+  for (const [namn, p, x] of [['A', {perspektiv: 'A'}, D.mob.stad.A], ['B', {perspektiv: 'B'}, D.mob.stad.B_local], ['B gtfs', {perspektiv: 'B', bLage: 'gtfs'}, D.mob.stad.B_gtfs]]) {
+    assert.ok(x.el > 0 && x.el < 0.02 * x.total, namn + ': laddelen är en liten del');
+    near(M.view(S, M.compute(S, p), 2024).city.mobilitet, om(x, 37), 1, namn + ', Boverket 37 g');
+    near(M.view(S, M.compute(S, {...p, elVal: 'iea'}), 2024).city.mobilitet, om(x, 26), 1, namn + ', IEA 26 g');
+    near(M.view(S, M.compute(S, {...p, elVal: 'egen', efElEgen: D.mob.elFaktor.A / 1000}), 2024).city.mobilitet, x.total, 1e-6, namn + ', Vägvis egen elfaktor');
+  }
+});
+
+test('Elens klimatfaktor: tre val med startvärde och takt; äldre lägen behåller sitt resultat', () => {
+  assert.strictEqual(M.params({}).elVal, 'boverket'); near(M.params({}).efEl, 0.037, 1e-15);
+  const iea = M.params({elVal: 'iea'}), egen = M.params({elVal: 'egen', efElEgen: 0.05});
+  near(iea.efEl, 0.026, 1e-15); assert.deepStrictEqual([1, 2, 3, 4, 5].map(k => iea['elR' + k]), M.UTV.el_iea);
+  near(egen.efEl, 0.05, 1e-15); assert.deepStrictEqual([1, 2, 3, 4, 5].map(k => egen['elR' + k]), M.UTV.el_wem);
+  near(M.faktorer(iea, 2030).el, 0.026 * Math.pow(1 + M.UTV.el_iea[0] / 100, 4), 1e-15);
+  assert.strictEqual(M.params({elVal: 'okänd'}).elVal, 'boverket');
+  const gammal = M.params({efEl: 0.05});   // äldre läge: eget startvärde utan val, Boverkets takt
+  assert.strictEqual(gammal.elVal, 'egen'); near(gammal.efEl, 0.05, 1e-15);
+  assert.deepStrictEqual([1, 2, 3, 4, 5].map(k => gammal['elR' + k]), M.UTV.el);
+  assert.strictEqual(M.params({elVal: 'iea', elR1: -1}).elR1, -1, 'egen takt går före valets standard');
 });
 
 test('Utan exploatering är exploateringsposterna noll', () => {
@@ -138,8 +155,12 @@ test('Standardtakterna för el, fjärrvärme och klimattrappor = Road2Zero-Plans
   const rader = fs.readFileSync(path.join(OP, '..', 'road2zero', 'data', 'utveckling.csv'), 'utf8').trim().split(/\r?\n/).map(r => r.split(';'));
   const hdr = rader[0], kol = ['p2027_2030', 'p2031_2035', 'p2036_2040', 'p2041_2045', 'p2046_2050'].map(c => hdr.indexOf(c));
   const rad = id => rader.find(r => r[0] === id);
-  for (const [nyckel, id] of [['el', 'el'], ['fv', 'fjv'], ['insteg', 'bygg.betong_bau'], ['fardplan', 'bygg.betong_bast']])
+  for (const [nyckel, id] of [['el', 'el'], ['el_iea', 'el_iea'], ['el_wem', 'el_wem'], ['fv', 'fjv'], ['insteg', 'bygg.betong_bau'], ['fardplan', 'bygg.betong_bast']])
     assert.deepStrictEqual(M.UTV[nyckel], kol.map(c => Number(rad(id)[c])), nyckel);
+  // elens startvärden = Road2Zero-Plans parametrar (g CO2e/kWh)
+  const par = Object.fromEntries(fs.readFileSync(path.join(OP, '..', 'road2zero', 'data', 'parametrar.csv'), 'utf8').trim().split(/\r?\n/).map(r => r.split(';')).map(r => [r[0], Number(r[3])]));
+  near(M.EL_ALT.boverket.ef * 1000, par['el.startvarde'], 1e-9, 'Boverket'); near(M.EL_ALT.iea.ef * 1000, par['el.startvarde_iea'], 1e-9, 'IEA');
+  near(M.DEFAULTS.efElEgen * 1000, par['el.startvarde_egen'], 1e-9, 'eget startvärde');
   assert.deepStrictEqual(M.PERIODER.map(([a, b]) => 'p' + a + '_' + b), hdr.filter(h => /^p20(2|3|4)/.test(h)).slice(0, 5));
 });
 

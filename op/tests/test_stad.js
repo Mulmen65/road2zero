@@ -11,6 +11,8 @@ const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, (msg || '') +
 let passed = 0; const test = (n, f) => { f(); passed++; console.log('✓ ' + n); };
 const S = M.prepare(D), R = M.compute(S, {}), res = Z.berakna(M, S, R, B);
 const rad = (r, y) => r.rader.find(x => x.ar === y);
+// elbilarnas laddel i Vägvis wtt räknas om från Vägvis elfaktor till modellens (Boverkets 37 g 2024)
+const elOm = x => x.el * (R.faktorer[0].el * 1000 / D.mob.elFaktor.A - 1);
 const T = B.territoriell, i24 = T.ar.indexOf(2024);
 
 test('underlaget: sektorerna summerar till den publicerade totalen och varje källa finns', () => {
@@ -63,7 +65,7 @@ test('GPC: scope 2 = el × elfaktor, sektorernas summor och BASIC', () => {
   near(r.gpc.II.s1, r.sek.vagtrafik + r.sek.sjofart + r.sek.arbetsmaskiner, 1e-9);
   near(r.basic, r.gpc.I.s1 + r.gpc.I.s2 + r.gpc.II.s1 + r.gpc.II.s2 + r.gpc.III.s1, 1e-9);
   near(r.basicPlus, r.terr + r.s2.stat + r.s2.jvg + r.mark, 1e-6, 'BASIC+ = territoriellt + scope 2 + mark');
-  near(r.gpc.II.s3, D.mob.stad.A.wtt + D.mob.stad.A.fordon, 1e-3, 'scope 3 för trafiken 2024');
+  near(r.gpc.II.s3, D.mob.stad.A.wtt + elOm(D.mob.stad.A) + D.mob.stad.A.fordon, 1, 'scope 3 för trafiken 2024, laddelen med 37 g');
   const re = Z.berakna(M, S, M.compute(S, {effektivisering2050: 20}), B);
   near(rad(res, 2050).elKwh - rad(re, 2050).elKwh, 0.2 * res.el.byggKwh, 1, 'effektiviseringen gäller byggnadselen');
 });
@@ -110,7 +112,7 @@ test('bryggan: klimatavtrycket → territoriellt → GPC BASIC+', () => {
   const steg = (i, j) => b.slice(i, j).reduce((a, x) => a + x.t, 0);
   near(b[0].t + steg(1, 7), b[7].t, 1e-6, 'till territoriellt'); near(b[7].t, r.terr, 1e-6);
   near(b[7].t + steg(8, 10), b[10].t, 1e-6, 'till BASIC+'); near(b[10].t, r.basicPlus, 1e-6);
-  near(-(b[1].t + b[2].t), D.mob.stad.A.wtt + D.mob.stad.A.fordon, 1e-3, 'Vägvis uppströms och fordon');
+  near(-(b[1].t + b[2].t), D.mob.stad.A.wtt + elOm(D.mob.stad.A) + D.mob.stad.A.fordon, 1, 'Vägvis uppströms och fordon, laddelen med 37 g');
 });
 
 test('förklaringarna bygger på underlaget', () => {
@@ -120,9 +122,16 @@ test('förklaringarna bygger på underlaget', () => {
   assert.ok(Z.forklaringTerr(S, B, res, 'vagtrafik').includes('3,9 %'), 'vägtrafikens skillnad');
 });
 
-test('Road2Zero-OP:s egen beräkning är oförändrad', () => {
+test('Road2Zero-OP:s egen beräkning: oförändrad utom elbilarnas laddel, som räknas med modellens elfaktor (0.14.0)', () => {
   const rows = M.cityByYear(R);
-  near(rows[0].total, 561581.73, 0.05, 'OP 2024'); near(rows.find(r => r.year === 2050).total, 568831.55, 0.05, 'OP 2050');
+  near(rows[0].total, 560111.05, 0.05, 'OP 2024'); near(rows.find(r => r.year === 2050).total, 566623.49, 0.05, 'OP 2050');
+});
+
+test('elvalet ändrar inte avgaserna: territoriellt och scope 1 är desamma för alla tre val', () => {
+  for (const p of [{elVal: 'iea'}, {elVal: 'egen', efElEgen: 0.09}]) {
+    const rx = Z.berakna(M, S, M.compute(S, p), B);
+    for (const y of [2024, 2035, 2050]) near(rad(rx, y).terr, rad(res, y).terr, 1e-6, JSON.stringify(p) + ' ' + y);
+  }
 });
 
 console.log('\n' + passed + ' tester för stadens redovisning godkända.');

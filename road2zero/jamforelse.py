@@ -22,6 +22,7 @@ from .engine import berakna
 from .factlib import Faktabibliotek, ladda
 from .konstanter import BYGGNADSTYPER
 from .scenario import takt
+from .utveckling import EL_RAD, PERIODER
 
 NARSERVICE_TYPER = {"skola"}                               # närservice räknas till boendefunktionen
 PARKERING_TYPER = {"mobilitetshus", "underjordisk_parkering"}
@@ -48,6 +49,8 @@ def lika_forutsattningar(s: dict) -> dict:
     s = copy.deepcopy(s)
     for f, v in s["utveckling"]["takt"].items():
         s["utveckling"]["takt"][f] = [0.0] * len(v)
+    for f in EL_RAD.values():          # elkurvorna gäller oavsett om en äldre fil saknar dem
+        s["utveckling"]["takt"][f] = [0.0] * len(PERIODER)
     return s
 
 

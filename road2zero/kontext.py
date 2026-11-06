@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from .factlib import Faktabibliotek
-from .utveckling import Utveckling
+from .utveckling import EL_START, Utveckling
 
 
 @dataclass
@@ -40,15 +40,15 @@ class Kontext:
     # ---------- tidskurvor ----------
     def _bygg_elkurva(self):
         self.tabell("utveckling")
-        return self.p("el.startvarde")
+        return self.p(EL_START[self.utv.el_val])
 
     def _bygg_fjvkurva(self):
         self.anvanda.add("fjv.startvarde")
         return float(self.scen["fjarrvarme"]["startvarde"])
 
     def el(self, y: int) -> float:
-        """Elens klimatfaktor, g CO2e/kWh: startvärdet 2026 gånger index för el."""
-        return self._el * self.utv.index("el", y)
+        """Elens klimatfaktor, g CO2e/kWh: det valda startvärdet 2026 gånger index för den valda kurvan."""
+        return self._el * self.utv.index(self.utv.el_rad(), y)
 
     def fjv(self, y: int) -> float:
         """Fjärrvärmens klimatfaktor, g CO2e/kWh: ortens startvärde gånger index för fjärrvärme."""

@@ -599,3 +599,45 @@ def test_nybyggnadsandel_kallor_och_varde():
          * (v["bygginv_bostader"] + v["bygginv_lokaler"]) / (v["bygginv_bostader"] + v["bygginv_lokaler"] + v["bygginv_anlaggningar"])
          * v["nybyggnad_ghg"] / (v["nybyggnad_ghg"] + v["ombyggnad_ghg"]))
     assert round(100 * n, 1) == 21.1
+
+
+def test_elval_tre_alternativ():
+    """Elens klimatfaktor: Boverket, IEA handelskorrigerad eller eget startvärde, var och en med eget startvärde och egen kurva."""
+    import copy
+    from road2zero.kontext import Kontext
+    from road2zero.utveckling import EL_RAD, EL_START, EL_VAL
+    fb = ladda()
+    meta = fb.utveckling.set_index("faktor")
+    s0 = exempel()
+    assert s0["utveckling"]["el_val"] == "boverket"
+    for v in EL_VAL:
+        s = copy.deepcopy(s0)
+        s["utveckling"]["el_val"] = v
+        k = Kontext(fb, s)
+        r = float(meta.loc[EL_RAD[v], "p2027_2030"])
+        assert abs(k.el(2026) - fb.param(EL_START[v])) < 1e-9
+        assert abs(k.el(2030) - fb.param(EL_START[v]) * (1 + r / 100) ** 4) < 1e-9
+    assert fb.param("el.startvarde") == 37 and fb.param("el.startvarde_iea") == 26
+    s = copy.deepcopy(s0)
+    s["utveckling"]["el_val"] = "egen"
+    s["parametrar"]["el.startvarde_egen"] = 90
+    assert abs(Kontext(fb, s).el(2026) - 90) < 1e-9
+    s["utveckling"]["el_val"] = "okänd"
+    assert abs(Kontext(fb, s).el(2026) - 37) < 1e-9, "ogiltigt val ger Boverket"
+
+
+def test_elval_migrering_av_aldre_filer():
+    """Äldre filer utan elval: utan eget startvärde blir valet Boverket; med eget startvärde blir det Eget startvärde
+    med filens el-kurva, och resultatet blir detsamma som tidigare."""
+    import copy
+    fb = ladda()
+    gammal = copy.deepcopy(exempel())
+    gammal["utveckling"].pop("el_val")
+    gammal["utveckling"]["takt"]["el"] = [-5.0] * len(PERIODER)
+    assert fran_json(json.dumps(gammal), fb)["utveckling"]["el_val"] == "boverket"
+    gammal["parametrar"]["el.startvarde"] = 50
+    fore = berakna(copy.deepcopy(gammal), fb).netto(2)
+    ny = fran_json(json.dumps(gammal), fb)
+    assert ny["utveckling"]["el_val"] == "egen" and ny["parametrar"] == {"el.startvarde_egen": 50.0}
+    assert ny["utveckling"]["takt"]["el_wem"] == [-5.0] * len(PERIODER)
+    assert abs(berakna(ny, fb).netto(2) - fore) < 1e-6
