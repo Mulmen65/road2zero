@@ -157,7 +157,7 @@
     const ovriga = ['industri', 'jordbruk', 'sjofart', 'arbetsmaskiner', 'produkt', 'avfall'].reduce((s, id) => s + r0.sek[id], 0);
     const brygga = [
       {text: 'Road2Zero-OP:s klimatavtryck, perspektiv A (sidan Resultat & klimatbudget)', t: r0.op.total, summa: true},
-      {text: 'Mobilitet: bränslets produktion och transport (Vägvis, uppströms)', t: -r0.mobWtt},
+      {text: 'Mobilitet: bränslets produktion och transport och elbilarnas laddel (Vägvis, uppströms; laddelen med vald elfaktor)', t: -r0.mobWtt},
       {text: 'Mobilitet: fordonstillverkning (Vägvis)', t: -r0.mobFordon},
       {text: 'Energi i befintliga och nya byggnader med faktorerna för använd el och fjärrvärme', t: -r0.op.energi},
       {text: 'Nybyggnation A1–A5 och förändrad markanvändning', t: -(r0.bygg + r0.mark)},
