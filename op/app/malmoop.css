@@ -124,3 +124,7 @@ td.iv{color:var(--muted)}
 .r2zr-paris p{font-size:12.5px;max-width:980px}
 @media(max-width:1150px){.r2zr-kpis{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:720px){.r2zr-kpis{grid-template-columns:1fr}}
+/* stadens klimatredovisning (stad.js) */
+.r2zs-tab tr.r2zs-sub td{color:var(--muted,#56635e);font-size:12.5px}
+.r2zs-tab tr.r2zs-sum td{font-weight:650;border-top:1px solid var(--line)}
+.r2zs-tab td:first-child{min-width:260px}

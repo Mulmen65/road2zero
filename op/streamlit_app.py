@@ -128,6 +128,11 @@ def assemble(overrides: dict | None = None, projekt: str = STANDARD) -> str:
             return _embed("r2z.json", json.dumps(r2z_underlag(), ensure_ascii=False))
         if name == "plotly":
             return _embed("plotly.js", _plotly_fil().read_text(encoding="utf-8"))
+        valfri = name.endswith("?")               # {{data/fil.json?}}: underlag som inte alla projekt har
+        if valfri:
+            name = name[:-1]
+            if name not in overrides and not (rot / name).is_file():
+                return "null"
         if name.startswith("projekt:"):
             return html_escape(str(pmeta.get(name.split(":", 1)[1], "")))
         if ".." in name.split("/") or not (name.startswith("app/") or name.startswith("data/")):

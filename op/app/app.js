@@ -9,6 +9,7 @@ const json = id => JSON.parse($(id).textContent);
 const D = {deso: json('d-deso'), land: json('d-land'), energi: json('d-energi'), mob: json('d-mob'), expl: json('d-expl'), meta: json('d-meta')};
 const PJ = (() => { try { return json('d-projekt'); } catch (e) { return {}; } })();
 const R2Z = (() => { try { return json('d-r2z'); } catch (e) { return null; } })();
+const BOKF = (() => { try { return json('d-bokf'); } catch (e) { return null; } })();   // stadens officiella klimatredovisning (valfri per projekt)
 const S = M.prepare(D);
 const COLORS = {energi: '#1baf7a', mobilitet: '#2a78d6', bygg: '#eb6834', mark: '#6250d6', nydrift: '#eda100', nymob: '#e87ba4'};
 const STORE = 'r2z-op-' + (PJ.id || 'malmo_op') + '-antaganden';
@@ -84,6 +85,8 @@ const stockCount = new Float64Array(S.n); if (D.energi.bestand) D.energi.bestand
 const HEAD = {
   overview: ['ROAD2ZERO-OP · ' + esc(PJ.namn || 'ÖVERSIKT'), esc(PJ.rubrik || 'Staden växer.') + '<br><em>' + esc(PJ.betonad || 'Hela klimatavtrycket.') + '</em>', PJ.ingress || 'Årligt klimatavtryck per DeSO från energi i befintliga byggnader, mobilitet och utbyggnaden enligt översiktsplanen.'],
   results: ['PARISAVTALET · 1,5–2,0 °C', 'Resultat & klimatbudget', 'Stadens utsläpp per klimatkategori och år, per invånare och mot en koldioxidbudget för 1,5–2,0 °C enligt Forster m.fl. (2026).'],
+  gpc: ['GPC · SCOPE 1, 2 OCH 3', 'GHG Protocol for Cities', 'Stadens utsläpp per sektor och scope enligt GHG Protocol for Cities, med prognos till 2050 och speglade mot inventeringen i klimatkontraktet med EU-missionen.'],
+  bokforing: ['TERRITORIELLA UTSLÄPP · MÅL 2030', (BOKF && BOKF.stad ? esc(BOKF.stad) + 's' : 'Stadens') + ' klimatbokföring', 'Utsläppen inom stadens gräns per sektor som staden redovisar dem, med prognos till 2050, målen för 2030 och koldioxidbudgeten.'],
   map: ['DESO 2025 · ' + S.n + ' OMRÅDEN', 'Karta & områden', 'Utforska områdena. Välj nyckeltal, enhet och år; klicka på ett område för detaljer.'],
   calc: ['STEG FÖR STEG', 'Så räknas resultatet', 'Följ beräkningen för ett område, från energideklaration och trafik till nybyggnation och mark.'],
   parameters: ['ANTAGANDEN', 'Antaganden & scenario', 'Alla värden kan ändras. Beräkningen uppdateras direkt och sparas i din webbläsare.'],
@@ -631,6 +634,7 @@ function methodView() {
     '<li><b>Elandel s</b> skattas ur r = primärenergital/energiprestanda. El har högre primärenergifaktor än fjärrvärme (1,8 mot 0,7 efter 1 sep 2020; 1,6 mot 1,0 före). Regimskiftet syns tydligt i data. Saknas primärenergital används medianen i DeSO eller Malmö.</li><li><b>Emissionsfaktorer:</b> startvärdena el 0,037 och fjärrvärme 0,056 kg CO₂e/kWh enligt Boverkets klimatdatabas, återgivna i Boverkets räkneexempel för modul A5. Användningen för årlig driftenergi är ett modellval. Faktorerna är nationella medelvärden och inte Malmöspecifika eller marginella. Över tid förändras de som i Road2Zero-Plan: startvärdet gäller till och med 2026 och från 2027 en årlig förändring per period, som standard enligt EU:s referensscenario 2020. Sysavs koldioxidavskiljning kan läggas till som en minskning av fjärrvärmens faktor från ett valt år (se Antaganden & scenario).</li><li><b>Urval:</b> exakta dubbletter tas bort; en adress styrs av den senaste deklarationen; adresser väger lika; okopplade adresser får ingen vikt. ' + nf(D.energi.urval.ej_kartlagda) + ' deklarationer kunde inte kartläggas och ingår inte i DeSO-summorna (men i kalibreringen).</li></ul>' +
     '<h2>2. Mobilitet (Vägvis 2.3.1)</h2><p>Utgångsläget 2024 per DeSO hämtas från Vägvis 2.3.1: <b>A</b> = territoriell trafik på vägar i området (vägar × trafikmängd, livscykel, kalibrerad mot Malmös direkta vägtrafikutsläpp 2024), <b>B</b> = hushållens registrerade bilar × körsträcka × livscykelfaktor. B räknas om här med Vägvis egen beräkningsmotor (3 000 iterationer, seed 19062026). A och B är olika perspektiv och adderas aldrig. Framåt skalas utgångsläget med flottans klimatfaktor och förändrat trafikarbete. Nya hushåll får bilinnehav och körsträcka som värd-DeSO 2024. I A läggs deras trafik på Malmös vägnät i proportion till dagens trafik.</p>' +
     '<h2>3. Exploatering 2030–2050 (ÖP 2023)</h2><ul><li><b>Volymer:</b> bostäder, arbetsplatser och skolplatser per utbyggnadsområde från Malmö stads ÖP-underlag. BTA = bostäder × 90 m² + arbetsplatser × 25 m² (blandad stad) eller 100 m² (verksamhetsområde) + skolplatser × 10 m². Alla värden kan ändras.</li><li><b>Tid:</b> Fokus 1 byggs 2030–2039 och Fokus 2 2040–2049, jämnt fördelat. Enligt Malmö stad detaljplaneras Fokus 1 före 2030 och Fokus 2 därefter.</li><li><b>Nybyggnation (A1–A5):</b> BTA × klimatfaktor för byggåret enligt vald klimattrappa. Standard är Boverkets föreslagna gränsvärden för 2030: flerbostadshus 235, kontor/skolor 250, hallbyggnader 190 kg CO₂e/m² BTA. Alternativ: Boverkets färdplan med skärpning vart femte år, en linjär indikativ bana till −90 % år 2040 mot en 75-percentil som här approximeras som referensvärdet × 1,15, SBUF 14381 Insteg eller Färdplan från dagens referensvärden (358/383/291), oförändrade referensvärden eller en egen takt.</li><li><b>Förändrad markanvändning:</b> utbyggnadsytan delas per DeSO och klassas med OpenStreetMap (åker, öppen mark, skog, vatten, bebyggd, okänd). Förlust = ha × hårdgörandel (0,7) × (kolförråd före − 22 t C/ha) × 44/12. Kolförråden är hämtade från Länsstyrelsen i Uppsala län (2025) och används som proxy. Utsläppet fördelas över byggåren.</li><li><b>Nya byggnaders energi:</b> BTA × 0,9 × 50 kWh/m² och år × emissionsfaktor (22 % el), från det år byggnaderna är klara.</li><li><b>Fördelning:</b> ett område som ligger i flera DeSO fördelas efter yta.</li></ul>' +
+    '<h2>4. Stadens klimatredovisning (GPC och klimatbokföring)</h2><p>Sidorna <i>GHG Protocol for Cities</i> och <i>Stadens klimatbokföring</i> visar stadens utsläpp som staden redovisar dem. De ändrar inte beräkningen ovan. Trafiken räknas alltid territoriellt med Vägvis modell A och bara avgaserna (scope 1); energisektorn följer fjärrvärmens klimatfaktor och Sysavs koldioxidavskiljning; el i scope 2 är SCB:s elanvändning × elfaktorn; industri, sjöfart, järnväg och flyg, arbetsmaskiner, produktanvändning, avfall och avlopp och jordbruk börjar på stadens officiella värden för 2024 och förändras med en egen takt per år från 2027. Resultaten speglas mot Miljöbarometern och klimatkontraktets inventering med EU-missionen, men kalibreras inte. Mål: −70 % till 2030 mot 1990 (staden) och −80 % (EU-missionen); koldioxidbudget 6 600 kt 2021–2030.</p>' +
     '<h2>Osäkerhet och tolkning</h2><p>Energin i befintliga byggnader har en Monte Carlo-beräkning (standard 1 000 iterationer, seed 19062026). Varje iteration drar gemensamma fel, som påverkar alla byggnader lika, och slumpfel per byggnad. Gemensamma fel ger brett intervall för summan; slumpfel jämnas ut i summan men inte i ett litet område. Kalibreringen dras om i varje iteration, så ett för högt dragen Atemp vägs delvis upp av en lägre faktor k.</p>' +
     '<table class="quality-table"><thead><tr><th>Källa</th><th>Gemensamt fel</th><th>Slumpfel per byggnad</th></tr></thead><tbody>' +
     '<tr><td>Emissionsfaktor el / fjärrvärme</td><td>Ingen: startvärdena ' + nf(P.efEl, 3) + ' / ' + nf(P.efFv, 3) + ' kg CO₂e/kWh och utvecklingen över tid är fasta</td><td>–</td></tr>' +
@@ -681,6 +685,17 @@ function bindExports() {
 
 
 /* ---------- Resultat & klimatbudget (samma vy som Road2Zero-Plan) ---------- */
+/* Stadens redovisning räknar trafiken territoriellt (modell A) oavsett sidomenyn; modell A räknas separat när B är vald. */
+let RA = null, RAkey = null;
+function stadCtx() {
+  if (P.perspektiv === 'A') RA = R;
+  else { const k = JSON.stringify(P); if (k !== RAkey || !RA || RA.P.perspektiv !== 'A') { RA = M.compute(S, {...P, perspektiv: 'A'}); RAkey = k; } }
+  return {M, S, R: RA, P};
+}
+function stadView(vy) {
+  if (!window.R2ZStad || !BOKF) return notice('Projektet saknar underlag för stadens klimatredovisning (data/klimatbokforing.json).', 'error');
+  try { return window.R2ZStad.html(stadCtx(), BOKF, vy); } catch (e) { return notice('Stadens redovisning kunde inte räknas: ' + esc(e.message), 'error'); }
+}
 function resultsCtx() { return {rows: M.cityByYear(R), mobLabel: mobLabel()}; }
 function resultsView() {
   if (!window.R2ZResultat || !R2Z) return notice('Resultatvyn saknar sitt underlag (klimatbudget och diagrambibliotek).', 'error');
@@ -721,10 +736,11 @@ function render() {
   const view = $('view');
   if (map && st.view !== 'map') { map.remove(); map = null; }
   charts.length = 0;
-  const html = {overview, results: resultsView, map: mapView, calc: calcView, parameters: paramsView, expl: explView, traffic: trafficView, data: dataView, method: methodView}[st.view]();
+  const html = {overview, results: resultsView, gpc: () => stadView('gpc'), bokforing: () => stadView('bokforing'), map: mapView, calc: calcView, parameters: paramsView, expl: explView, traffic: trafficView, data: dataView, method: methodView}[st.view]();
   view.innerHTML = html;
   drawCharts();
   if (st.view === 'results' && window.R2ZResultat && R2Z) window.R2ZResultat.bind(resultsCtx(), R2Z, render);
+  if ((st.view === 'gpc' || st.view === 'bokforing') && window.R2ZStad && BOKF) { try { window.R2ZStad.bind(stadCtx(), BOKF, st.view, render); } catch (e) { /* visas som notis */ } }
   if (st.view === 'expl') {
     document.querySelectorAll('#expl-table th[data-sort]').forEach(th => th.onclick = () => { const c = th.dataset.sort; st.explSort = [c, st.explSort[0] === c ? -st.explSort[1] : (c === 'namn' ? 1 : -1)]; render(); });
     document.querySelectorAll('[data-area]').forEach(b => b.onclick = () => { const a = D.expl.omraden.find(x => String(x.id) === b.dataset.area); const big = a.delar.slice().sort((x, y) => y.ha - x.ha)[0]; st.selected = big.deso; st.dev = true; go('map'); setTimeout(() => { if (map) map.fitBounds(window.L.geoJSON(a.geometry).getBounds(), {padding: [60, 60], maxZoom: 15}); }, 120); }); }

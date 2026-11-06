@@ -22,11 +22,12 @@ class TestAssemble(unittest.TestCase):
     def test_html_is_complete_and_safe(self):
         html = streamlit_app.assemble()
         self.assertNotRegex(html, r"\{\{[^}]+\}\}")
-        for tag in ("d-deso", "d-energi", "d-mob", "d-expl", "d-meta", "d-land"):
+        for tag in ("d-deso", "d-energi", "d-mob", "d-expl", "d-meta", "d-land", "d-bokf"):
             m = re.search(r'<script id="' + tag + r'" type="application/json">(.*?)</script>', html, re.S)
             self.assertIsNotNone(m, tag)
             json.loads(m.group(1))
         self.assertIn("window.MalmoOP", html)
+        self.assertIn("R2ZStad", html)
         self.assertLess(len(html.encode()), 25 * 1024 * 1024)
 
     def test_overrides_replace_energy_data(self):
@@ -34,6 +35,18 @@ class TestAssemble(unittest.TestCase):
         energi["urval"]["kartlagda"] = 4242
         html = streamlit_app.assemble({"data/energi_deklarationer.json": json.dumps(energi)})
         self.assertIn('"kartlagda":4242', html.replace(" ", ""))
+
+    def test_optional_city_accounts(self):
+        """Stadens klimatredovisning är valfri per projekt: saknas filen blir underlaget null."""
+        original = ROOT / "data" / "klimatbokforing.json"
+        flyttad = original.with_suffix(".json.bak")
+        original.rename(flyttad)
+        try:
+            html = streamlit_app.assemble()
+            m = re.search(r'<script id="d-bokf" type="application/json">(.*?)</script>', html, re.S)
+            self.assertEqual(m.group(1).strip(), "null")
+        finally:
+            flyttad.rename(original)
 
     def test_rejects_paths_outside_repo(self):
         with self.assertRaises(ValueError):

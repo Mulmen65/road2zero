@@ -150,6 +150,12 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   transport = Mobilitet och transport, hushållens transport minus flyget.
   Värden i `road2zero/data/budgetandelar.csv` (Konsumtionskompassen 2022 för Malmö, Skåne och Sverige; offentligt och
   investeringar SEI 2026). Standard Malmö (27,8 %); val: Skåne, Sverige, egna andelar, hela budgeten (faktor 1).
+  Stadens klimatredovisning (0.13.0, `op/app/stad.js`, `op/projekt/<id>/data/klimatbokforing.json`): sidorna GHG Protocol for
+  Cities och Stadens klimatbokföring. Ändrar inte OP:s beräkning. Trafiken alltid territoriellt (Vägvis A, bara avgaser = scope 1);
+  fjärrvärmen som i klimatkontraktet (produktionen i scope 1, energiindustri, ingår i summan); el i scope 2 = SCB:s el utom
+  transporter × Boverkets elfaktor; industri, sjöfart/järnväg/flyg, arbetsmaskiner, produktanvändning, avfall och jordbruk börjar
+  på Miljöbarometerns 2024 och förändras med egen takt (standard 0 %); energisektorn följer fjärrvärmens index. Speglas mot
+  Miljöbarometern och klimatkontraktet, kalibreras inte. Mål 2030 mot 1990: −70 % (staden), −80 % (EU-missionen); budget 6 600 kt.
 
 ## Kända osäkerheter
 

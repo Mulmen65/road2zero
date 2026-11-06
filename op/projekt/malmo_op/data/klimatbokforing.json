@@ -1,0 +1,86 @@
+{
+  "schema": "r2z-klimatbokforing-1",
+  "stad": "Malmö",
+  "beskrivning": "Malmö stads officiella klimatredovisning: territoriella utsläpp per sektor (Miljöbarometern), inventeringen enligt GHG Protocol for Cities i klimatkontraktet med EU-missionen, stadens mål och koldioxidbudget samt SCB:s elanvändning per förbrukarkategori. Används av sidorna GHG Protocol for Cities och Malmös klimatbokföring i Road2Zero-OP.",
+  "kallor": {
+    "MB2026": {
+      "kort": "Malmö stad, 2026",
+      "text": "Malmö stad (2026) Territoriella växthusgasutsläpp. Miljöbarometern, uppdaterad 11 juni 2026. Underlag: Malmö stad och SMED, Nationella emissionsdatabasen, SMHI.",
+      "url": "https://malmo2.miljobarometern.se/klimat/utslapp-av-vaxthusgaser/vaxthusgasutslapp/table/"
+    },
+    "CCC": {
+      "kort": "Malmö stad, u.å.c",
+      "text": "Malmö stad (u.å.c) 2030 Climate Neutrality Action Plan of Malmö. Klimatkontraktet med EU-missionen 100 klimatneutrala och smarta städer, avsnitt A-1.4 och A-1.6 (GPC BASIC beräknad i CIRIS, data för 2022).",
+      "url": "https://netzerocities.app/_content/files/knowledge/4189/malmo_nzc_ccc_ok.pdf"
+    },
+    "KB2025": {
+      "kort": "Malmö stad, 2025a",
+      "text": "Malmö stad (2025a) Uppföljning 2025 – Malmös koldioxidbudget. Miljöförvaltningen, 23 oktober 2025.",
+      "url": "https://malmo2.miljobarometern.se/content/docs/uppfoljning-2025-malmos-koldioxidbudget.pdf"
+    },
+    "MR2024": {
+      "kort": "Malmö stad, 2025b",
+      "text": "Malmö stad (2025b) Miljöredovisning 2024. Malmö stads miljöprogram 2021–2030, mål 1.",
+      "url": "https://malmo2.miljobarometern.se/content/docs/miljoredovisning-2024.pdf"
+    },
+    "SCB2026EN": {
+      "kort": "Statistiska centralbyrån, 2026a",
+      "text": "Statistiska centralbyrån (2026a) Slutanvändning (MWh), efter län och kommun, förbrukarkategori samt bränsletyp. År 2009–2024. Kommunal och regional energistatistik, tabell TAB3654.",
+      "url": "https://statistikdatabasen.scb.se/api/v2/tables/TAB3654/metadata?lang=sv"
+    },
+    "GPC2021": {
+      "kort": "WRI, C40 och ICLEI, 2021",
+      "text": "WRI, C40 och ICLEI (2021) Global Protocol for Community-Scale Greenhouse Gas Inventories: An Accounting and Reporting Standard for Cities, version 1.1. World Resources Institute, C40 Cities Climate Leadership Group och ICLEI – Local Governments for Sustainability.",
+      "url": "https://ghgprotocol.org/sites/default/files/standards/GPC_Full_MASTER_RW_v7.pdf"
+    }
+  },
+  "territoriell": {
+    "kalla": "MB2026",
+    "uppdaterad": "2026-06-11",
+    "enhet": "kt CO2e",
+    "preliminara_ar": [2025],
+    "not": "Utsläpp inom Malmös geografiska område, land och vatten, motsvarande scope 1 i GHG Protocol for Cities. Koldioxid från energi, vägtrafik, sjöfart, järnväg, flyg och arbetsmaskiner kommer från ENVIMAN; övriga sektorer och gaser från SMED med cirka 1,5 års eftersläpning. Totalen är avrundad till tre värdesiffror.",
+    "ar": [1990, 2000, 2005, 2010, 2015, 2020, 2021, 2022, 2023, 2024, 2025],
+    "totalt": [1660, 1520, 1440, 1990, 1240, 832, 907, 839, 825, 859, 845],
+    "sektorer": {
+      "energi": [722, 630, 669, 1290, 618, 288, 348, 343, 343, 342, 349],
+      "industri": [184, 181, 93.9, 105, 95.0, 79.8, 120, 103, 97.9, 96.2, 96.2],
+      "jordbruk": [10.1, 7.91, 7.46, 7.40, 7.16, 8.05, 7.72, 7.64, 7.18, 7.79, 7.79],
+      "vagtrafik": [433, 495, 476, 377, 323, 303, 289, 263, 259, 291, 281],
+      "sjofart": [133, 45.7, 30.1, 47.2, 44.1, 45.1, 45.1, 26.6, 24.5, 24.5, 25.1],
+      "arbetsmaskiner": [70.7, 50.6, 50.6, 75.5, 74.5, 46.1, 46.1, 46.1, 46.1, 46.7, 34.5],
+      "produkt": [10.8, 31.1, 42.0, 42.2, 48.7, 40.9, 33.7, 32.7, 31.0, 37.5, 37.5],
+      "avfall": [93.2, 81.0, 68.0, 46.2, 31.6, 20.3, 17.7, 16.7, 15.6, 14.0, 14.0]
+    }
+  },
+  "mal": {
+    "territoriellt": {"basar": 1990, "ar": 2030, "minskning_pct": 70, "kalla": "MR2024",
+      "text": "Miljöprogrammets mål 1: utsläppen av växthusgaser i Malmö som geografiskt område har minskat med 70 procent till 2030 jämfört med 1990. Kommunfullmäktige har också beslutat att Malmö ska vara en klimatneutral stad 2030."},
+    "mission": {"ar": 2030, "minskning_pct": 80, "kvarvarande_max_pct": 20, "kalla": "CCC",
+      "text": "EU-missionen: minst 80 procents minskning till 2030 och högst 20 procent kvarvarande utsläpp som neutraliseras. Klimatkontraktet konstaterar att stadens mål på 70 procent inte motsvarar missionens 80 procent. Här används 1990 som basår, som i Malmös mål."},
+    "koldioxidbudget": {"start": 2021, "slut": 2030, "kt": 6600, "kvar_2025_2030_kt": 3190, "kalla": "KB2025",
+      "text": "Malmös koldioxidbudget för 2021–2030, antagen 2023: alla fossila växthusgaser inom Malmös geografiska område. Importerad el, konsumtionsbaserade utsläpp och negativa utsläpp ingår inte. Uppföljningen 2025 anger 3 190 kt kvar för 2025–2030."}
+  },
+  "gpc_klimatkontrakt": {
+    "kalla": "CCC",
+    "dataar": 2022,
+    "metod": "GPC BASIC, alla växthusgaser, beräknad i CIRIS. Avfallsförbränningen i fjärrvärmesystemet ingår i byggnadernas scope 1 (energiindustri). Scope 3 redovisas inte (IE/NO).",
+    "enhet": "t CO2e",
+    "rader": [
+      {"id": "stationar", "namn": "Byggnader (stationär energi)", "s1": 599485, "s2": 120765},
+      {"id": "transport", "namn": "Transport", "s1": 645323, "s2": 221},
+      {"id": "avfall", "namn": "Avfall", "s1": 6398, "s2": 0},
+      {"id": "ippu", "namn": "Industriprocesser och produktanvändning (IPPU)", "s1": 36270, "s2": 0},
+      {"id": "afolu", "namn": "Jordbruk, skogsbruk och annan markanvändning (AFOLU)", "s1": 6370, "s2": 0}
+    ],
+    "totalt": 1414832
+  },
+  "el_scb": {
+    "kalla": "SCB2026EN",
+    "ar": 2024,
+    "enhet": "MWh",
+    "kategorier": {"jordbruk": 16531, "industri": 355582, "offentlig": 296421, "transporter": 33053, "ovriga_tjanster": 1051121,
+      "smahus": 284239, "flerbostadshus": 170869, "fritidshus": 6767},
+    "totalt": 2214582
+  }
+}
