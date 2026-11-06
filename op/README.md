@@ -52,7 +52,7 @@ python -m streamlit run op/streamlit_app.py
 | 02 Resultat & klimatbudget | Samma resultatvy som Road2Zero-Plan: summa per klimatkategori, från brutto till summa, trädkarta, över tid, per person, klimatbudget för 1,5–2,0 °C (Parisavtalet, Forster m.fl. 2026) med budgettilldelning enligt Konsumtionskompassen, tabeller med CSV och källor. Kategorier och befintlig stad/exploatering väljs överst. |
 | 03 GHG Protocol for Cities | Stadens utsläpp i klimatkontraktets kategorier (Byggnader, Transport, Avfall, IPPU, AFOLU × scope 1, 2 och 3) och i GPC:s undersektorer med notationsnycklar, BASIC och BASIC+, prognos 2024–2050 och spegling mot klimatkontraktet 2022 med förklaring per kategori |
 | 04 Stadens klimatbokföring | Territoriella utsläpp i Miljöbarometerns åtta sektorer med deras innehåll: utfall 1990–2025, prognos till 2050, målen −70 % (staden) och −80 % (EU-missionen) 2030, koldioxidbudgeten 2021–2030, spegling mot Miljöbarometern 2024 med förklaring per sektor och en brygga från OP:s klimatavtryck till territoriellt och GPC |
-| 05 Jämför räknesätten | Klimatavtrycket, den territoriella bokföringen och GPC (BASIC+ eller BASIC) med samma antaganden, ackumulerat över valfri period (standard 2027–2050) eller för ett år: nyckeltal med per invånare och det som är gemensamt, staplar uppdelade på utsläppskällor (samma färg = samma utsläpp), en tabell över vad som ingår i vilket räknesätt och var det hamnar annars, med en bedömning av vad översiktsplanen kan påverka, en brygga steg för steg, utsläpp per år och ackumulerat, vilket mål som hör till vilket räknesätt, och CSV |
+| 05 Jämför räknesätten | Klimatavtrycket, den territoriella bokföringen och GPC (BASIC+ eller BASIC) med samma antaganden, ackumulerat över valfri period (standard 2027–2050) eller för ett år, med varje räknesätts egen datakälla (standard; vägtrafiken i bokföringen från Miljöbarometern, GPC från Miljöbarometern, klimatkontraktets transport eller hela klimatkontraktet) eller samma trafikmodell för alla: nyckeltal med per invånare och det som är gemensamt, staplar uppdelade på utsläppskällor (samma färg = samma utsläpp), en tabell över vad som ingår i vilket räknesätt och var det hamnar annars, med en bedömning av vad översiktsplanen kan påverka, en brygga steg för steg, utsläpp per år och ackumulerat, vilket mål som hör till vilket räknesätt, och CSV |
 | 06 Karta & områden | Koropletkarta (OSM-bakgrund, havsavskiljning, utbyggnadsområden), områdespanel och tabell över alla 209 DeSO, med 95 %-intervall för energin |
 | 07 Så räknas resultatet | Beräkningen steg för steg med siffror för vald DeSO, inklusive deklarationerna och de skattade byggnaderna |
 | 08 Antaganden & scenario | Emissionsfaktorer över tid (el med tre val: Boverket, IEA handelskorrigerad eller eget startvärde; fjärrvärme, Sysavs koldioxidavskiljning och klimattrappa för nybyggnation) och alla övriga antaganden med källor; ändringar sparas i webbläsaren |
@@ -92,6 +92,9 @@ Koldioxidbudget   = Σ 2021–2030 (officiellt utfall till och med 2025, däreft
 Jämförelse        = Σ år i perioden per utsläppskälla; klimatavtryck = avgaser + bränsle och laddel + fordon + använd el + använd fjärrvärme
                     + nybyggnation + mark (perspektiv A, alla kategorier); territoriellt = de åtta sektorerna; BASIC+ = territoriellt + el i
                     scope 2 + mark, BASIC = utan produktanvändning, jordbruk och mark. Per invånare = medel av årens t per invånare
+Egen datakälla    = modellvärde × källfaktor (nivån från källan, utvecklingen från modellen): vägtrafik × Miljöbarometern 2024 / Vägvis A 2024;
+                    GPC-transport × klimatkontraktet 2022 / Miljöbarometern 2022 (vägtrafik, sjöfart, arbetsmaskiner); hela kontraktet per kategori.
+                    Klimatavtrycket följer sidomenyn (A eller B)
 ```
 
 | Standardantagande | Värde | Källa |
@@ -151,7 +154,7 @@ Kalibreringen räknas om i varje iteration. Intervallen för framtida år skalas
 ```bash
 node tests/test_model.js                 # 28 beräkningstester (massbalans, kalibrering, Monte Carlo, räkneexempel, enheter, tidsplan …)
 node tests/test_resultat.js              # 11 tester för Resultat & klimatbudget
-node tests/test_stad.js                  # 18 tester för GHG Protocol for Cities, stadens klimatbokföring och jämförelsen
+node tests/test_stad.js                  # 22 tester för GHG Protocol for Cities, stadens klimatbokföring och jämförelsen
 python -m unittest discover tests        # 13 tester av sidbygge, data, byggnadsbestånd och uppdateringsflöde
 ```
 
@@ -221,6 +224,7 @@ tests/                     beräknings- och apptester
 
 | Version | Datum | Innehåll |
 |---|---|---|
+| 1.3.0 (Road2Zero 0.15.1) | 6 november 2026 | Jämför räknesätten räknar som standard varje räknesätt med sin egen datakälla: vägtrafiken i bokföringen på Miljöbarometerns nivå (ENVIMAN, faktor 1,041 mot Vägvis A), GPC valbart med Miljöbarometern, klimatkontraktets transport (SMED, faktor 1,922) eller hela klimatkontraktet, och klimatavtrycket enligt sidomenyn (A eller B). Bryggan visar stegen för datakällan streckade. Standard 2027–2050: klimatavtryck 14 766 kt, territoriellt 19 440 kt, BASIC+ 29 371 kt; vägtrafikens avgaser 7 134–14 270 kt. Valet Samma trafikmodell ger 0.15.0. Inga andra resultat ändrade. |
 | 1.3.0 (Road2Zero 0.15.0) | 6 november 2026 | Ny sida 05 Jämför räknesätten: klimatavtrycket, den territoriella bokföringen och GHG Protocol for Cities med samma antaganden, ackumulerat eller för ett år, uppdelade på utsläppskällor, med brygga och en bedömning av vad översiktsplanen kan påverka. Övriga sidor numreras 06–12. Standard 2027–2050: klimatavtryck 14 766 kt, territoriellt 19 150 kt, BASIC+ 20 658 kt; vägtrafikens avgaser, 7 134 kt, ingår i alla tre. Inga resultat ändrade. |
 | 1.3.0 (Road2Zero 0.14.0) | 6 november 2026 | Elens klimatfaktor har tre val som i Road2Zero-Plan: Boverket 37 g CO₂e/kWh med EU:s referensscenario 2020 (standard), IEA handelskorrigerad 26 g med IEA:s kurva och eget startvärde med Sveriges WEM-prognos. Elbilarnas laddel i Vägvis underlag (90 g) räknas om med den valda elfaktorn; avgaserna påverkas inte. Standardresultatet 2024 blir 560,1 kt i stället för 561,6 kt och 2050 566,6 kt i stället för 568,8 kt (perspektiv A). |
 | 1.3.0 (Road2Zero 0.13.1) | 6 november 2026 | Sidorna 03 och 04 redovisar i de officiella kategorierna: klimatkontraktets fem kategorier × scope och GPC:s undersektorer (I.1–V.2, med IE och NE; el i scope 2 fördelad efter SCB:s förbrukarkategorier), Miljöbarometerns åtta sektorer med deras innehåll. Skillnaderna mot de officiella siffrorna förklaras per kategori, och en brygga visar vägen från OP:s klimatavtryck (561,6 kt) till territoriellt (848,3 kt) och GPC BASIC+ (930,3 kt). Inga resultat ändrade. |

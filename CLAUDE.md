@@ -164,6 +164,10 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   Jämför räknesätten (0.15.0, vy `jamfor` i `stad.js`, sida 05): `jamforelse(res, j)` summerar utsläppskällorna (`KALLOR`) per
   räknesätt för en period (standard 2027–2050) eller ett år, GPC som BASIC+ (standard) eller BASIC. Klimatavtrycket med perspektiv A
   och alla kategorier; per invånare = medel av årens värden. Kolumnen om vad översiktsplanen kan påverka är en bedömning (modellval).
+  Datakällor (0.15.1, användarens val): standard egen källa per räknesätt, valbart samma trafikmodell (Vägvis A, som 0.15.0).
+  Klimatavtrycket följer sidomenyn (A eller B, `mobDelar`); bokföringens vägtrafik på Miljöbarometerns nivå; GPC valbart Miljöbarometern,
+  klimatkontraktets transport (SMED, standard) eller hela klimatkontraktet. Källfaktorer ur underlaget (`kallfaktorer` i `berakna`):
+  källans nivå samma år delat med modellens eller Miljöbarometerns; utvecklingen följer modellen. Sidorna 03 och 04 räknar som förut.
 
 ## Kända osäkerheter
 
