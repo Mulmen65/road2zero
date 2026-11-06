@@ -454,8 +454,10 @@
     return '<article class="card r2zr-urval">' + forsta +
       '<p class="small">Sektorerna som Road2Zero-OP inte räknar själv börjar på Malmö stads officiella värden för ' + START + ' (' + kalla(B, B.territoriell.kalla) + ') och förändras med den årliga takten från ' + FORANDRING_FRAN + '. Standard är 0 %, oförändrad nivå. ' +
       'Energisektorn följer fjärrvärmens klimatfaktor (' + (P.beccs === 'ja' ? 'med Sysavs koldioxidavskiljning från ' + P.beccsAr + ', −' + nf(P.beccsMinskning) + ' %' : 'utan Sysavs koldioxidavskiljning') + '), vägtrafiken fordonsflottans klimatfaktor ' + fl + ' för 2030 / 2040 / 2050 och trafikförändringen ' + nf(P.trafikForandring2050) + ' % till 2050, och elen elens klimatfaktor. ' +
-      'De ändras under <button type="button" class="link-btn" data-go="parameters">Antaganden &amp; scenario</button>. Trafiken räknas alltid territoriellt med Vägvis modell A, oavsett perspektivet i sidomenyn.' +
-      (vy === 'jamfor' ? '' : ' Jämför med de andra räknesätten under <button type="button" class="link-btn" data-go="jamfor">Jämför räknesätten</button>.') + '</p></article>';
+      'De ändras under <button type="button" class="link-btn" data-go="parameters">Antaganden &amp; scenario</button>. ' +
+      (vy !== 'jamfor' ? 'Trafiken räknas alltid territoriellt med Vägvis modell A, oavsett perspektivet i sidomenyn. Jämför med de andra räknesätten under <button type="button" class="link-btn" data-go="jamfor">Jämför räknesätten</button>.'
+        : st.j.trafik === 'egen' ? 'Med egen datakälla per räknesätt följer klimatavtrycket perspektivet i sidomenyn, och vägtrafiken i bokföringen och GPC har källornas nivå med modellens utveckling över tid.'
+          : 'Med samma trafikmodell räknas vägtrafiken i alla tre med Vägvis modell A, oavsett perspektivet i sidomenyn.') + '</p></article>';
   }
 
   /* ----- sidan GHG Protocol for Cities ----- */
