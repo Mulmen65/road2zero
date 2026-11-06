@@ -134,4 +134,53 @@ test('elvalet ändrar inte avgaserna: territoriellt och scope 1 är desamma för
   }
 });
 
+/* ---------- jämförelse av räknesätten (0.15.0) ---------- */
+test('jämförelse: delarna summerar till varje räknesätt varje år, energin = el + fjärrvärme', () => {
+  const op = Z.KALLOR.filter(k => k.med.op), terr = Z.KALLOR.filter(k => k.med.terr);
+  const gpc = niva => Z.KALLOR.filter(k => k.med.gpc === 'basic' || (niva === 'plus' && k.med.gpc === 'plus'));
+  const s = (ks, x) => ks.reduce((a, k) => a + k.v(x), 0);
+  for (const x of res.rader) {
+    near(s(op, x), x.op.total, 1e-6, 'klimatavtryck ' + x.ar); near(s(terr, x), x.terr, 1e-6, 'territoriellt ' + x.ar);
+    near(s(gpc('plus'), x), x.basicPlus, 1e-6, 'BASIC+ ' + x.ar); near(s(gpc('basic'), x), x.basic, 1e-6, 'BASIC ' + x.ar);
+    near(x.opEl + x.opFv, x.op.energi, 1e-6, 'energi ' + x.ar); assert.ok(x.opEl > 0 && x.opFv > 0);
+  }
+  near(rad(res, 2024).opEl, R.energyBase.tEl.reduce((a, v) => a + v, 0), 1e-6, 'el i befintliga byggnader 2024');
+  for (const k of Z.KALLOR) assert.ok(Z.DELAR.some(d => d.id === k.del) && k.op, k.id);
+});
+
+test('jämförelse ackumulerat 2027–2050: samma summor som sidorna, avgaserna gemensamma', () => {
+  const J = Z.jamforelse(res), [op, terr, gpc] = J.metoder, sel = res.rader.filter(x => x.ar >= 2027 && x.ar <= 2050);
+  assert.deepStrictEqual([J.fran, J.till, J.j.niva], [2027, 2050, 'plus']);
+  near(op.total, M.cityByYear(R).filter(r => r.year >= 2027 && r.year <= 2050).reduce((a, r) => a + r.total, 0), 1e-4, 'klimatavtrycket = Resultat, alla kategorier');
+  near(terr.total, sel.reduce((a, x) => a + x.terr, 0), 1e-4); near(gpc.total, sel.reduce((a, x) => a + x.basicPlus, 0), 1e-4);
+  near(J.gemensamt.t, sel.reduce((a, x) => a + x.sek.vagtrafik, 0), 1e-4, 'gemensamt = vägtrafikens avgaser');
+  for (const m of J.metoder) { near(m.delar.avgaser, J.gemensamt.t, 1e-6, m.id); near(m.perAr.reduce((a, v, i) => a + (res.rader[i].ar >= 2027 ? v : 0), 0), m.total, 1e-4); }
+  near(op.perPerson, sel.reduce((a, x) => a + x.op.total / x.inv, 0) / sel.length, 1e-9, 'snitt per invånare');
+  near(op.total / 1000, 14766.0, 0.5, 'klimatavtryck 2027–2050'); near(terr.total / 1000, 19150.1, 0.5); near(gpc.total / 1000, 20658.3, 0.5);
+});
+
+test('jämförelse: bryggan går från klimatavtrycket via territoriellt till GPC', () => {
+  for (const niva of ['plus', 'basic']) {
+    const J = Z.jamforelse(res, {niva}), b = J.brygga, iT = b.findIndex(x => x.metod === 'terr');
+    assert.strictEqual(b[0].metod, 'op'); assert.strictEqual(b[b.length - 1].metod, 'gpc');
+    near(b[0].t + b.slice(1, iT).reduce((a, x) => a + x.t, 0), b[iT].t, 1e-4, niva + ' till territoriellt');
+    near(b[iT].t + b.slice(iT + 1, -1).reduce((a, x) => a + x.t, 0), b[b.length - 1].t, 1e-4, niva + ' till GPC');
+    near(b[b.length - 1].t, J.metoder[2].total, 1e-6);
+    assert.ok(b.some(x => x.text === 'Läggs till i bokföringen: industri, sjöfart, arbetsmaskiner, avfall och jordbruk'), 'hel del med sitt namn');
+    assert.ok(b.slice(1, iT).findIndex(x => x.t > 0) > b.slice(1, iT).findLastIndex(x => x.t < 0), 'först det som tas bort');
+  }
+  const t = Z.jamforelse(res, {niva: 'basic'}).brygga.map(x => x.text).join(' | ');
+  assert.ok(t.includes('Ingår inte i BASIC: produktanvändning och jordbruk'), t);
+});
+
+test('jämförelse ett år: samma värden som årsraden', () => {
+  for (const y of [2024, 2030, 2050]) {
+    const J = Z.jamforelse(res, {lage: 'ar', ar: y, niva: 'basic'}), r = rad(res, y);
+    assert.deepStrictEqual(J.ar, [y]);
+    near(J.metoder[0].total, r.op.total, 1e-6); near(J.metoder[1].total, r.terr, 1e-6); near(J.metoder[2].total, r.basic, 1e-6);
+    near(J.metoder[1].perPerson, r.terr / r.inv, 1e-12);
+  }
+  assert.throws(() => Z.jamforelse(res, {lage: 'ar', ar: 2060}));
+});
+
 console.log('\n' + passed + ' tester för stadens redovisning godkända.');

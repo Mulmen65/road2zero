@@ -87,6 +87,7 @@ const HEAD = {
   results: ['PARISAVTALET · 1,5–2,0 °C', 'Resultat & klimatbudget', 'Stadens utsläpp per klimatkategori och år, per invånare och mot en koldioxidbudget för 1,5–2,0 °C enligt Forster m.fl. (2026).'],
   gpc: ['GPC · SCOPE 1, 2 OCH 3', 'GHG Protocol for Cities', 'Stadens utsläpp per sektor och scope enligt GHG Protocol for Cities, med prognos till 2050 och speglade mot inventeringen i klimatkontraktet med EU-missionen.'],
   bokforing: ['TERRITORIELLA UTSLÄPP · MÅL 2030', (BOKF && BOKF.stad ? esc(BOKF.stad) + 's' : 'Stadens') + ' klimatbokföring', 'Utsläppen inom stadens gräns per sektor som staden redovisar dem, med prognos till 2050, målen för 2030 och koldioxidbudgeten.'],
+  jamfor: ['SYSTEMGRÄNSER · TRE RÄKNESÄTT', 'Jämför räknesätten', 'Road2Zero-OP:s klimatavtryck, stadens territoriella klimatbokföring och GHG Protocol for Cities med samma antaganden, ackumulerat över en period eller för ett år.'],
   map: ['DESO 2025 · ' + S.n + ' OMRÅDEN', 'Karta & områden', 'Utforska områdena. Välj nyckeltal, enhet och år; klicka på ett område för detaljer.'],
   calc: ['STEG FÖR STEG', 'Så räknas resultatet', 'Följ beräkningen för ett område, från energideklaration och trafik till nybyggnation och mark.'],
   parameters: ['ANTAGANDEN', 'Antaganden & scenario', 'Alla värden kan ändras. Beräkningen uppdateras direkt och sparas i din webbläsare.'],
@@ -698,7 +699,7 @@ let RA = null, RAkey = null;
 function stadCtx() {
   if (P.perspektiv === 'A') RA = R;
   else { const k = JSON.stringify(P); if (k !== RAkey || !RA || RA.P.perspektiv !== 'A') { RA = M.compute(S, {...P, perspektiv: 'A'}); RAkey = k; } }
-  return {M, S, R: RA, P};
+  return {M, S, R: RA, P, Rvald: R};
 }
 function stadView(vy) {
   if (!window.R2ZStad || !BOKF) return notice('Projektet saknar underlag för stadens klimatredovisning (data/klimatbokforing.json).', 'error');
@@ -745,11 +746,11 @@ function render() {
   const view = $('view');
   if (map && st.view !== 'map') { map.remove(); map = null; }
   charts.length = 0;
-  const html = {overview, results: resultsView, gpc: () => stadView('gpc'), bokforing: () => stadView('bokforing'), map: mapView, calc: calcView, parameters: paramsView, expl: explView, traffic: trafficView, data: dataView, method: methodView}[st.view]();
+  const html = {overview, results: resultsView, gpc: () => stadView('gpc'), bokforing: () => stadView('bokforing'), jamfor: () => stadView('jamfor'), map: mapView, calc: calcView, parameters: paramsView, expl: explView, traffic: trafficView, data: dataView, method: methodView}[st.view]();
   view.innerHTML = html;
   drawCharts();
   if (st.view === 'results' && window.R2ZResultat && R2Z) window.R2ZResultat.bind(resultsCtx(), R2Z, render);
-  if ((st.view === 'gpc' || st.view === 'bokforing') && window.R2ZStad && BOKF) { try { window.R2ZStad.bind(stadCtx(), BOKF, st.view, render); } catch (e) { /* visas som notis */ } }
+  if (['gpc', 'bokforing', 'jamfor'].includes(st.view) && window.R2ZStad && BOKF) { try { window.R2ZStad.bind(stadCtx(), BOKF, st.view, render); } catch (e) { /* visas som notis */ } }
   if (st.view === 'expl') {
     document.querySelectorAll('#expl-table th[data-sort]').forEach(th => th.onclick = () => { const c = th.dataset.sort; st.explSort = [c, st.explSort[0] === c ? -st.explSort[1] : (c === 'namn' ? 1 : -1)]; render(); });
     document.querySelectorAll('[data-area]').forEach(b => b.onclick = () => { const a = D.expl.omraden.find(x => String(x.id) === b.dataset.area); const big = a.delar.slice().sort((x, y) => y.ha - x.ha)[0]; st.selected = big.deso; st.dev = true; go('map'); setTimeout(() => { if (map) map.fitBounds(window.L.geoJSON(a.geometry).getBounds(), {padding: [60, 60], maxZoom: 15}); }, 120); }); }

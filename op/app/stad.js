@@ -121,8 +121,10 @@
       // Road2Zero-OP:s eget klimatavtryck samma år (sidan Resultat & klimatbudget, perspektiv A)
       const op = {energi: summa(R.comp.energi[yi]) + summa(R.comp.nydrift[yi]), mobilitet: mobTot, bygg, mark};
       op.total = op.energi + op.mobilitet + op.bygg + op.mark;
-      return {ar: y, sek, terr, s2, s2kat, mark, bygg, mobS3, mobWtt, mobFordon, elKwh, gpc, basic, basicPlus: basic + gpc.IV.s1 + gpc.V.s1, scope3: mobS3 + bygg, op,
-        detalj: detalj({sek, s2, s2kat, mark, bygg, mobS3})};
+      // energin uppdelad på använd el och fjärrvärme: befintliga byggnader ur energyBase, nya byggnader med elandelen
+      const opEl = summa(R.energyBase.tEl) * f.iEl * eff + (efMix > 0 ? summa(R.comp.nydrift[yi]) * P.elandelNy * f.el / efMix : 0);
+      return {ar: y, inv: summa(R.pop[yi]), sek, terr, s2, s2kat, mark, bygg, mobS3, mobWtt, mobFordon, elKwh, gpc, basic, basicPlus: basic + gpc.IV.s1 + gpc.V.s1, scope3: mobS3 + bygg, op,
+        opEl, opFv: op.energi - opEl, detalj: detalj({sek, s2, s2kat, mark, bygg, mobS3})};
     });
     const rad = y => rader.find(x => x.ar === y);
     // mål: −70 % (Malmö) och −80 % (EU-missionen) mot 1990
@@ -171,6 +173,104 @@
     return {rader, start, mal, budget, speglingTerr, speglingGpc, mbGpc, brygga, elAndel,
       el: {byggKwh: elByggKwh, ovrigKwh: ovrigElKwh, jvgKwh: elJvgKwh, statKwh: elStatKwh, fvKwh},
       officiellTotal: officiellt(null, START), officiellTotalCcc: officiellt(null, cAr), cccTotal: ccc.totalt, cccAr: cAr};
+  }
+
+  /* ---------- jämförelse av de tre räknesätten ---------- */
+  /* Räknesätten i jämförelsen, med färg och linjetyp för diagrammen över tid och sidan där de redovisas. */
+  const METODER = [
+    {id: 'op', namn: 'Road2Zero-OP:s klimatavtryck', kort: 'Klimatavtryck', farg: '#1f5a6e', dash: 'solid', sida: 'results', sidnamn: 'Resultat & klimatbudget'},
+    {id: 'terr', namn: 'Stadens klimatbokföring, territoriellt', kort: 'Territoriellt', farg: '#7aa65a', dash: 'dash', sida: 'bokforing', sidnamn: 'Stadens klimatbokföring'},
+    {id: 'gpc', namn: 'GHG Protocol for Cities', kort: 'GPC', farg: '#5a86b8', dash: 'dot', sida: 'gpc', sidnamn: 'GHG Protocol for Cities'}];
+  /* Delarna i stapeldiagrammet i staplingsordning: det som ingår i alla tre först, sedan det som bokföringen och GPC delar.
+     Färgerna ur paletten, valda så att delar som ligger intill varandra i någon stapel skiljer sig minst ΔE 15 (OKLab). */
+  const DELAR = [
+    {id: 'avgaser', namn: 'Vägtrafikens avgaser', farg: '#5a86b8'},
+    {id: 'produktion', namn: 'El- och värmeproduktion och egen uppvärmning', farg: '#a76019'},
+    {id: 'ovriga', namn: 'Industri, sjöfart, arbetsmaskiner, avfall och jordbruk', farg: '#7d939d'},
+    {id: 'elScope2', namn: 'El i scope 2', farg: '#2c6e9e'},
+    {id: 'trafikLc', namn: 'Trafikens bränsle, laddel och fordon', farg: '#bcd3db'},
+    {id: 'energiAnv', namn: 'Använd el och fjärrvärme i byggnaderna', farg: '#4fa8a0'},
+    {id: 'bygg', namn: 'Nybyggnation A1–A5', farg: '#1f5a6e'},
+    {id: 'mark', namn: 'Förändrad markanvändning', farg: '#a3c27a'}];
+  /* Utsläppskällor: v = t CO2e ur årsraden, med = om källan ingår (gpc: 'basic' = i BASIC och BASIC+, 'plus' = bara BASIC+),
+     ute = var källan hamnar i ett räknesätt där den inte ingår, op = vad en översiktsplan kan påverka (bedömning, modellval). */
+  const KALLOR = [
+    {id: 'avgaser', del: 'avgaser', namn: 'Vägtrafikens avgaser på stadens vägar', v: x => x.sek.vagtrafik, med: {op: true, terr: true, gpc: 'basic'}, gpcKod: 'II.1, scope 1', ute: {},
+      op: 'Stor: lokalisering, täthet, gatunät, parkering och kollektivtrafik påverkar hur mycket som körs.'},
+    {id: 'bransle', del: 'trafikLc', namn: 'Bränslets produktion och transport, elbilarnas laddel', v: x => x.mobWtt, med: {op: true, terr: false, gpc: false},
+      ute: {terr: 'Utanför gränsen: bränslet och elen produceras i regel utanför staden.', gpc: 'Scope 3, utanför summan; laddelen ingår i elen i scope 2.'},
+      op: 'Som avgaserna: följer hur mycket som körs.'},
+    {id: 'fordon', del: 'trafikLc', namn: 'Tillverkning av fordon och batterier', v: x => x.mobFordon, med: {op: true, terr: false, gpc: false},
+      ute: {terr: 'Utanför gränsen: fordonen tillverkas utanför staden.', gpc: 'Scope 3, utanför summan.'},
+      op: 'Viss: bilinnehavet följer täthet, parkering och närhet till kollektivtrafik.'},
+    {id: 'anvEl', del: 'energiAnv', namn: 'Använd el i befintliga och nya byggnader', v: x => x.opEl, med: {op: true, terr: false, gpc: false},
+      ute: {terr: 'Utanför gränsen: importerad el ingår inte; elproduktion i staden ingår i el- och värmeproduktionen.', gpc: 'I stället el i scope 2 med SCB:s elanvändning.'},
+      op: 'Viss: täthet, byggnadstyper och lokal elproduktion. Energikraven på byggnaderna är nationella.'},
+    {id: 'anvFv', del: 'energiAnv', namn: 'Använd fjärrvärme i befintliga och nya byggnader', v: x => x.opFv, med: {op: true, terr: false, gpc: false},
+      ute: {terr: 'Räknas vid produktionen (el- och värmeproduktionen).', gpc: 'Räknas vid produktionen i scope 1 (I.4).'},
+      op: 'Viss: fjärrvärmenätets utbyggnad och täthet. Produktionen styrs av energibolaget.'},
+    {id: 'elScope2', del: 'elScope2', namn: 'El i scope 2: stadens elanvändning enligt SCB × elfaktorn', v: x => x.s2.stat + x.s2.jvg, med: {op: false, terr: false, gpc: 'basic'}, gpcKod: 'I.1–I.5 och II.2–II.4, scope 2',
+      ute: {op: 'Byggnadernas el ingår i stället som använd el, ur energideklarationerna.', terr: 'Utanför gränsen: importerad el ingår inte.'},
+      op: 'Viss: som använd el i byggnaderna.'},
+    {id: 'produktion', del: 'produktion', namn: 'El- och värmeproduktion i staden och egen uppvärmning', v: x => x.sek.energi, med: {op: false, terr: true, gpc: 'basic'}, gpcKod: 'I.4, scope 1',
+      ute: {op: 'I stället använd el och fjärrvärme i byggnaderna.'},
+      op: 'Liten: produktionen och avfallsmängderna styrs av energibolaget och avfallsplaneringen. ÖP kan reservera mark för anläggningar.'},
+    {id: 'industri', del: 'ovriga', namn: 'Industri, inklusive industriprocesser', v: x => x.sek.industri, med: {op: false, terr: true, gpc: 'basic'}, gpcKod: 'I.3, scope 1',
+      ute: {op: 'Ingår inte: verksamheternas egen förbränning och processer räknas inte.'}, op: 'Liten: mark för verksamheter.'},
+    {id: 'produkt', del: 'ovriga', namn: 'Produktanvändning', v: x => x.sek.produkt, med: {op: false, terr: true, gpc: 'plus'}, gpcKod: 'IV.2, scope 1', ute: {op: 'Ingår inte.', gpc: 'Ingår inte i BASIC.'},
+      op: 'Liten.'},
+    {id: 'sjofart', del: 'ovriga', namn: 'Sjöfart, järnväg och inrikes flyg', v: x => x.sek.sjofart, med: {op: false, terr: true, gpc: 'basic'}, gpcKod: 'II.2–II.4, scope 1', ute: {op: 'Ingår inte: OP räknar vägtrafiken.'},
+      op: 'Liten: hamnens och spårens lokalisering.'},
+    {id: 'arbetsmaskiner', del: 'ovriga', namn: 'Arbetsmaskiner', v: x => x.sek.arbetsmaskiner, med: {op: false, terr: true, gpc: 'basic'}, gpcKod: 'II.5, scope 1',
+      ute: {op: 'Ingår inte; byggarbetsplatsens maskiner ingår i nybyggnationens A5.'}, op: 'Liten.'},
+    {id: 'avfall', del: 'ovriga', namn: 'Avfall och avlopp', v: x => x.sek.avfall, med: {op: false, terr: true, gpc: 'basic'}, gpcKod: 'III, scope 1', ute: {op: 'Ingår inte.'},
+      op: 'Liten: mark för avfallsanläggningar och avloppsrening.'},
+    {id: 'jordbruk', del: 'ovriga', namn: 'Jordbruk', v: x => x.sek.jordbruk, med: {op: false, terr: true, gpc: 'plus'}, gpcKod: 'V.1 och V.3, scope 1',
+      ute: {op: 'Ingår inte; den mark som bebyggs ingår i förändrad markanvändning.', gpc: 'Ingår inte i BASIC.'}, op: 'Viss: hur mycket jordbruksmark som bebyggs.'},
+    {id: 'bygg', del: 'bygg', namn: 'Nybyggnation, material och byggskede A1–A5', v: x => x.bygg, med: {op: true, terr: false, gpc: false},
+      ute: {terr: 'Utanför gränsen: materialen tillverkas i regel utanför staden.', gpc: 'Scope 3, utanför summan.'},
+      op: 'Stor: hur mycket, var och hur det byggs, och om befintliga byggnader kan användas i stället.'},
+    {id: 'mark', del: 'mark', namn: 'Förändrad markanvändning: kolförråd i mark och växtlighet', v: x => x.mark, med: {op: true, terr: false, gpc: 'plus'}, gpcKod: 'V.2',
+      ute: {terr: 'Ingår inte i Miljöbarometern.', gpc: 'Ingår inte i BASIC.'}, op: 'Stor: var det byggs och hur mycket åker och grönyta som bevaras.'}];
+  const NIVAER = {plus: 'BASIC+', basic: 'BASIC'};
+  function jamforStandard() { return {lage: 'period', p0: 2027, p1: 2050, ar: 2030, niva: 'plus'}; }
+  const ingar = (k, m, niva) => m === 'gpc' ? (k.med.gpc === 'basic' || (k.med.gpc === 'plus' && niva === 'plus')) : k.med[m] === true;
+
+  /* Jämför räknesätten för valda år. res = berakna(…), j = {lage: 'period' | 'ar', p0, p1, ar, niva: 'plus' | 'basic'}.
+     Ackumulerat = summan av årsvärdena; per invånare = medel av årens utsläpp per invånare (som på sidan Resultat). */
+  function jamforelse(res, jIn) {
+    const j = {...jamforStandard(), ...(jIn || {})}, alla = res.rader.map(x => x.ar);
+    const fran = j.lage === 'ar' ? j.ar : Math.min(j.p0, j.p1), till = j.lage === 'ar' ? j.ar : Math.max(j.p0, j.p1);
+    const sel = res.rader.filter(x => x.ar >= fran && x.ar <= till);
+    if (!sel.length) throw new Error('Inga år mellan ' + fran + ' och ' + till + '.');
+    const kallor = KALLOR.map(k => ({id: k.id, del: k.del, namn: k.namn, gpcKod: k.gpcKod, ute: k.ute, op: k.op,
+      t: sel.reduce((s, x) => s + k.v(x), 0), ingar: Object.fromEntries(METODER.map(m => [m.id, ingar(k, m.id, j.niva)]))}));
+    const metoder = METODER.map(m => {
+      const delar = Object.fromEntries(DELAR.map(d => [d.id, 0]));
+      for (const k of kallor) if (k.ingar[m.id]) delar[k.del] += k.t;
+      const arsvarde = x => KALLOR.reduce((s, k) => s + (ingar(k, m.id, j.niva) ? k.v(x) : 0), 0);
+      const perAr = res.rader.map(arsvarde);
+      const perPerson = sel.reduce((s, x) => s + (x.inv > 0 ? arsvarde(x) / x.inv : 0), 0) / sel.length;
+      return {...m, namn: m.id === 'gpc' ? m.namn + ', ' + NIVAER[j.niva] : m.namn, kort: m.id === 'gpc' ? 'GPC ' + NIVAER[j.niva] : m.kort,
+        delar, total: Object.values(delar).reduce((s, v) => s + v, 0), perAr, perPerson};
+    });
+    // brygga: klimatavtrycket → territoriellt → GPC, en rad per del som skiljer
+    const steg = (fore, efter, plus, minus) => DELAR.map(d => {
+      const v = efter.delar[d.id] - fore.delar[d.id];
+      if (Math.abs(v) < 1e-6) return null;
+      const k = KALLOR.filter(x => x.del === d.id), diff = k.filter(x => ingar(x, fore.id, j.niva) !== ingar(x, efter.id, j.niva));
+      const lc = s => s.charAt(0).toLowerCase() + s.slice(1);
+      const namn = diff.length === k.length ? [d.namn] : diff.map(x => x.namn.split(':')[0]);
+      const vad = namn.length === 1 ? lc(namn[0]) : namn.slice(0, -1).map(lc).join(', ') + ' och ' + lc(namn[namn.length - 1]);
+      return {del: d.id, text: (v > 0 ? plus : minus) + vad, t: v};
+    }).filter(Boolean).sort((a, b) => (a.t > 0) - (b.t > 0));   // först det som tas bort, sedan det som läggs till
+    const [op, terr, gpc] = metoder;
+    const brygga = [{text: op.namn, t: op.total, summa: true, metod: 'op'},
+      ...steg(op, terr, 'Läggs till i bokföringen: ', 'Ingår inte i bokföringen: '), {text: terr.namn, t: terr.total, summa: true, metod: 'terr'},
+      ...steg(terr, gpc, 'Läggs till i GPC: ', 'Ingår inte i ' + NIVAER[j.niva] + ': '), {text: gpc.namn, t: gpc.total, summa: true, metod: 'gpc'}];
+    const gemensamma = kallor.filter(k => METODER.every(m => k.ingar[m.id]));
+    return {j, lage: j.lage, fran, till, ar: sel.map(x => x.ar), alla, kallor, metoder, brygga,
+      gemensamt: {t: gemensamma.reduce((s, k) => s + k.t, 0), kallor: gemensamma.map(k => k.namn)}};
   }
 
   /* ---------- förklaringar av skillnaderna (text med siffror ur underlaget) ---------- */
@@ -226,12 +326,24 @@
   let st = null;
   function urvalStart() {
     let s = null; try { s = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (e) { s = null; }
-    const u = standard();
+    const u = standard(); u.j = jamforStandard();
     if (s && typeof s === 'object') {
       if (s.r && typeof s.r === 'object') for (const [k] of TAKTER) { const v = Number(s.r[k]); if (Number.isFinite(v)) u.r[k] = Math.max(-50, Math.min(50, v)); }
       if (Number.isFinite(Number(s.ar))) u.ar = Number(s.ar);
+      if (s.j && typeof s.j === 'object') {
+        if (['period', 'ar'].includes(s.j.lage)) u.j.lage = s.j.lage;
+        if (NIVAER[s.j.niva]) u.j.niva = s.j.niva;
+        for (const k of ['p0', 'p1', 'ar']) if (Number.isInteger(Number(s.j[k]))) u.j[k] = Number(s.j[k]);
+      }
     }
     return u;
+  }
+  /* Håll jämförelsens år inom modellens år (2024–2050). */
+  function jamforUrval(ar) {
+    const j = st.j, inom = y => Math.max(ar[0], Math.min(ar[ar.length - 1], y)), std = jamforStandard();
+    for (const k of ['p0', 'p1', 'ar']) j[k] = ar.includes(j[k]) ? j[k] : inom(std[k]);
+    if (j.p0 > j.p1) [j.p0, j.p1] = [j.p1, j.p0];
+    return j;
   }
   function spara() { try { localStorage.setItem(STORE, JSON.stringify(st)); } catch (e) { /* lagring ej tillgänglig */ } }
   function layout(titel, undertitel, hojd, yt) {
@@ -242,20 +354,34 @@
       xaxis: {showgrid: false, linecolor: LINJE, tickcolor: LINJE, automargin: true},
       yaxis: {gridcolor: GRID, zerolinecolor: INK2, zerolinewidth: 1, title: {text: yt || 'kt CO2e'}, tickformat: ',.0f', automargin: true, rangemode: 'tozero'}};
   }
+  const lum = h => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+  const textfarg = h => 1.05 / (lum(h) + 0.05) >= (lum(h) + 0.05) / (lum(INK) + 0.05) ? '#ffffff' : INK;   // vit eller mörk text, den som kontrasterar mest
+  const radbryt = (t, n) => { const ord = esc(t).split(' '), rader = ['']; for (const o of ord) { const r = rader[rader.length - 1]; if (r && (r + ' ' + o).length > n) rader.push(o); else rader[rader.length - 1] = r ? r + ' ' + o : o; } return rader.join('<br>'); };
   const kort = (l, v, f, huvud) => '<div class="card' + (huvud ? ' kpi-main' : '') + '"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-foot">' + f + '</div></div>';
   const cell = v => '<td class="numeric">' + (typeof v === 'string' ? '<span class="r2zs-nyckel">' + esc(v) + '</span>' : v ? kt(v) : '–') + '</td>';
   const num = v => typeof v === 'number' ? v : 0;
 
   function panel(ctx, B, vy) {
-    const P = ctx.P, ar = ctx.R.years;
-    const takter = TAKTER.filter(([k]) => vy === 'gpc' || k !== 'ovrigEl').map(([k, l]) =>
+    const P = ctx.P, ar = ctx.R.years, opt = (v, l, val) => '<option value="' + v + '"' + (v === val ? ' selected' : '') + '>' + l + '</option>';
+    const takter = TAKTER.filter(([k]) => vy !== 'bokforing' || k !== 'ovrigEl').map(([k, l]) =>
       '<label class="field">' + esc(l) + ', % per år<input class="input" type="number" step="0.1" min="-50" max="50" data-r2zs-takt="' + k + '" value="' + st.r[k] + '"></label>').join('');
     const fl = [P.flotta2030, P.flotta2040, P.flotta2050].map(v => nf(v, 2)).join(' / ');
-    return '<article class="card r2zr-urval"><div class="r2zr-rad r2zr-val" style="margin-top:0">' +
-      '<label class="field">Visa år i tabellerna<select data-r2zs="ar">' + ar.map(y => '<option value="' + y + '"' + (y === st.ar ? ' selected' : '') + '>' + y + '</option>').join('') + '</select></label>' + takter + '</div>' +
+    let forsta;
+    if (vy === 'jamfor') {
+      const j = st.j, val = (k, a) => '<select data-r2zs-j="' + k + '">' + a.map(y => opt(y, y, j[k])).join('') + '</select>';
+      forsta = '<div class="r2zr-rad r2zr-val" style="margin-top:0"><div><div class="r2zr-etikett">Jämför</div><div class="toggle" style="margin:0">' +
+        [['period', 'Ackumulerat'], ['ar', 'Ett år']].map(([v, l]) => '<button type="button" data-r2zs-lage="' + v + '" class="' + (j.lage === v ? 'active' : '') + '">' + l + '</button>').join('') + '</div></div>' +
+        (j.lage === 'period' ? '<label class="field">Från' + val('p0', ar) + '</label><label class="field">Till och med' + val('p1', ar) + '</label>'
+          : '<label class="field">År' + val('ar', ar) + '</label>') +
+        '<label class="field">Nivå i GHG Protocol for Cities<select data-r2zs-j="niva">' + opt('plus', 'BASIC+ (som klimatkontraktet)', j.niva) + opt('basic', 'BASIC', j.niva) + '</select></label></div>' +
+        '<div class="r2zr-etikett" style="margin-top:16px">Årlig förändring från ' + FORANDRING_FRAN + ' för de sektorer som Road2Zero-OP inte räknar själv</div><div class="r2zr-rad r2zr-val" style="margin-top:0">' + takter + '</div>';
+    } else forsta = '<div class="r2zr-rad r2zr-val" style="margin-top:0">' +
+      '<label class="field">Visa år i tabellerna<select data-r2zs="ar">' + ar.map(y => opt(y, y, st.ar)).join('') + '</select></label>' + takter + '</div>';
+    return '<article class="card r2zr-urval">' + forsta +
       '<p class="small">Sektorerna som Road2Zero-OP inte räknar själv börjar på Malmö stads officiella värden för ' + START + ' (' + kalla(B, B.territoriell.kalla) + ') och förändras med den årliga takten från ' + FORANDRING_FRAN + '. Standard är 0 %, oförändrad nivå. ' +
       'Energisektorn följer fjärrvärmens klimatfaktor (' + (P.beccs === 'ja' ? 'med Sysavs koldioxidavskiljning från ' + P.beccsAr + ', −' + nf(P.beccsMinskning) + ' %' : 'utan Sysavs koldioxidavskiljning') + '), vägtrafiken fordonsflottans klimatfaktor ' + fl + ' för 2030 / 2040 / 2050 och trafikförändringen ' + nf(P.trafikForandring2050) + ' % till 2050, och elen elens klimatfaktor. ' +
-      'De ändras under <button type="button" class="link-btn" data-go="parameters">Antaganden &amp; scenario</button>. Trafiken räknas alltid territoriellt med Vägvis modell A, oavsett perspektivet i sidomenyn.</p></article>';
+      'De ändras under <button type="button" class="link-btn" data-go="parameters">Antaganden &amp; scenario</button>. Trafiken räknas alltid territoriellt med Vägvis modell A, oavsett perspektivet i sidomenyn.' +
+      (vy === 'jamfor' ? '' : ' Jämför med de andra räknesätten under <button type="button" class="link-btn" data-go="jamfor">Jämför räknesätten</button>.') + '</p></article>';
   }
 
   /* ----- sidan GHG Protocol for Cities ----- */
@@ -351,11 +477,71 @@
       '<p><b>Prognos.</b> Energisektorn börjar på ' + START + ' års värde och följer fjärrvärmens klimatfaktor i Road2Zero-OP, med Sysavs koldioxidavskiljning om den är vald. Den följer alltså inte Malmös värmebehov, eftersom avfallet bränns oavsett. Vägtrafiken är Road2Zero-OP:s egen beräkning (Vägvis modell A, avgaser) med fordonsflottans klimatfaktor, trafikförändringen och de nya invånarnas trafik. Övriga sektorer börjar på ' + START + ' års värde och förändras med en egen takt per år från ' + FORANDRING_FRAN + '. Negativa utsläpp räknas inte, som i Malmös koldioxidbudget.</p></article>';
   }
 
+  /* ----- sidan Jämför räknesätten ----- */
+  const period = J => J.fran === J.till ? String(J.fran) : J.fran + '–' + J.till;
+  const pct = (a, b) => b > 0 ? nf(100 * a / b, 0) + ' %' : '–';
+  const AV = {op: 'klimatavtrycket', terr: 'det territoriella', gpc: 'GPC'};
+  function jamforHtml(ctx, B, res) {
+    const J = jamforelse(res, jamforUrval(ctx.R.years)), per = period(J), ack = J.lage === 'period', niva = NIVAER[J.j.niva];
+    const omf = {op: 'Energi i byggnaderna, trafikens livscykel, nybyggnation och mark',
+      terr: 'Utsläpp inom stadens gräns (scope 1)',
+      gpc: J.j.niva === 'plus' ? 'Scope 1 och el i scope 2 i alla fem kategorier' : 'Byggnader och transport (scope 1 + 2) och avfall (scope 1)'};
+    const tot = J.metoder.map(m => m.total), hogst = Math.max(...tot), lagst = Math.min(...tot);
+    let h = '<section class="r2zr-kpis r2zs-kpis4">' +
+      J.metoder.map(m => kort(esc(m.kort) + ' ' + per, kt(m.total, 0) + '<small> kt CO₂e</small>', nf(m.perPerson, 2) + (ack ? ' t per invånare och år i snitt. ' : ' t per invånare. ') + omf[m.id])).join('') +
+      kort('Gemensamt för alla tre', kt(J.gemensamt.t, 0) + '<small> kt CO₂e</small>', esc(J.gemensamt.kallor.join(', ')) + ': ' + J.metoder.map(m => pct(J.gemensamt.t, m.total) + ' av ' + AV[m.id]).join(', ').replace(/, ([^,]*)$/, ' och $1'), true) + '</section>';
+    if (ctx.P.perspektiv === 'B' && ctx.Rvald) {
+      const b = ctx.M.cityByYear(ctx.Rvald).filter(r => r.year >= J.fran && r.year <= J.till).reduce((s, r) => s + r.total, 0);
+      h += '<div class="notice info">Sidomenyn visar perspektiv B, hushållens bilar. Här räknas klimatavtrycket med perspektiv A, trafiken på stadens vägar, så att avgaserna avser samma trafik i alla tre räknesätten. Med perspektiv B är klimatavtrycket ' + kt(b, 0) + ' kt ' + per + '.</div>';
+    }
+    h += '<article class="card r2zr-paris"><h2>Samma stad, samma antaganden, tre svar</h2><p>Räknesätten bygger på samma beräkning av ' + esc(B.stad || 'staden') + ' med samma antaganden. De skiljer sig i <b>systemgränsen</b>, alltså vilka utsläpp som räknas och var. ' +
+      'Klimatavtrycket följer det som stadens byggnader, trafik och utbyggnad orsakar, även utanför staden. Den territoriella bokföringen räknar det som släpps ut inom stadens gräns, oavsett vem som orsakar det. GHG Protocol for Cities lägger till den el som används i staden. ' +
+      (ack ? 'Ackumulerat ' : 'År ') + per + ' skiljer det ' + kt(hogst - lagst, 0) + ' kt mellan högsta och lägsta, och bara ' + kt(J.gemensamt.t, 0) + ' kt ingår i alla tre.</p></article>';
+    h += '<article class="card r2zr-fig" id="r2zs-jmf-staplar"></article>';
+    // vad som ingår i vilket räknesätt
+    const farg = id => DELAR.find(d => d.id === id).farg;
+    const d = ack ? 0 : 1, cellJ = (k, m) => k.ingar[m] ? '<td class="numeric">' + kt(k.t, d) + (m === 'gpc' && k.gpcKod ? '<span class="r2zs-kod">' + esc(k.gpcKod) + '</span>' : '') + '</td>'
+      : '<td class="r2zs-ute">' + esc(k.ute[m] || 'Ingår inte.') + '</td>';
+    h += '<article class="card"><h2>Vad som ingår i vilket räknesätt, ' + (ack ? 'ackumulerat ' : '') + per + ' (kt CO₂e)</h2><p class="small">Ett värde betyder att utsläppskällan ingår; annars står var den hamnar i stället. Färgen visar delen i stapeldiagrammet.</p>' +
+      '<div class="table-wrap r2zs-full"><table class="r2zs-tab r2zs-jmf"><thead><tr><th>Utsläppskälla</th>' + J.metoder.map(m => '<th class="numeric">' + esc(m.namn) + '</th>').join('') + '<th>Vad översiktsplanen kan påverka (bedömning)</th></tr></thead><tbody>' +
+      J.kallor.map(k => '<tr><td><i class="r2zs-farg" style="background:' + farg(k.del) + '"></i>' + esc(k.namn) + '</td>' + METODER.map(m => cellJ(k, m.id)).join('') + '<td class="r2zs-not">' + esc(k.op) + '</td></tr>').join('') +
+      '<tr class="r2zs-sum"><td>Summa</td>' + J.metoder.map(m => '<td class="numeric">' + kt(m.total, d) + '</td>').join('') + '<td></td></tr>' +
+      '<tr><td>Per invånare' + (ack ? ' och år, snitt' : '') + ', t CO₂e</td>' + J.metoder.map(m => '<td class="numeric">' + nf(m.perPerson, 2) + '</td>').join('') + '<td></td></tr>' +
+      '<tr><td>Ingår inte i något av räknesätten</td><td colspan="3" class="r2zs-ute">Mat, varor och tjänster, flygresor, offentlig konsumtion och investeringar utöver nybyggnationen. De ingår i det konsumtionsbaserade fotavtrycket per invånare (Konsumtionskompassen), som sidan Resultat &amp; klimatbudget använder för att fördela budgeten.</td><td class="r2zs-not">Liten direkt.</td></tr>' +
+      '</tbody></table></div></article>';
+    h += '<article class="card r2zr-fig" id="r2zs-jmf-brygga"></article>';
+    h += ack ? '<section class="grid2 grid-even"><article class="card r2zr-fig" id="r2zs-jmf-tid"></article><article class="card r2zr-fig" id="r2zs-jmf-kum"></article></section>'
+      : '<article class="card r2zr-fig" id="r2zs-jmf-tid"></article>';
+    // vilket mål hör till vilket räknesätt
+    const mt = B.mal.territoriellt, mm = B.mal.mission, K = B.mal.koldioxidbudget;
+    const fraga = {op: 'Vilka utsläpp orsakar stadens byggnader, trafik och utbyggnad, var de än uppstår?',
+      terr: 'Hur mycket släpps ut inom stadens gräns?',
+      gpc: 'Hur mycket släpps ut inom stadens gräns, och hur mycket orsakar den el som används i staden?'};
+    const mal = {op: 'Parisavtalets koldioxidbudget för 1,5–2,0 °C, lika per invånare (Forster m.fl. 2026) och fördelad på kategorierna enligt Konsumtionskompassen.',
+      terr: esc(B.stad || 'Stadens') + 's mål: −' + mt.minskning_pct + '\u00a0% till ' + mt.ar + ' jämfört med ' + mt.basar + ' (' + kalla(B, mt.kalla) + '), och koldioxidbudgeten ' + nf(K.kt) + ' kt för ' + K.start + '–' + K.slut + ' (' + kalla(B, K.kalla) + ').',
+      gpc: 'EU-missionen 100 klimatneutrala och smarta städer: minst −' + mm.minskning_pct + '\u00a0% till ' + mm.ar + ' och högst ' + mm.kvarvarande_max_pct + '\u00a0% kvarvarande utsläpp, som neutraliseras (' + kalla(B, mm.kalla) + ').'};
+    h += '<article class="card"><h2>Räknesätten svarar på olika frågor och följs upp mot olika mål</h2><div class="table-wrap r2zs-full"><table class="r2zs-tab"><thead><tr><th>Räknesätt</th><th>Frågan det svarar på</th><th>Mål och budget som hör till</th><th>Mer på sidan</th></tr></thead><tbody>' +
+      J.metoder.map(m => '<tr><td>' + esc(m.namn) + '</td><td class="r2zs-not">' + fraga[m.id] + '</td><td class="r2zs-not">' + mal[m.id] + '</td><td><button type="button" class="link-btn" data-go="' + m.sida + '">' + esc(m.sidnamn) + '</button></td></tr>').join('') +
+      '</tbody></table></div></article>';
+    return h + metodJmf(ctx, B, J, niva);
+  }
+  function metodJmf(ctx, B, J, niva) {
+    return '<article class="card method-text"><h2>Systemgränser i en översiktsplan</h2>' +
+      '<p>En översiktsplan påverkar framför allt var och hur mycket som byggs, hur marken används och hur mycket trafik staden får. Det syns främst i klimatavtrycket: nybyggnationen, marken och trafikens bränsle och fordon ingår bara där. ' +
+      'Den territoriella bokföringen domineras i stället av utsläpp som planen påverkar lite: el- och värmeproduktionen, främst förbränningen av avfall, och industrin, sjöfarten och arbetsmaskinerna. GHG Protocol for Cities lägger till elen som används i staden, men inte byggmaterialen, bränslets produktion eller fordonen.</p>' +
+      '<p>Ett enda räknesätt ger därför en ofullständig bild. Den territoriella siffran visar inte det mesta av det planen påverkar, och klimatavtrycket kan inte följas upp direkt mot stadens mål, som gäller de territoriella utsläppen. Sidan ställer de tre bredvid varandra med samma antaganden, och bryggan visar steg för steg vad som skiljer dem.</p>' +
+      '<h3>Så räknas jämförelsen</h3><p>Alla tre räknas år för år med antagandena under <button type="button" class="link-btn" data-go="parameters">Antaganden &amp; scenario</button> och samma trafik: Vägvis modell A, trafiken på stadens vägar, även när sidomenyn visar perspektiv B. ' +
+      'Klimatavtrycket omfattar alla fyra kategorier och både befintlig stad och exploateringen, oavsett urvalet på sidan Resultat &amp; klimatbudget. GHG Protocol for Cities visas som ' + niva + (J.j.niva === 'plus' ? ', med IPPU och AFOLU som i klimatkontraktet' : ', utan IPPU och AFOLU') + '. ' +
+      'Ackumulerat är summan av årens utsläpp. Per invånare är medelvärdet av årens utsläpp per invånare, med stadens invånare och de nya invånarna år för år, som på sidan Resultat &amp; klimatbudget. ' +
+      'Alla år är modellvärden, även ' + START + ' och ' + (START + 1) + '; skillnaden mot Miljöbarometerns utfall förklaras på sidan Stadens klimatbokföring. Kolumnen om översiktsplanen är en kvalitativ bedömning (modellval).</p>' +
+      '<p class="small"><button type="button" class="secondary" id="r2zs-jmf-csv">De tre räknesätten och utsläppskällorna per år · CSV</button></p></article>';
+  }
+
   function html(ctx, B, vy) {
     if (!st) st = urvalStart();
     if (!ctx.R.years.includes(st.ar)) st.ar = 2030;
     const res = berakna(ctx.M, ctx.S, ctx.R, B, st);
-    return panel(ctx, B, vy) + (vy === 'gpc' ? gpcHtml(ctx, B, res) : bokfHtml(ctx, B, res));
+    return panel(ctx, B, vy) + (vy === 'gpc' ? gpcHtml(ctx, B, res) : vy === 'jamfor' ? jamforHtml(ctx, B, res) : bokfHtml(ctx, B, res));
   }
 
   function rita(ctx, B, vy) {
@@ -380,6 +566,44 @@
         {type: 'bar', orientation: 'h', name: 'Road2Zero-OP ' + START, y, x: s.map(x => (x.modellS1 + x.modellS2) / 1000), marker: {color: '#1f5a6e'}, text: s.map(x => kt(x.modellS1 + x.modellS2, 0)), textposition: 'outside', cliponaxis: false, hovertemplate: '%{y}: %{x:,.1f} kt<extra>Road2Zero-OP</extra>'},
         {type: 'bar', orientation: 'h', name: 'Klimatkontraktet ' + res.cccAr, y, x: s.map(x => (x.cccS1 + x.cccS2) / 1000), marker: {color: '#bcd3db', line: {color: '#7d939d', width: 1}}, text: s.map(x => kt(x.cccS1 + x.cccS2, 0)), textposition: 'outside', cliponaxis: false, hovertemplate: '%{y}: %{x:,.1f} kt<extra>Klimatkontraktet</extra>'},
         {type: 'bar', orientation: 'h', name: 'Miljöbarometern ' + res.cccAr + ' (scope 1)', y, x: s.map(x => x.mbS1 / 1000), marker: {color: '#a3c27a'}, text: s.map(x => kt(x.mbS1, 0)), textposition: 'outside', cliponaxis: false, hovertemplate: '%{y}: %{x:,.1f} kt<extra>Miljöbarometern</extra>'}], l2);
+    } else if (vy === 'jamfor') {
+      const J = jamforelse(res, jamforUrval(ctx.R.years)), per = period(J), ack = J.lage === 'period', namn = J.metoder.map(m => m.kort);
+      // 1. staplar: tre räknesätt, uppdelade på delarna
+      const maxT = Math.max(...J.metoder.map(m => m.total));
+      const data = DELAR.filter(d => J.metoder.some(m => m.delar[d.id] > 0)).map(d => ({type: 'bar', orientation: 'h', name: d.namn, y: namn, x: J.metoder.map(m => m.delar[d.id] / 1000),
+        marker: {color: d.farg, line: {color: SURF, width: 2}}, text: J.metoder.map(m => m.delar[d.id] >= 0.08 * maxT ? kt(m.delar[d.id], 0) : ''),
+        textposition: 'inside', insidetextanchor: 'middle', textfont: {color: textfarg(d.farg), size: 12}, hovertemplate: '%{y} · ' + d.namn + ': %{x:,.0f} kt<extra></extra>'}));
+      const l = layout('Samma stad, tre systemgränser', (ack ? 'Ackumulerat ' : '') + per + ', kt CO₂e · samma färg är samma utsläpp i flera räknesätt', 400, '');
+      l.barmode = 'stack'; l.bargap = 0.3; l.hovermode = 'closest'; l.margin = {l: 10, r: 20, t: 72, b: 10};
+      l.yaxis = {gridcolor: 'rgba(0,0,0,0)', autorange: 'reversed', automargin: true, ticks: '', tickfont: {size: 13, color: INK}};
+      l.xaxis = {...l.xaxis, showgrid: true, gridcolor: GRID, title: {text: ''}, tickformat: ',.0f', range: [0, maxT / 1000 * 1.13]};   // enheten står i undertiteln
+      l.annotations = J.metoder.map(m => ({x: m.total / 1000, y: m.kort, text: '<b>' + kt(m.total, 0) + ' kt</b>', showarrow: false, xanchor: 'left', xshift: 6, font: {color: INK, size: 13}}));
+      l.legend = {...l.legend, y: -0.2};
+      plot('r2zs-jmf-staplar', data, l);
+      // 2. brygga (vattenfall)
+      const b = J.brygga, etikett = s => s.summa ? '<b>' + esc(J.metoder.find(m => m.id === s.metod).kort) + '</b>' : radbryt(s.text, 46);
+      const lb = layout('Från klimatavtrycket till ' + esc(J.metoder[2].kort) + ', ' + (ack ? 'ackumulerat ' : '') + per, 'Steg för steg: vad som tas bort och läggs till när systemgränsen ändras, kt CO₂e', 90 + 44 * b.length, '');
+      lb.hovermode = 'closest'; lb.showlegend = false; lb.margin = {l: 10, r: 70, t: 72, b: 10};
+      lb.yaxis = {gridcolor: 'rgba(0,0,0,0)', autorange: 'reversed', automargin: true, ticks: '', tickfont: {size: 12, color: INK}};
+      lb.xaxis = {...lb.xaxis, showgrid: true, gridcolor: GRID, title: {text: 'kt CO2e'}, tickformat: ',.0f', rangemode: 'tozero'};
+      plot('r2zs-jmf-brygga', [{type: 'waterfall', orientation: 'h', y: b.map(etikett), x: b.map(s => s.summa ? 0 : s.t / 1000).map((v, i) => i === 0 ? b[0].t / 1000 : v),
+        measure: b.map((s, i) => i === 0 ? 'absolute' : s.summa ? 'total' : 'relative'), text: b.map(s => s.summa ? kt(s.t, 0) : (s.t > 0 ? '+' : '−') + kt(Math.abs(s.t), 0)),
+        textposition: 'outside', cliponaxis: false, increasing: {marker: {color: '#5c6f78'}}, decreasing: {marker: {color: '#bcd3db'}}, totals: {marker: {color: '#1f5a6e'}},
+        connector: {line: {color: LINJE, width: 1}}, hovertemplate: '%{text} kt<extra></extra>'}], lb);
+      // 3. per år och 4. ackumulerat
+      const ar = res.rader.map(x => x.ar), linje = m => ({type: 'scatter', mode: 'lines', name: m.kort, line: {color: m.farg, width: 2.5, dash: m.dash}, hovertemplate: m.kort + ': %{y:,.0f} kt<extra></extra>'});
+      const lt = layout('Utsläpp per år', ar[0] + '–' + ar[ar.length - 1] + ', kt CO₂e per år · ' + (ack ? 'skuggat: ' : 'markerat: ') + per, 420);
+      lt.xaxis = {...lt.xaxis, dtick: 5, range: [ar[0] - 0.5, ar[ar.length - 1] + 0.5]};
+      lt.shapes = [ack ? {type: 'rect', x0: J.fran - 0.5, x1: J.till + 0.5, yref: 'paper', y0: 0, y1: 1, fillcolor: rgba(GRID, 0.55), line: {width: 0}, layer: 'below'}
+        : {type: 'line', x0: J.fran, x1: J.fran, yref: 'paper', y0: 0, y1: 1, line: {color: INK2, width: 1.5, dash: 'dot'}}];
+      plot('r2zs-jmf-tid', J.metoder.map(m => ({...linje(m), x: ar, y: m.perAr.map(v => v / 1000)})), lt);
+      if (ack) {
+        const kum = m => { let s = 0; return J.ar.map(a => (s += m.perAr[ar.indexOf(a)]) / 1000); };
+        const lk = layout('Ackumulerade utsläpp ' + per, 'kt CO₂e från ' + J.fran, 420);
+        lk.margin = {l: 10, r: 80, t: 72, b: 10};
+        lk.annotations = J.metoder.map(m => ({x: J.till, y: m.total / 1000, text: kt(m.total, 0), showarrow: false, xanchor: 'left', xshift: 6, font: {color: m.farg, size: 12}}));
+        plot('r2zs-jmf-kum', J.metoder.map(m => ({...linje(m), x: J.ar, y: kum(m)})), lk);
+      }
     } else {
       const T = B.territoriell, m = res.mal;
       const data = SEKTORER.map(s => ({type: 'scatter', mode: 'lines', stackgroup: 'p', name: s.namn, x: ar, y: res.rader.map(x => x.sek[s.id] / 1000), line: {width: 0.5, color: s.farg}, fillcolor: rgba(s.farg, 0.85), hovertemplate: s.namn + ': %{y:,.1f} kt<extra></extra>'}));
@@ -414,17 +638,33 @@
     return '﻿' + [huvud.join(';'), ...rader].join('\n') + '\n';
   }
 
+  /* De tre räknesätten och utsläppskällorna per år, i t CO2e. */
+  function csvJamfor(ctx, B) {
+    const res = berakna(ctx.M, ctx.S, ctx.R, B, st), tal1 = v => String(Math.round(v * 10) / 10).replace('.', ',');
+    const m = niva => jamforelse(res, {lage: 'period', p0: res.rader[0].ar, p1: res.rader[res.rader.length - 1].ar, niva}).metoder;
+    const plus = m('plus'), basic = m('basic');
+    const huvud = ['ar', 'invanare', 'klimatavtryck_t', 'territoriellt_t', 'gpc_basic_t', 'gpc_basic_plus_t', ...KALLOR.map(k => k.id + '_t')];
+    const rader = res.rader.map((x, i) => [x.ar, Math.round(x.inv), tal1(plus[0].perAr[i]), tal1(plus[1].perAr[i]), tal1(basic[2].perAr[i]), tal1(plus[2].perAr[i]), ...KALLOR.map(k => tal1(k.v(x)))].join(';'));
+    return '\ufeff' + [huvud.join(';'), ...rader].join('\n') + '\n';
+  }
+  const ladda = (text, fil) => { const b = new Blob([text], {type: 'text/csv'}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = fil; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
+
   function bind(ctx, B, vy, rerender) {
     if (!st) st = urvalStart();
     const om = () => { spara(); rerender(); };
     document.querySelectorAll('[data-r2zs-takt]').forEach(el => el.onchange = () => { const v = Number(String(el.value).replace(',', '.')); st.r[el.dataset.r2zsTakt] = Number.isFinite(v) ? Math.max(-50, Math.min(50, v)) : 0; om(); });
     document.querySelectorAll('[data-r2zs]').forEach(el => el.onchange = () => { if (el.dataset.r2zs === 'ar') st.ar = Number(el.value); om(); });
+    document.querySelectorAll('[data-r2zs-lage]').forEach(el => el.onclick = () => { st.j.lage = el.dataset.r2zsLage; om(); });
+    document.querySelectorAll('[data-r2zs-j]').forEach(el => el.onchange = () => { const k = el.dataset.r2zsJ; st.j[k] = k === 'niva' ? el.value : Number(el.value); om(); });
     const c = document.getElementById('r2zs-csv');
-    if (c) c.onclick = () => { const b = new Blob([csv(ctx, B)], {type: 'text/csv'}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'road2zero_op_stadens_redovisning.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
+    if (c) c.onclick = () => ladda(csv(ctx, B), 'road2zero_op_stadens_redovisning.csv');
+    const cj = document.getElementById('r2zs-jmf-csv');
+    if (cj) cj.onclick = () => ladda(csvJamfor(ctx, B), 'road2zero_op_tre_raknesatt.csv');
     rita(ctx, B, vy);
     const omMat = () => document.querySelectorAll('.r2zr-fig.js-plotly-plot').forEach(el => { try { Plotly.Plots.resize(el); } catch (e) { /* diagrammet är borta */ } });
     if (typeof Plotly !== 'undefined') { requestAnimationFrame(omMat); setTimeout(omMat, 250); }
   }
 
-  return {START, FORANDRING_FRAN, SEKTORER, GPC, DETALJ, ELKAT, TAKTER, TABELL, standard, berakna, forklaringTerr, forklaringGpc, html, bind, csv};
+  return {START, FORANDRING_FRAN, SEKTORER, GPC, DETALJ, ELKAT, TAKTER, TABELL, METODER, DELAR, KALLOR, NIVAER, standard, berakna, jamforStandard, jamforelse,
+    forklaringTerr, forklaringGpc, html, bind, csv, csvJamfor};
 });

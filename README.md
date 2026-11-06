@@ -8,7 +8,7 @@ kartor med DeSO-områden och OpenStreetMap i bakgrunden.
 
 | Modell | Huvudfil | Använd när du vill … |
 |---|---|---|
-| **Road2Zero-OP** | `op/streamlit_app.py` | se hela stadens klimatavtryck per DeSO enligt översiktsplanen: energi i befintliga byggnader, mobilitet och utbyggnaden 2030–2050. Ett projekt per stad i `op/projekt/`; först **Malmö_ÖP**. |
+| **Road2Zero-OP** | `op/streamlit_app.py` | se hela stadens klimatavtryck per DeSO enligt översiktsplanen: energi i befintliga byggnader, mobilitet och utbyggnaden 2030–2050, och jämföra klimatavtrycket med stadens territoriella bokföring och GHG Protocol for Cities. Ett projekt per stad i `op/projekt/`; först **Malmö_ÖP**. |
 | **Road2Zero-Plan** | `plan/streamlit_app.py` | analysera en plan i detalj (till exempel Jägersro): tio klimatkategorier år för år mot en koldioxidbudget. |
 | **Road2Zero-CityScenario** | `cityscenario/streamlit_app.py` | testa planer mot varandra, i samma eller olika stadsdelar, med rättvis jämförelse. Indata från JSON eller Excel. |
 

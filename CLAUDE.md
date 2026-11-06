@@ -161,6 +161,9 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   Miljöbarometern och klimatkontraktet, kalibreras inte. Mål 2030 mot 1990: −70 % (staden), −80 % (EU-missionen); budget 6 600 kt.
   Resultaten redovisas i de officiella kategorierna (0.13.1): klimatkontraktets fem kategorier × scope, GPC:s undersektorer med IE/NE,
   Miljöbarometerns åtta sektorer; skillnaderna förklaras per kategori och en brygga går från OP:s klimatavtryck till territoriellt och GPC.
+  Jämför räknesätten (0.15.0, vy `jamfor` i `stad.js`, sida 05): `jamforelse(res, j)` summerar utsläppskällorna (`KALLOR`) per
+  räknesätt för en period (standard 2027–2050) eller ett år, GPC som BASIC+ (standard) eller BASIC. Klimatavtrycket med perspektiv A
+  och alla kategorier; per invånare = medel av årens värden. Kolumnen om vad översiktsplanen kan påverka är en bedömning (modellval).
 
 ## Kända osäkerheter
 

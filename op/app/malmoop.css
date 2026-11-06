@@ -122,6 +122,14 @@ td.iv{color:var(--muted)}
 .r2zr-fig{padding:0;margin:0 0 16px;min-height:220px;overflow:hidden}
 .r2zr-paris{border-left:4px solid var(--teal);margin-bottom:16px}
 .r2zr-paris p{font-size:12.5px;max-width:980px}
+.r2zs-kpis4{grid-template-columns:repeat(3,1fr) 1.2fr}
+.r2zs-farg{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px;vertical-align:-1px}
+.r2zs-tab td.r2zs-ute{white-space:normal;font-size:11.5px;line-height:1.4;color:var(--muted,#56635e);min-width:150px;max-width:240px}
+.r2zs-kod{display:block;font-size:10px;font-weight:400;color:var(--muted,#56635e);margin-top:2px}
+.r2zs-jmf th.numeric{min-width:130px;max-width:170px}
+.r2zs-jmf td.numeric{vertical-align:top}
+.r2zs-jmf td:first-child{white-space:normal;min-width:190px;max-width:280px}
+.r2zs-jmf td.r2zs-not{min-width:200px;max-width:320px}
 @media(max-width:1150px){.r2zr-kpis{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:720px){.r2zr-kpis{grid-template-columns:1fr}}
 /* stadens klimatredovisning (stad.js) */

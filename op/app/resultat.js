@@ -195,7 +195,8 @@
       '<label class="field">till<select data-r2zr="p1">' + ar.map(y => opt(y, y, st.period[1])).join('') + '</select></label>' +
       '<label class="field">Temperaturgräns<select data-r2zr="temp">' + temps.map(t => opt(t, t + ' °C', st.temp)).join('') + '</select></label>' +
       '<label class="field">Sannolikhet att hålla gränsen<select data-r2zr="sann">' + SANNOLIKHETER.map(p => opt(p, p + ' %', st.sann)).join('') + '</select></label>' +
-      '</div>' + tilldelningRad(B) + '<p class="small">Mobiliteten följer perspektivet i sidomenyn (' + esc(ctx.mobLabel) + '). Klimatbudgeten gäller från 2026; år före 2026 visas men får ingen budgetandel och räknas inte in i jämförelsen med budgeten.</p></article>';
+      '</div>' + tilldelningRad(B) + '<p class="small">Mobiliteten följer perspektivet i sidomenyn (' + esc(ctx.mobLabel) + '). Klimatbudgeten gäller från 2026; år före 2026 visas men får ingen budgetandel och räknas inte in i jämförelsen med budgeten. ' +
+      'Klimatavtrycket ställs mot stadens territoriella bokföring och GHG Protocol for Cities under <button type="button" class="link-btn" data-go="jamfor">Jämför räknesätten</button>.</p></article>';
   }
 
   function byggandelVisad(B) { return st.byggandel == null ? Number((100 * standardByggandel(B)).toFixed(1)) : st.byggandel; }
