@@ -50,8 +50,8 @@ python -m streamlit run op/streamlit_app.py
 |---|---|
 | 01 Översikt | Nyckeltal, klimatavtryckets delar, utveckling 2024–2050 och energins osäkerhet (histogram och 95 %-intervall) |
 | 02 Resultat & klimatbudget | Samma resultatvy som Road2Zero-Plan: summa per klimatkategori, från brutto till summa, trädkarta, över tid, per person, klimatbudget för 1,5–2,0 °C (Parisavtalet, Forster m.fl. 2026) med budgettilldelning enligt Konsumtionskompassen, tabeller med CSV och källor. Kategorier och befintlig stad/exploatering väljs överst. |
-| 03 GHG Protocol for Cities | Stadens utsläpp per GPC-sektor och scope 1, 2 och 3 med BASIC och BASIC+, prognos 2024–2050 och spegling mot klimatkontraktets inventering med EU-missionen (data för 2022) |
-| 04 Stadens klimatbokföring | Territoriella utsläpp per sektor som i Miljöbarometern: utfall 1990–2025, prognos till 2050, målen −70 % (staden) och −80 % (EU-missionen) 2030, koldioxidbudgeten 2021–2030 och spegling mot Miljöbarometern 2024 |
+| 03 GHG Protocol for Cities | Stadens utsläpp i klimatkontraktets kategorier (Byggnader, Transport, Avfall, IPPU, AFOLU × scope 1, 2 och 3) och i GPC:s undersektorer med notationsnycklar, BASIC och BASIC+, prognos 2024–2050 och spegling mot klimatkontraktet 2022 med förklaring per kategori |
+| 04 Stadens klimatbokföring | Territoriella utsläpp i Miljöbarometerns åtta sektorer med deras innehåll: utfall 1990–2025, prognos till 2050, målen −70 % (staden) och −80 % (EU-missionen) 2030, koldioxidbudgeten 2021–2030, spegling mot Miljöbarometern 2024 med förklaring per sektor och en brygga från OP:s klimatavtryck till territoriellt och GPC |
 | 05 Karta & områden | Koropletkarta (OSM-bakgrund, havsavskiljning, utbyggnadsområden), områdespanel och tabell över alla 209 DeSO, med 95 %-intervall för energin |
 | 06 Så räknas resultatet | Beräkningen steg för steg med siffror för vald DeSO, inklusive deklarationerna och de skattade byggnaderna |
 | 07 Antaganden & scenario | Emissionsfaktorer över tid (el, fjärrvärme, Sysavs koldioxidavskiljning och klimattrappa för nybyggnation) och alla övriga antaganden med källor; ändringar sparas i webbläsaren |
@@ -147,7 +147,7 @@ Kalibreringen räknas om i varje iteration. Intervallen för framtida år skalas
 ```bash
 node tests/test_model.js                 # 28 beräkningstester (massbalans, kalibrering, Monte Carlo, räkneexempel, enheter, tidsplan …)
 node tests/test_resultat.js              # 11 tester för Resultat & klimatbudget
-node tests/test_stad.js                  # 9 tester för GHG Protocol for Cities och stadens klimatbokföring
+node tests/test_stad.js                  # 13 tester för GHG Protocol for Cities och stadens klimatbokföring
 python -m unittest discover tests        # 13 tester av sidbygge, data, byggnadsbestånd och uppdateringsflöde
 ```
 
@@ -190,7 +190,8 @@ tests/                     beräknings- och apptester
 * Malmö stad (2024) *OP2023_Underlag – Utbyggnadsområden*. https://gis.malmo.se/arcgis/rest/services/op/OP2023_Underlag/MapServer/129 (Hämtad: 29 oktober 2026).
 * Malmö stad (2025a) *Uppföljning 2025 – Malmös koldioxidbudget*. Miljöförvaltningen, 23 oktober 2025. https://malmo2.miljobarometern.se/content/docs/uppfoljning-2025-malmos-koldioxidbudget.pdf (Hämtad: 6 november 2026).
 * Malmö stad (2025b) *Miljöredovisning 2024*. https://malmo2.miljobarometern.se/content/docs/miljoredovisning-2024.pdf (Hämtad: 6 november 2026).
-* Malmö stad (2026) *Territoriella växthusgasutsläpp*. Miljöbarometern, uppdaterad 11 juni 2026. https://malmo2.miljobarometern.se/klimat/utslapp-av-vaxthusgaser/vaxthusgasutslapp/table/ (Hämtad: 6 november 2026).
+* Malmö stad (2026a) *Territoriella växthusgasutsläpp*. Miljöbarometern, uppdaterad 11 juni 2026, med *Beskrivning av datakällor som använts för utsläppsstatistiken* (uppdaterad 20 november 2023). https://malmo2.miljobarometern.se/klimat/utslapp-av-vaxthusgaser/vaxthusgasutslapp/table/ (Hämtad: 6 november 2026).
+* Malmö stad (2026b) *Fjärrvärmens växthusgasutsläpp*. Miljöbarometern, uppdaterad 2 oktober 2026. https://malmo2.miljobarometern.se/klimat/utslapp-av-vaxthusgaser/fjarrvarmens-koldioxidutslapp/ (Hämtad: 6 november 2026).
 * Malmö stad (u.å.a) *Malmo_adresser_platser* (GeocodeServer). https://gis.malmo.se/arcgis/rest/services/Malmo_adresser_platser/GeocodeServer (Hämtad: 29 oktober 2026).
 * Malmö stad (u.å.b) *Malmö Energikarta*. https://stadsatlas.malmo.se/energikarta/ (Hämtad: 29 oktober 2026).
 * Malmö stad (u.å.c) *2030 Climate Neutrality Action Plan of Malmö* (klimatkontraktet med EU-missionen). https://netzerocities.app/_content/files/knowledge/4189/malmo_nzc_ccc_ok.pdf (Hämtad: 6 november 2026).
@@ -212,6 +213,7 @@ tests/                     beräknings- och apptester
 
 | Version | Datum | Innehåll |
 |---|---|---|
+| 1.3.0 (Road2Zero 0.13.1) | 6 november 2026 | Sidorna 03 och 04 redovisar i de officiella kategorierna: klimatkontraktets fem kategorier × scope och GPC:s undersektorer (I.1–V.2, med IE och NE; el i scope 2 fördelad efter SCB:s förbrukarkategorier), Miljöbarometerns åtta sektorer med deras innehåll. Skillnaderna mot de officiella siffrorna förklaras per kategori, och en brygga visar vägen från OP:s klimatavtryck (561,6 kt) till territoriellt (848,3 kt) och GPC BASIC+ (930,3 kt). Inga resultat ändrade. |
 | 1.3.0 (Road2Zero 0.13.0) | 6 november 2026 | Två nya sidor: GHG Protocol for Cities (sektor × scope, BASIC och BASIC+, spegling mot klimatkontraktet 2022) och Stadens klimatbokföring (territoriellt som Miljöbarometern, mål −70 % och −80 % 2030, koldioxidbudget 2021–2030). Trafiken alltid territoriellt (Vägvis A, avgaser); sektorer som OP inte räknar börjar på officiella värden 2024. Prognos 2030: 827 kt (−50 % mot 1990), budgeten förbrukad 2028. OP:s övriga beräkningar oförändrade. |
 | 1.3.0 (Road2Zero 0.12.1) | 5 november 2026 | Nybyggnationens andel av investeringarnas utsläpp är 21,1 % i stället för 100 %, härledd ur SCB:s miljöräkenskaper, bygginvesteringarna och Boverkets miljöindikatorer. Standard Malmö: 27,8 % av budgeten, 1,53 t per person mot 0,16 t (9,8 gånger), stadens budget 2 069 kt, förbrukad 2029. |
 | 1.3.0 (Road2Zero 0.12.0) | 5 november 2026 | Budgettilldelning: de valda kategorierna jämförs med sin andel av budgeten enligt Konsumtionskompassen (Malmö, Skåne eller Sverige 2022), egna andelar eller hela budgeten. Nybyggnationen hör till investeringarna. Standard Malmö: 46,8 % av budgeten, 1,53 t per person mot 0,26 t, förbrukad 2031. |

@@ -127,4 +127,14 @@ td.iv{color:var(--muted)}
 /* stadens klimatredovisning (stad.js) */
 .r2zs-tab tr.r2zs-sub td{color:var(--muted,#56635e);font-size:12.5px}
 .r2zs-tab tr.r2zs-sum td{font-weight:650;border-top:1px solid var(--line)}
-.r2zs-tab td:first-child{min-width:260px}
+.r2zs-tab td:first-child{min-width:220px}
+.r2zs-tab tr.r2zs-grupp td{border-top:1px solid var(--line);background:#f6f8f6}
+.r2zs-tab td.r2zs-why,.r2zs-tab td.r2zs-def{font-size:12px;line-height:1.45;color:#3d4a45;min-width:320px;max-width:560px;white-space:normal}
+.r2zs-full{max-height:none!important}
+.r2zs-tab th{white-space:normal;vertical-align:bottom;line-height:1.35}
+.r2zs-forklaring th.numeric{min-width:78px;max-width:110px}
+.r2zs-tab td.r2zs-not{white-space:normal;min-width:300px;font-size:12px;line-height:1.45}
+.r2zs-tab tr.r2zs-datarad td{border-bottom:0;padding-bottom:4px}
+.r2zs-tab tr.r2zs-whyrow td{white-space:normal;font-weight:400;color:#3d4a45;font-size:12px;line-height:1.55;padding-top:2px;padding-bottom:14px;max-width:1100px}
+.r2zs-tab tr.r2zs-whyrow:hover{background:none}
+.r2zs-nyckel{font-size:11px;font-weight:650;letter-spacing:.04em;color:#7d939d}

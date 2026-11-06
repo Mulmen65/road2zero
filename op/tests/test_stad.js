@@ -84,6 +84,42 @@ test('mål och koldioxidbudget', () => {
   assert.strictEqual(b.ar.length, 10);
 });
 
+test('officiella kategorier: Miljöbarometerns sektorer i dess ordning, klimatkontraktets fem kategorier', () => {
+  assert.deepStrictEqual(Z.TABELL, ['energi', 'industri', 'jordbruk', 'vagtrafik', 'sjofart', 'arbetsmaskiner', 'produkt', 'avfall']);
+  assert.deepStrictEqual(Object.keys(T.sektorer).sort(), Z.TABELL.slice().sort());
+  assert.deepStrictEqual(Z.GPC.map(g => g.ccc), B.gpc_klimatkontrakt.rader.map(r => r.id));
+});
+
+test('GPC:s undersektorer summerar till klimatkontraktets kategorier; elen fördelas efter SCB', () => {
+  for (const y of [2024, 2040]) {
+    const r = rad(res, y);
+    for (const g of Z.GPC) {
+      const d = r.detalj.filter(x => x.grupp === g.id), s = k => d.reduce((a, x) => a + (typeof x[k] === 'number' ? x[k] : 0), 0);
+      near(s('s1'), r.gpc[g.id].s1, 1e-6, g.id + ' scope 1 ' + y); near(s('s2'), r.gpc[g.id].s2, 1e-6, g.id + ' scope 2 ' + y); near(s('s3'), r.gpc[g.id].s3, 1e-6, g.id + ' scope 3 ' + y);
+    }
+    near(r.detalj.find(x => x.grupp === null).s3, r.bygg, 1e-9, 'övrigt scope 3 = nybyggnation');
+  }
+  const k = B.el_scb.kategorier, stat = B.el_scb.totalt - k.transporter;
+  near(res.elAndel.bostader, (k.smahus + k.flerbostadshus + k.fritidshus) / stat, 1e-6);
+  near(Object.values(res.elAndel).reduce((a, v) => a + v, 0), 1, 1e-6, 'andelarna täcker all el utom transporter');
+});
+
+test('bryggan: klimatavtrycket → territoriellt → GPC BASIC+', () => {
+  const b = res.brygga, rows = M.cityByYear(R), r = rad(res, 2024);
+  near(b[0].t, rows[0].total, 1e-6, 'start = sidan Resultat & klimatbudget, perspektiv A');
+  const steg = (i, j) => b.slice(i, j).reduce((a, x) => a + x.t, 0);
+  near(b[0].t + steg(1, 7), b[7].t, 1e-6, 'till territoriellt'); near(b[7].t, r.terr, 1e-6);
+  near(b[7].t + steg(8, 10), b[10].t, 1e-6, 'till BASIC+'); near(b[10].t, r.basicPlus, 1e-6);
+  near(-(b[1].t + b[2].t), D.mob.stad.A.wtt + D.mob.stad.A.fordon, 1e-3, 'Vägvis uppströms och fordon');
+});
+
+test('förklaringarna bygger på underlaget', () => {
+  const t = Z.forklaringGpc(B, res, 'II');
+  assert.ok(t.includes('Nationella emissionsdatabasen') && t.includes('ENVIMAN'), 'transportens källor');
+  assert.ok(Z.forklaringGpc(B, res, 'I').includes('55 g/kWh'), 'kontraktets implicita elfaktor');
+  assert.ok(Z.forklaringTerr(S, B, res, 'vagtrafik').includes('3,9 %'), 'vägtrafikens skillnad');
+});
+
 test('Road2Zero-OP:s egen beräkning är oförändrad', () => {
   const rows = M.cityByYear(R);
   near(rows[0].total, 561581.73, 0.05, 'OP 2024'); near(rows.find(r => r.year === 2050).total, 568831.55, 0.05, 'OP 2050');

@@ -156,6 +156,8 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   transporter × Boverkets elfaktor; industri, sjöfart/järnväg/flyg, arbetsmaskiner, produktanvändning, avfall och jordbruk börjar
   på Miljöbarometerns 2024 och förändras med egen takt (standard 0 %); energisektorn följer fjärrvärmens index. Speglas mot
   Miljöbarometern och klimatkontraktet, kalibreras inte. Mål 2030 mot 1990: −70 % (staden), −80 % (EU-missionen); budget 6 600 kt.
+  Resultaten redovisas i de officiella kategorierna (0.13.1): klimatkontraktets fem kategorier × scope, GPC:s undersektorer med IE/NE,
+  Miljöbarometerns åtta sektorer; skillnaderna förklaras per kategori och en brygga går från OP:s klimatavtryck till territoriellt och GPC.
 
 ## Kända osäkerheter
 
