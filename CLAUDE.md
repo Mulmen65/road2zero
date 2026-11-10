@@ -171,6 +171,10 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   Energi i byggnader valbar (0.16.0, `energiVal` 'med' (standard) | 'utan'): `aktiva(P)` i `model.js` styr vilka komponenter som ingår i
   `view().total`, `exploatering` och `cityByYear().total`; `totalAlla` tar alltid med alla. Komponenterna beräknas alltid. Lokaliseringskartan
   visas utan energi (användarens förslag till Malmö stad); laddelen ligger kvar i mobiliteten; sidorna 03–05 tar alltid med energin.
+  Fordonsflottan (0.16.1, `flottaVal` 'nv2026' (standard) | 'oforandrad' | 'egen'): mobiliteten delas i bränslekedja (ttw + wtt − el),
+  laddel och tillverkning ur Vägvis underlag. Bränslekedjan följer `UTV.flotta_nv2026` (Naturvårdsverket 2026, tabell 4, inrikes transporter
+  med beslutade styrmedel, delat med trafikarbetet +0,87 %/år enligt Trafikverket 2026; 2046–2050 som 2041–2045), laddelen elvalet och
+  tillverkningen `UTV.bilprod` (global el, IEA). 'oforandrad' och 'egen' skalar hela livscykelfaktorn som i 1.3. Standard 2050: 180,0 kt (A).
 
 ## Kända osäkerheter
 

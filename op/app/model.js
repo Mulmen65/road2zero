@@ -6,7 +6,7 @@
   else root.MalmoOP = factory();
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-  const VERSION = '1.4.0';
+  const VERSION = '1.4.1';
   const BASE_YEAR = 2024, END_YEAR = 2050;
   const YEARS = [2024, 2030, 2035, 2040, 2045, 2050];
   const ACK = [2030, 2050];
@@ -44,7 +44,13 @@
     el_wem: [-8.2, -1.69, -0.91, 0, 0],         // eget startvärde: Sveriges prognos med befintliga styrmedel (Naturvårdsverket, 2025)
     fv: [-1.63, -1.75, -1.92, -2.13, -2.38],
     insteg: [-5.71, -5.98, -1.44, -1.53, -1.23],
-    fardplan: [-9.24, -5.92, -1.65, -1.8, -0.97]
+    fardplan: [-9.24, -5.92, -1.65, -1.8, -0.97],
+    /* Fordonsflottan: bränslekedjans utsläpp (avgaser och bränslets produktion) per fordonskilometer. Sveriges scenario med
+       beslutade styrmedel för inrikes transporter (Naturvårdsverket, 2026, tabell 4: 16,7 Mt 2025, 13,8 år 2030, 10,6 år 2035,
+       6,2 år 2040 och 4,4 år 2045) delat med trafikarbetet (Trafikverket, 2026: lätta fordon +20 % 2024–2045, 0,87 % per år);
+       2046–2050 fortsätter takten 2041–2045 (härlett). Hela sektorns bana används för personbilarna (modellval). */
+    flotta_nv2026: [-4.58, -5.96, -10.95, -7.44, -7.44],
+    bilprod: [-3.7, -3.7, -3.7, -3.7, -3.7]      // fordonens tillverkning följer den globala elens klimatfaktor (IEA, 2026), som i Road2Zero-Plan
   };
   const TAKT = {el: 'elR', fv: 'fvR', bygg: 'byggR'};   // parameternamn elR1…elR5 osv., ett per period
   /* Elens klimatfaktor, tre val som i Road2Zero-Plan (road2zero/data/parametrar.csv och utveckling.csv; test_model.js kontrollerar):
@@ -89,7 +95,8 @@
     beccsAr: BECCS.ar, beccsMinskning: BECCS.minskning,
     // Mobilitet
     trafikForandring2050: 0,    // % förändrat trafikarbete i befintlig stad till 2050 (linjärt)
-    flotta2030: 1, flotta2040: 1, flotta2050: 1, // fordonsflottans klimatfaktor relativt 2024
+    flottaVal: 'nv2026',        // bränslekedjans klimatfaktor per fordonskilometer: 'nv2026' (beslutade styrmedel, standard) | 'oforandrad' | 'egen'
+    flotta2030: 1, flotta2040: 1, flotta2050: 1, // 'egen': bränslekedjans klimatfaktor relativt 2024, linjärt mellan åren
     // Exploatering 2030–2050 (ÖP 2023)
     exploatering: true,
     f1Start: 2030, f1Slut: 2040, f2Start: 2040, f2Slut: 2050,
@@ -121,7 +128,7 @@
     atempNy: [0.3, 1.2], energiNy: [0, 500], elandelNy: [0, 1], personerPerBostad: [0, 10], bilFaktor: [0, 5],
     andelKmInomMalmo: [0, 1], hardgorandel: [0, 1], kolAker: [0, 1000], kolOppen: [0, 1000], kolSkog: [0, 1000], kolBebyggd: [0, 1000]
   };
-  const ENUMS = {elVal: ['boverket', 'iea', 'egen'], perspektiv: ['A', 'B'], energiVal: ['med', 'utan'], bLage: ['local', 'gtfs'], atempLage: ['osm', 'fast'], elLage: ['kvot', 'fast'],
+  const ENUMS = {elVal: ['boverket', 'iea', 'egen'], perspektiv: ['A', 'B'], energiVal: ['med', 'utan'], flottaVal: ['nv2026', 'oforandrad', 'egen'], bLage: ['local', 'gtfs'], atempLage: ['osm', 'fast'], elLage: ['kvot', 'fast'],
     bestand: ['hela', 'deklarerade'], kalibrering: ['sektor', 'total', 'ingen'],
     klimatBygg: ['referens', 'gransvarde2030', 'bana', 'trappa', 'insteg', 'fardplan', 'egen'], markOkand: ['bebyggd', 'oppen', 'aker'],
     beccs: ['nej', 'ja']};
@@ -145,6 +152,8 @@
       for (let k = 1; k <= 5; k++) if (!har('elR' + k)) out['elR' + k] = UTV.el[k - 1];
     } else for (let k = 1; k <= 5; k++) if (!har('elR' + k)) out['elR' + k] = EL_ALT[out.elVal].takt[k - 1];
     out.efEl = out.elVal === 'egen' ? out.efElEgen : EL_ALT[out.elVal].ef;
+    // Fordonsflottan: äldre lägen med egna flottfaktorer men utan val blir 'egen', så att resultatet består.
+    if (!har('flottaVal') && ['flotta2030', 'flotta2040', 'flotta2050'].some(k => har(k) && Math.abs(out[k] - 1) > 1e-12)) out.flottaVal = 'egen';
     out.iterationer = Math.round(out.iterationer); out.seed = Math.round(out.seed);
     if (out.f1Slut <= out.f1Start) out.f1Slut = out.f1Start + 1;
     if (out.f2Slut <= out.f2Start) out.f2Slut = out.f2Start + 1;
@@ -172,6 +181,12 @@
     return I;
   }
   const takter = (P, namn) => [1, 2, 3, 4, 5].map(k => P[TAKT[namn] + k]);
+  /* Fordonsflottans index relativt 2024. Bränslekedjan (avgaser och bränslets produktion): 'nv2026' följer Sveriges scenario
+     med beslutade styrmedel per fordonskilometer, 'oforandrad' är 1 och 'egen' användarens tre punkter. Fordonens tillverkning
+     följer bilproduktionens kurva i 'nv2026' och samma index som bränslekedjan i de andra två (hela livscykelfaktorn skalas,
+     som i MalmoOP 1.3, då även laddelen). Laddelen följer alltid elens klimatfaktor för året. */
+  const flottaIndex = (P, y) => P.flottaVal === 'oforandrad' ? 1 : P.flottaVal === 'egen' ? fleet(P, y) : indexAr(UTV.flotta_nv2026, y);
+  const bilprodIndex = (P, y) => P.flottaVal === 'nv2026' ? indexAr(UTV.bilprod, y) : flottaIndex(P, y);
   /* Emissionsfaktorer för el och fjärrvärme ett visst år (kg CO2e/kWh) och deras index mot 2024. */
   function faktorer(P, y) {
     const iEl = indexAr(takter(P, 'el'), y), beccs = P.beccs === 'ja' && y >= P.beccsAr ? 1 - P.beccsMinskning / 100 : 1;
@@ -374,18 +389,22 @@
     const bKey = P.bLage === 'gtfs' ? 'B_gtfs' : 'B_local';
     const years = []; for (let y = BASE_YEAR; y <= END_YEAR; y++) years.push(y);
     const eb = energyBase(S, P);
-    const A0 = S.ids.map(id => mob.A[id] ? mob.A[id].total : 0), B0 = S.ids.map(id => mob[bKey][id] ? mob[bKey][id].total : 0);
     const cityAvkm = mob.stad.A.vkm;
-    // Elbilarnas laddel (el, ingår i Vägvis wtt) räknas om från Vägvis elfaktor till modellens elfaktor för året: sätt(y) = 1 − e + e · k(y)
-    const efV = mob.elFaktor || {}, elAndel = (x, t) => x && t > 0 ? (x.el || 0) / t : 0;
-    const eA = S.ids.map((id, i) => elAndel(mob.A[id], A0[i])), eB = S.ids.map((id, i) => elAndel(mob[bKey][id], B0[i]));
-    const eBstad = elAndel(mob.stad[bKey], mob.stad[bKey] ? mob.stad[bKey].total : 0);
-    const perDeso = {cph: new Float64Array(n), km: new Float64Array(n), epv: new Float64Array(n)};
+    /* Mobiliteten i tre delar ur Vägvis: bränslekedjan (avgaser ttw + bränslets produktion wtt utan laddelen), elbilarnas laddel
+       (el, ingår i Vägvis wtt) och fordonens tillverkning (fordon). Bränslekedjan följer flottans index, laddelen räknas om från
+       Vägvis elfaktor till modellens elfaktor för året (k = EF_el(år) / EF_Vägvis) och tillverkningen följer bilproduktionens index. */
+    const efV = mob.elFaktor || {};
+    const delar = x => x && x.total > 0 ? {fuel: (x.ttw || 0) + (x.wtt || 0) - (x.el || 0), el: x.el || 0, fordon: x.fordon || 0} : {fuel: 0, el: 0, fordon: 0};
+    const dA = S.ids.map(id => delar(mob.A[id])), dB = S.ids.map(id => delar(mob[bKey][id]));
+    const stadB = mob.stad[bKey] || {}, epvStad = stadB.vkm > 0 ? delar(stadB) : {fuel: S.cityEpv, el: 0, fordon: 0};
+    const perDeso = {cph: new Float64Array(n), km: new Float64Array(n), epv: new Float64Array(n), epvFuel: new Float64Array(n), epvEl: new Float64Array(n), epvFordon: new Float64Array(n)};
     for (let i = 0; i < n; i++) {
       const h = S.hh[i], b = mob[bKey][S.ids[i]];
       perDeso.cph[i] = h.hh > 0 && h.bil > 0 ? h.bil / h.hh : S.cityCph;
       perDeso.km[i] = b && b.cars > 0 && b.vkm > 0 ? b.vkm / b.cars : S.cityKm;
-      perDeso.epv[i] = b && b.vkm > 0 ? b.total / b.vkm : S.cityEpv;
+      const d = b && b.vkm > 0 ? delar(b) : epvStad, vkm = b && b.vkm > 0 ? b.vkm : (stadB.vkm > 0 ? stadB.vkm : 1);
+      perDeso.epvFuel[i] = d.fuel / vkm; perDeso.epvEl[i] = d.el / vkm; perDeso.epvFordon[i] = d.fordon / vkm;
+      perDeso.epv[i] = perDeso.epvFuel[i] + perDeso.epvEl[i] + perDeso.epvFordon[i];
     }
     const kol = {aker: P.kolAker, oppen: P.kolOppen, skog: P.kolSkog, vatten: 0, bebyggd: P.kolBebyggd};
     // förbered områden
@@ -406,19 +425,26 @@
     const comp = {}; for (const c of COMPONENTS) comp[c] = years.map(() => new Float64Array(n));
     const pop = years.map(() => new Float64Array(n)), newPop = years.map(() => new Float64Array(n));
     const areaRes = areas.map(x => ({id: x.a.id, namn: x.a.namn, bygg: 0, mark: 0, nydrift2050: 0, nymob2050: 0, btaSum: x.btaSum, s: x.s, e: x.e}));
+    const mobDelar = [], flotta = [];
     years.forEach((y, yi) => {
-      const f = ramp(y), fl = fleet(P, y), tr = 1 + P.trafikForandring2050 / 100 * f;
+      const f = ramp(y), fl = flottaIndex(P, y), ip = bilprodIndex(P, y), tr = 1 + P.trafikForandring2050 / 100 * f;
       const fk = faktorer(P, y), effScale = 1 - P.effektivisering2050 / 100 * f;
       const efMixNy = P.elandelNy * fk.el + (1 - P.elandelNy) * fk.fv;
       const kA = efV.A > 0 ? fk.el * 1000 / efV.A : 1, kB = efV.B > 0 ? fk.el * 1000 / efV.B : 1;
-      const sA = i => 1 - eA[i] + eA[i] * kA, sB = i => 1 - eB[i] + eB[i] * kB;
+      const elFl = P.flottaVal === 'nv2026' ? 1 : fl;   // 'oforandrad' och 'egen' skalar hela livscykelfaktorn, även laddelen (som MalmoOP 1.3)
+      const kAy = kA * elFl, kBy = kB * elFl, dM = P.perspektiv === 'A' ? dA : dB, kM = P.perspektiv === 'A' ? kAy : kBy;
+      const md = {ttw: 0, wtt: 0, fordon: 0, tot: 0};   // stadens mobilitet per del, inklusive nya invånare
       let newVkmCity = 0;
       const nymobB = new Float64Array(n);
       for (let i = 0; i < n; i++) {
         comp.energi[yi][i] = (eb.tEl[i] * fk.iEl + eb.tFv[i] * fk.iFv) * effScale;
-        comp.mobilitet[yi][i] = (P.perspektiv === 'A' ? A0[i] * sA(i) : B0[i] * sB(i)) * fl * tr;
+        const d = dM[i], x = mob[P.perspektiv === 'A' ? 'A' : bKey][S.ids[i]] || {};
+        comp.mobilitet[yi][i] = (d.fuel * fl + d.el * kM + d.fordon * ip) * tr;
+        md.ttw += (x.ttw || 0) * fl * tr; md.wtt += (((x.wtt || 0) - (x.el || 0)) * fl + (x.el || 0) * kM) * tr; md.fordon += (x.fordon || 0) * ip * tr;
         pop[yi][i] = S.hh[i].bef;
       }
+      md.tot = md.ttw + md.wtt + md.fordon;
+      const epvAr = i => perDeso.epvFuel[i] * fl + perDeso.epvEl[i] * kBy + perDeso.epvFordon[i] * ip;   // t per fordonskilometer för nya bilar (B)
       if (P.exploatering) areas.forEach((x, k) => {
         const dur = x.e - x.s, build = (y >= x.s && y < x.e) ? 1 / dur : 0, done = clamp01((y - x.s) / dur);
         for (const d of x.delar) {
@@ -428,20 +454,31 @@
           const drift = d.w * done * x.btaSum * P.atempNy * P.energiNy * efMixNy / 1000;
           comp.nydrift[yi][d.i] += drift;
           const hhNew = x.a.bostader * d.w * done, vkm = hhNew * perDeso.cph[d.i] * P.bilFaktor * perDeso.km[d.i];
-          const sNy = mob[bKey][S.ids[d.i]] && mob[bKey][S.ids[d.i]].vkm > 0 ? sB(d.i) : 1 - eBstad + eBstad * kB;
-          nymobB[d.i] += vkm * perDeso.epv[d.i] * fl * sNy;
+          nymobB[d.i] += vkm * epvAr(d.i);
           newVkmCity += vkm;
           newPop[yi][d.i] += hhNew * P.personerPerBostad;
           pop[yi][d.i] += hhNew * P.personerPerBostad;
           if (y >= 2030 && y <= 2050) { areaRes[k].bygg += d.w * build * bygg; areaRes[k].mark += build * d.luc; }
-          if (y === 2050) { areaRes[k].nydrift2050 += drift; areaRes[k].nymob2050 += vkm * perDeso.epv[d.i] * fl * sNy; }
+          if (y === 2050) { areaRes[k].nydrift2050 += drift; areaRes[k].nymob2050 += vkm * epvAr(d.i); }
         }
       });
-      if (P.perspektiv === 'B') comp.nymob[yi].set(nymobB);
-      else if (newVkmCity > 0) { const g = P.andelKmInomMalmo * newVkmCity / cityAvkm; for (let i = 0; i < n; i++) comp.nymob[yi][i] = A0[i] * sA(i) * fl * tr * g; }
+      if (P.perspektiv === 'B') {
+        comp.nymob[yi].set(nymobB);
+        let fuel = 0, el = 0, fordon = 0;
+        for (let i = 0; i < n; i++) if (nymobB[i] > 0) { const e = epvAr(i); fuel += nymobB[i] * perDeso.epvFuel[i] * fl / e; el += nymobB[i] * perDeso.epvEl[i] * kBy / e; fordon += nymobB[i] * perDeso.epvFordon[i] * ip / e; }
+        // nya bilars bränslekedja fördelas på avgaser och bränsle som stadens B-underlag
+        const sb = delar(stadB), w = sb.fuel > 0 ? (stadB.ttw || 0) / sb.fuel : 1;
+        md.ttw += fuel * w; md.wtt += fuel * (1 - w) + el; md.fordon += fordon;
+      } else if (newVkmCity > 0) {
+        const g = P.andelKmInomMalmo * newVkmCity / cityAvkm;
+        for (let i = 0; i < n; i++) comp.nymob[yi][i] = comp.mobilitet[yi][i] * g;
+        md.ttw *= 1 + g; md.wtt *= 1 + g; md.fordon *= 1 + g;
+      }
+      md.tot = md.ttw + md.wtt + md.fordon;
+      mobDelar.push(md); flotta.push({year: y, bransle: fl, bilprod: ip, laddel: kM});
     });
     const fakt = years.map(y => ({year: y, ...faktorer(P, y), bygg: Object.fromEntries(Object.keys(BYGG.referens).map(t => [t, byggFaktor(P, t, y)]))}));
-    return {P, years, comp, pop, newPop, areas: areaRes, energyBase: eb, perDeso, bKey, faktorer: fakt};
+    return {P, years, comp, pop, newPop, areas: areaRes, energyBase: eb, perDeso, bKey, faktorer: fakt, mobDelar, flotta};
   }
 
   /* Hämta värden för valt år ('ack' = summa 2030–2050) som objekt per DeSO. Summan (total, exploatering) tar bara med de
@@ -482,6 +519,6 @@
 
   return {VERSION, BASE_YEAR, END_YEAR, YEARS, ACK, COMPONENTS, ENERGI, aktiva, LABELS, SHORT, DEFAULTS, LIMITS, ENUMS, BYGG, P75_PROXY, SIG_LV, SYS_LV, UNC,
     PERIODER, UTV, EL_ALT, BECCS, TAKT, indexAr, faktorer,
-    params, prepare, compute, view, cityByYear, metric, fleet, byggFaktor, energyBase, energyItems, simulateEnergy, uncertaintyKey, ramp,
+    params, prepare, compute, view, cityByYear, metric, fleet, flottaIndex, bilprodIndex, byggFaktor, energyBase, energyItems, simulateEnergy, uncertaintyKey, ramp,
     calibration, GROUP_NAMES, energyYearFactor, energyInterval};
 });

@@ -78,6 +78,7 @@
      underlag (till exempel nya bostadsområden i B) får stadens andelar. Laddelen i Vägvis wtt räknas om med modellens elfaktor
      för året, som i MalmoOP.compute; avgaserna påverkas inte av elvalet. */
   function mobDelar(S, R) {
+    if (R.mobDelar) return R.mobDelar;   // MalmoOP 1.4: delarna följer var sitt index och summeras i compute
     const nyckel = R.P.perspektiv === 'B' ? R.bKey : 'A', mob = S.D.mob[nyckel] || {}, stad = (S.D.mob.stad || {})[nyckel] || {}, n = S.n;
     const efVagvis = (S.D.mob.elFaktor || {})[nyckel === 'A' ? 'A' : 'B'] || 0;
     const andel = (a, f) => a && a.total > 0 ? (a[f] || 0) / a.total : null;
@@ -437,7 +438,7 @@
     const P = ctx.P, ar = ctx.R.years, opt = (v, l, val) => '<option value="' + v + '"' + (v === val ? ' selected' : '') + '>' + l + '</option>';
     const takter = TAKTER.filter(([k]) => vy !== 'bokforing' || k !== 'ovrigEl').map(([k, l]) =>
       '<label class="field">' + esc(l) + ', % per år<input class="input" type="number" step="0.1" min="-50" max="50" data-r2zs-takt="' + k + '" value="' + st.r[k] + '"></label>').join('');
-    const fl = [P.flotta2030, P.flotta2040, P.flotta2050].map(v => nf(v, 2)).join(' / ');
+    const fl = P.flottaVal === 'nv2026' ? 'beslutade styrmedel (Naturvårdsverket 2026)' : P.flottaVal === 'oforandrad' ? 'oförändrad' : 'egen, ' + [P.flotta2030, P.flotta2040, P.flotta2050].map(v => nf(v, 2)).join(' / ');
     let forsta;
     if (vy === 'jamfor') {
       const j = st.j, val = (k, a) => '<select data-r2zs-j="' + k + '">' + a.map(y => opt(y, y, j[k])).join('') + '</select>';

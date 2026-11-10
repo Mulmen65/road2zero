@@ -127,12 +127,13 @@ test('Nya invånare 2050 = alla bostäder × invånare per bostad', () => {
   near(v.city.bef, sum(S.hh.map(h => h.bef)) + b * M.DEFAULTS.personerPerBostad, 1e-9);
 });
 
-test('Ny mobilitet: B i värd-DeSO, A fördelad efter trafik; flottfaktor skalar', () => {
-  const vB = M.view(S, M.compute(S, {perspektiv: 'B'}), 2050), vA = M.view(S, M.compute(S, {perspektiv: 'A'}), 2050);
+test('Ny mobilitet: B i värd-DeSO, A fördelad efter trafik; egen flottfaktor skalar hela livscykeln (som 1.3)', () => {
+  const vB = M.view(S, M.compute(S, {perspektiv: 'B', flottaVal: 'oforandrad'}), 2050), vA = M.view(S, M.compute(S, {perspektiv: 'A'}), 2050);
   const host = new Set(D.expl.omraden.flatMap(a => a.delar.map(d => d.deso)));
   assert.ok(vB.rows.every(r => host.has(r.id) || r.nymob === 0), 'B utanför värd-DeSO');
   assert.ok(vA.rows.filter(r => r.mobilitet > 0).every(r => r.nymob > 0), 'A fördelas till alla med trafik');
-  const half = M.view(S, M.compute(S, {perspektiv: 'B', flotta2050: 0.5}), 2050);
+  const half = M.view(S, M.compute(S, {perspektiv: 'B', flotta2050: 0.5}), 2050);   // utan flottaVal: äldre läge, blir 'egen'
+  assert.strictEqual(M.params({flotta2050: 0.5}).flottaVal, 'egen'); assert.strictEqual(M.params({}).flottaVal, 'nv2026');
   near(half.city.nymob, vB.city.nymob * 0.5, 1e-9, 'flotta');
   near(half.city.mobilitet, vB.city.mobilitet * 0.5, 1e-9, 'flotta befintlig');
 });
@@ -212,9 +213,28 @@ test('Varje utbyggnadsområde fördelas fullt ut på DeSO', () => {
   for (const a of D.expl.omraden) near(a.delar.reduce((s, d) => s + d.andel, 0), 1, 1e-4, a.namn);
 });
 
-test('Kontrollsiffror med standardantaganden (perspektiv A, el Boverket): 560,1 kt 2024, 566,6 kt 2050', () => {
+test('Kontrollsiffror (perspektiv A, el Boverket): 560,1 kt 2024; 2050 566,6 kt med oförändrad flotta (1.3) och 180,0 kt med beslutade styrmedel', () => {
+  const R = M.compute(S, {}), R1 = M.compute(S, {flottaVal: 'oforandrad'});
+  near(M.view(S, R, 2024).city.total / 1000, 560.1, 2e-4); near(M.view(S, R1, 2024).city.total / 1000, 560.1, 2e-4);
+  near(M.view(S, R1, 2050).city.total / 1000, 566.6, 2e-4); near(M.view(S, R, 2050).city.total / 1000, 180.0, 1e-3);
+});
+
+test('Fordonsflottan: index 1 till 2026; bränslekedjan följer beslutade styrmedel, tillverkningen bilproduktionens kurva; delarna summerar', () => {
+  const P = M.params({});
+  for (const y of [2024, 2025, 2026]) { near(M.flottaIndex(P, y), 1, 1e-12); near(M.bilprodIndex(P, y), 1, 1e-12); }
+  near(M.flottaIndex(P, 2030), Math.pow(1 - 0.0458, 4), 1e-12); near(M.bilprodIndex(P, 2030), Math.pow(1 - 0.037, 4), 1e-12);
   const R = M.compute(S, {});
-  near(M.view(S, R, 2024).city.total / 1000, 560.1, 2e-4); near(M.view(S, R, 2050).city.total / 1000, 566.6, 2e-4);
+  R.years.forEach((y, yi) => {
+    const m = R.comp.mobilitet[yi].reduce((a, b) => a + b, 0) + R.comp.nymob[yi].reduce((a, b) => a + b, 0), d = R.mobDelar[yi];
+    near(d.ttw + d.wtt + d.fordon, m, 1e-9, 'delar ' + y); near(d.tot, m, 1e-9);
+    near(R.flotta[yi].bransle, M.flottaIndex(P, y), 1e-12);
+  });
+  // 2024: delarna = Vägvis A för staden (laddelen omräknad till Boverkets elfaktor)
+  const a = D.mob.stad.A, k = P.efEl * 1000 / D.mob.elFaktor.A;
+  near(R.mobDelar[0].ttw, a.ttw, 1e-6); near(R.mobDelar[0].wtt, a.wtt - a.el + a.el * k, 1e-6); near(R.mobDelar[0].fordon, a.fordon, 1e-6);
+  // B: samma summering med nya invånare
+  const RB = M.compute(S, {perspektiv: 'B'}), yi = RB.years.indexOf(2050), dB = RB.mobDelar[yi];
+  near(dB.tot, RB.comp.mobilitet[yi].reduce((x, y) => x + y, 0) + RB.comp.nymob[yi].reduce((x, y) => x + y, 0), 1e-9, 'B 2050');
 });
 
 test('Energi i byggnader valbar: utan energi = summan minus energi och nya byggnaders energi; komponenterna oförändrade', () => {

@@ -9,7 +9,10 @@ const D = {deso: read('data/kalla/deso_2025_malmo.geojson'), energi: read('data/
 const B = read('data/klimatbokforing.json');
 const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, (msg || '') + ' ' + a + ' ≠ ' + b);
 let passed = 0; const test = (n, f) => { f(); passed++; console.log('✓ ' + n); };
-const S = M.prepare(D), R = M.compute(S, {}), res = Z.berakna(M, S, R, B);
+/* Kontrollsiffrorna nedan gäller oförändrad fordonsflotta (standard till och med MalmoOP 1.3); från 1.4 är standarden
+   Sveriges scenario med beslutade styrmedel, som testas sist. */
+const BAS = {flottaVal: 'oforandrad'};
+const S = M.prepare(D), R = M.compute(S, BAS), res = Z.berakna(M, S, R, B);
 const rad = (r, y) => r.rader.find(x => x.ar === y);
 // elbilarnas laddel i Vägvis wtt räknas om från Vägvis elfaktor till modellens (Boverkets 37 g 2024)
 const elOm = x => x.el * (R.faktorer[0].el * 1000 / D.mob.elFaktor.A - 1);
@@ -52,7 +55,7 @@ test('egen takt: −5 % per år från 2027 för industrin', () => {
 });
 
 test('Sysavs koldioxidavskiljning sänker energisektorn från 2030', () => {
-  const Rb = M.compute(S, {beccs: 'ja'}), rb = Z.berakna(M, S, Rb, B);
+  const Rb = M.compute(S, {...BAS, beccs: 'ja'}), rb = Z.berakna(M, S, Rb, B);
   near(rad(rb, 2030).sek.energi, rad(res, 2030).sek.energi * (1 - M.DEFAULTS.beccsMinskning / 100), 1e-6);
   near(rad(rb, 2029).sek.energi, rad(res, 2029).sek.energi, 1e-9);
 });
@@ -66,13 +69,13 @@ test('GPC: scope 2 = el × elfaktor, sektorernas summor och BASIC', () => {
   near(r.basic, r.gpc.I.s1 + r.gpc.I.s2 + r.gpc.II.s1 + r.gpc.II.s2 + r.gpc.III.s1, 1e-9);
   near(r.basicPlus, r.terr + r.s2.stat + r.s2.jvg + r.mark, 1e-6, 'BASIC+ = territoriellt + scope 2 + mark');
   near(r.gpc.II.s3, D.mob.stad.A.wtt + elOm(D.mob.stad.A) + D.mob.stad.A.fordon, 1, 'scope 3 för trafiken 2024, laddelen med 37 g');
-  const re = Z.berakna(M, S, M.compute(S, {effektivisering2050: 20}), B);
+  const re = Z.berakna(M, S, M.compute(S, {...BAS, effektivisering2050: 20}), B);
   near(rad(res, 2050).elKwh - rad(re, 2050).elKwh, 0.2 * res.el.byggKwh, 1, 'effektiviseringen gäller byggnadselen');
 });
 
 test('perspektiv B i sidomenyn påverkar inte redovisningen; modell A krävs', () => {
-  assert.throws(() => Z.berakna(M, S, M.compute(S, {perspektiv: 'B'}), B));
-  const rA = Z.berakna(M, S, M.compute(S, {...M.compute(S, {perspektiv: 'B'}).P, perspektiv: 'A'}), B);
+  assert.throws(() => Z.berakna(M, S, M.compute(S, {...BAS, perspektiv: 'B'}), B));
+  const rA = Z.berakna(M, S, M.compute(S, {...M.compute(S, {...BAS, perspektiv: 'B'}).P, perspektiv: 'A'}), B);
   near(rad(rA, 2040).terr, rad(res, 2040).terr, 1e-6);
 });
 
@@ -129,7 +132,7 @@ test('Road2Zero-OP:s egen beräkning: oförändrad utom elbilarnas laddel, som r
 
 test('elvalet ändrar inte avgaserna: territoriellt och scope 1 är desamma för alla tre val', () => {
   for (const p of [{elVal: 'iea'}, {elVal: 'egen', efElEgen: 0.09}]) {
-    const rx = Z.berakna(M, S, M.compute(S, p), B);
+    const rx = Z.berakna(M, S, M.compute(S, {...BAS, ...p}), B);
     for (const y of [2024, 2035, 2050]) near(rad(rx, y).terr, rad(res, y).terr, 1e-6, JSON.stringify(p) + ' ' + y);
   }
 });
@@ -188,7 +191,7 @@ const sum = (a, f) => a.reduce((s, x) => s + f(x), 0), period = r => r.rader.fil
 test('mobDelar: perspektiv A som berakna; perspektiv B summerar till Resultat med B', () => {
   const a = Z.mobDelar(S, R);
   res.rader.forEach((x, i) => { near(a[i].ttw, x.sek.vagtrafik, 1e-6); near(a[i].wtt, x.mobWtt, 1e-6); near(a[i].fordon, x.mobFordon, 1e-6); near(a[i].tot, x.op.mobilitet, 1e-6); });
-  const RB = M.compute(S, {perspektiv: 'B'}), b = Z.mobDelar(S, RB), rows = M.cityByYear(RB);
+  const RB = M.compute(S, {...BAS, perspektiv: 'B'}), b = Z.mobDelar(S, RB), rows = M.cityByYear(RB);
   b.forEach((x, i) => { near(x.ttw + x.wtt + x.fordon, x.tot, 1e-6, 'delar ' + rows[i].year); near(x.tot, rows[i].mobilitet + rows[i].nymob, 1e-6, 'B ' + rows[i].year); });
   near(b[0].ttw, D.mob.stad[RB.bKey].ttw, 1, 'B:s avgaser 2024 = Vägvis B');
 });
@@ -221,7 +224,7 @@ test('egen datakälla (förval): territoriellt 2024 = Miljöbarometerns sektorer
 });
 
 test('egen datakälla: klimatavtrycket med B = Resultat med B, och bryggan går ihop i alla lägen', () => {
-  const RB = M.compute(S, {perspektiv: 'B'}), opMob = Z.mobDelar(S, RB);
+  const RB = M.compute(S, {...BAS, perspektiv: 'B'}), opMob = Z.mobDelar(S, RB);
   const JB = Z.jamforelse(res, {}, opMob), rowsB = M.cityByYear(RB).filter(r => r.year >= 2027 && r.year <= 2050);
   near(JB.metoder[0].total, sum(rowsB, r => r.total), 1e-4, 'klimatavtrycket med B'); near(JB.metoder[0].total / 1000, 11341, 1);
   assert.ok(JB.brygga.some(x => x.typ === 'kalla' && x.text.includes('hushållens bilar')));
@@ -232,6 +235,17 @@ test('egen datakälla: klimatavtrycket med B = Resultat med B, och bryggan går 
     for (const m of J.metoder) near(Object.values(m.delar).reduce((a, v) => a + v, 0), m.total, 1e-6);
     if (j.trafik === 'samma') assert.ok(b.every(x => x.typ !== 'kalla'), 'inga källsteg med samma modell');
   }
+});
+
+test('Standardflottan 1.4 (beslutade styrmedel): avgaserna faller mot 2050, delarna summerar, territoriellt lägre än med oförändrad flotta', () => {
+  const Rn = M.compute(S, {}), rn = Z.berakna(M, S, Rn, B);
+  assert.strictEqual(Rn.P.flottaVal, 'nv2026');
+  near(rad(rn, 2024).terr, rad(res, 2024).terr, 1e-6, '2024 lika');
+  assert.ok(rad(rn, 2050).terr < rad(res, 2050).terr, 'territoriellt 2050 lägre');
+  assert.ok(rad(rn, 2050).sek.vagtrafik < 0.3 * rad(res, 2050).sek.vagtrafik, 'vägtrafiken 2050 under 30 % av oförändrad flotta');
+  const md = Z.mobDelar(S, Rn), yi = Rn.years.indexOf(2050);
+  near(md[yi].ttw, Rn.mobDelar[yi].ttw, 1e-9); assert.ok(md[yi].ttw < 0.3 * md[0].ttw, 'avgaserna 2050 under 30 % av 2024');
+  near(M.cityByYear(Rn).find(r => r.year === 2050).total / 1000, 180.0, 0.05, 'OP 2050');
 });
 
 console.log('\n' + passed + ' tester för stadens redovisning godkända.');
