@@ -237,6 +237,41 @@ test('Fordonsflottan: index 1 till 2026; bränslekedjan följer beslutade styrme
   near(dB.tot, RB.comp.mobilitet[yi].reduce((x, y) => x + y, 0) + RB.comp.nymob[yi].reduce((x, y) => x + y, 0), 1e-9, 'B 2050');
 });
 
+test('Lokaliseringskartan: delarna summerar, energin bara när den är vald, typologi och marktäcke slår igenom, flaggor', () => {
+  const Rm = M.compute(S, {perspektiv: 'B'}), Ru = M.compute(S, {perspektiv: 'B', energiVal: 'utan'}), Tm = Rm.tillkommande, Tu = Ru.tillkommande;
+  assert.strictEqual(Tm.medEnergi, true); assert.strictEqual(Tu.medEnergi, false);
+  for (let i = 0; i < S.n; i++) for (const t of ['bostad', 'arbetsplats']) {
+    near(Tm[t].total[i], Tm[t].trafik[i] + Tm[t].bygg[i] + Tm[t].mark[i] + Tm[t].energi[i], 1e-9, t + ' med ' + i);
+    near(Tu[t].total[i], Tu[t].trafik[i] + Tu[t].bygg[i] + Tu[t].mark[i], 1e-9, t + ' utan ' + i);
+    near(Tu[t].trafik[i], Tm[t].trafik[i], 1e-9); assert.strictEqual(Tm.arbetsplats.trafik[i], 0);
+    assert(Tm[t].bygg[i] > 0 && Tm[t].energi[i] > 0 && Tm[t].mark[i] >= 0);
+  }
+  // trafik per ny bostad = DeSO:ns bilar per hushåll × km × livscykelfaktor per år, summerat 2030–2050; samma som nymob per bostad
+  const i = S.index['1280C1780'], P = Rm.P, y0 = Rm.years.indexOf(2030);
+  let sum = 0; for (let yi = y0; yi <= Rm.years.indexOf(2050); yi++) {
+    const f = Rm.flotta[yi]; sum += Rm.perDeso.cph[i] * P.bilFaktor * Rm.perDeso.km[i] * (Rm.perDeso.epvFuel[i] * f.bransle + Rm.perDeso.epvEl[i] * f.laddel + Rm.perDeso.epvFordon[i] * f.bilprod);
+  }
+  near(Tm.bostad.trafik[i], sum, 1e-9, 'trafik per bostad');
+  // bygg = BTA × klimatfaktor 2030; småhus med egen BTA och faktor; täthet ger markytan
+  near(Tm.bostad.bygg[i], P.btaBostad * M.byggFaktor(P, 'bostad', 2030) / 1000, 1e-9);
+  const Rs = M.compute(S, {perspektiv: 'B', nyTyp: 'smahus', byggSmahusFaktor: 0.8, nyMark: 'aker'}), Ts = Rs.tillkommande;
+  near(Ts.bostad.bygg[i], Rs.P.btaSmahus * M.byggFaktor(Rs.P, 'bostad', 2030) * 0.8 / 1000, 1e-9);
+  near(Ts.bostad.mark[i], Rs.P.hardgorandel * (Rs.P.kolAker - Rs.P.kolBebyggd) * 44 / 12 / Rs.P.tathetSmahus, 1e-9, 'mark småhus på åker');
+  near(Ts.arbetsplats.mark[i], Rs.P.hardgorandel * (Rs.P.kolAker - Rs.P.kolBebyggd) * 44 / 12 / Rs.P.tathetArb, 1e-9);
+  near(Ts.bostad.energi[i], Rs.P.btaSmahus * Tm.bostad.energi[i] / P.btaBostad, 1e-9, 'energi per m² lika');
+  // 'op': DeSO utan ÖP-område får 0 i mark; DeSO med åker i ÖP-området får > 0
+  assert.strictEqual(Tm.bostad.mark[S.index['1280C2850']], 0); assert(Tm.bostad.mark[S.index['1280C1550']] > 0 && Tm.akerAndel[S.index['1280C1550']] > 0.25 && Tm.akerAndel[S.index['1280C1090']] > 0.9);
+  // arbetsplatstyp: kontor = btaArbBlandad × lokal, annan = btaArbVerks × hall
+  near(Tm.arbetsplats.bygg[i], P.btaArbBlandad * M.byggFaktor(P, 'lokal', 2030) / 1000, 1e-9);
+  near(M.compute(S, {nyArbTyp: 'annan'}).tillkommande.arbetsplats.bygg[i], P.btaArbVerks * M.byggFaktor(P, 'hall', 2030) / 1000, 1e-9);
+  // view: fälten och flaggorna; metric ignorerar enheten; M-flagga precis när mark > 0
+  const v = M.view(S, Rm, 2050), r = v.rows[i];
+  near(r.ny_bostad, Tm.bostad.total[i], 1e-9); near(M.metric(r, 'ny_bostad', 't_ha'), r.ny_bostad, 1e-9);
+  const tr = v.rows.map(x => Tm.bostad.trafik[x.i]).sort((a, b) => a - b), med = tr[Math.floor(tr.length / 2)];
+  for (const x of v.rows) { assert.strictEqual(x.nyFlagg.includes('T'), Tm.bostad.trafik[x.i] > M.FLAGG_T * med); assert.strictEqual(x.nyFlagg.includes('M'), Tm.bostad.mark[x.i] > 0); }
+  assert.strictEqual(M.params({nyTyp: 'x'}).nyTyp, 'flerbostadshus');
+});
+
 test('Energi i byggnader valbar: utan energi = summan minus energi och nya byggnaders energi; komponenterna oförändrade', () => {
   const Rm = M.compute(S, {}), Ru = M.compute(S, {energiVal: 'utan'});
   assert.deepStrictEqual(M.aktiva(Ru.P), ['mobilitet', 'bygg', 'mark', 'nymob']); assert.deepStrictEqual(M.aktiva(Rm.P), M.COMPONENTS);

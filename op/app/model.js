@@ -6,7 +6,7 @@
   else root.MalmoOP = factory();
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-  const VERSION = '1.4.1';
+  const VERSION = '1.5.0';
   const BASE_YEAR = 2024, END_YEAR = 2050;
   const YEARS = [2024, 2030, 2035, 2040, 2045, 2050];
   const ACK = [2030, 2050];
@@ -114,7 +114,17 @@
     andelKmInomMalmo: 0.5,      // andel av nya bilars körsträcka på Malmös vägar (modell A; antagande)
     hardgorandel: 0.7,          // andel av utbyggnadsytan som bebyggs/hårdgörs (antagande)
     markOkand: 'bebyggd',       // mark utan OSM-klass antas vara: 'bebyggd' | 'oppen' | 'aker'
-    kolAker: 121, kolOppen: 103, kolSkog: 146, kolBebyggd: 22 // t C/ha, Länsstyrelsen i Uppsala län (2025)
+    kolAker: 121, kolOppen: 103, kolSkog: 146, kolBebyggd: 22, // t C/ha, Länsstyrelsen i Uppsala län (2025)
+    /* Lokaliseringskartan (1.5): klimatpåverkan per tillkommande bostad eller arbetsplats i varje DeSO, summa 2030–2050,
+       med bostaden eller arbetsplatsen klar 2030. Typologierna anges av användaren; värdena är antaganden. */
+    nyTyp: 'flerbostadshus',    // bostadstyp i lokaliseringskartan: 'flerbostadshus' | 'smahus'
+    btaSmahus: 130,             // m² BTA per småhus (antagande); flerbostadshus använder btaBostad
+    byggSmahusFaktor: 1,        // småhusets klimatfaktor relativt flerbostadshusets (modellval: samma värde)
+    tathetFbh: 50,              // bostäder per ha i flerbostadshus (antagande)
+    tathetSmahus: 12,           // bostäder per ha i småhus (antagande)
+    nyArbTyp: 'kontor',         // arbetsplatstyp: 'kontor' (btaArbBlandad, lokal) | 'annan' (btaArbVerks, hall)
+    tathetArb: 150,             // arbetsplatser per ha (antagande)
+    nyMark: 'op'                // marktäcke för ny bebyggelse i en DeSO: 'op' = ÖP-områdenas marktäcke i DeSO:n, annars bebyggd | 'bebyggd' | 'oppen' | 'aker'
   };
 
   const LIMITS = {
@@ -126,12 +136,13 @@
     f1Start: [2025, 2050], f1Slut: [2026, 2060], f2Start: [2025, 2060], f2Slut: [2026, 2070],
     btaBostad: [10, 1000], btaArbBlandad: [1, 2000], btaArbVerks: [1, 5000], btaSkolplats: [0, 200],
     atempNy: [0.3, 1.2], energiNy: [0, 500], elandelNy: [0, 1], personerPerBostad: [0, 10], bilFaktor: [0, 5],
+    btaSmahus: [10, 1000], byggSmahusFaktor: [0, 5], tathetFbh: [1, 1000], tathetSmahus: [0.1, 200], tathetArb: [1, 5000],
     andelKmInomMalmo: [0, 1], hardgorandel: [0, 1], kolAker: [0, 1000], kolOppen: [0, 1000], kolSkog: [0, 1000], kolBebyggd: [0, 1000]
   };
   const ENUMS = {elVal: ['boverket', 'iea', 'egen'], perspektiv: ['A', 'B'], energiVal: ['med', 'utan'], flottaVal: ['nv2026', 'oforandrad', 'egen'], bLage: ['local', 'gtfs'], atempLage: ['osm', 'fast'], elLage: ['kvot', 'fast'],
     bestand: ['hela', 'deklarerade'], kalibrering: ['sektor', 'total', 'ingen'],
     klimatBygg: ['referens', 'gransvarde2030', 'bana', 'trappa', 'insteg', 'fardplan', 'egen'], markOkand: ['bebyggd', 'oppen', 'aker'],
-    beccs: ['nej', 'ja']};
+    beccs: ['nej', 'ja'], nyTyp: ['flerbostadshus', 'smahus'], nyArbTyp: ['kontor', 'annan'], nyMark: ['op', 'bebyggd', 'oppen', 'aker']};
 
   function params(p = {}) {
     const out = {...DEFAULTS};
@@ -426,6 +437,8 @@
     const pop = years.map(() => new Float64Array(n)), newPop = years.map(() => new Float64Array(n));
     const areaRes = areas.map(x => ({id: x.a.id, namn: x.a.namn, bygg: 0, mark: 0, nydrift2050: 0, nymob2050: 0, btaSum: x.btaSum, s: x.s, e: x.e}));
     const mobDelar = [], flotta = [];
+    /* Lokaliseringskartan: trafik per ny bostad (t, 2030–2050) och nya byggnaders energi per m² BTA (t, 2030–2050) ackumuleras år för år. */
+    const tillTrafik = new Float64Array(n); let tillEnergiBta = 0;
     years.forEach((y, yi) => {
       const f = ramp(y), fl = flottaIndex(P, y), ip = bilprodIndex(P, y), tr = 1 + P.trafikForandring2050 / 100 * f;
       const fk = faktorer(P, y), effScale = 1 - P.effektivisering2050 / 100 * f;
@@ -445,6 +458,10 @@
       }
       md.tot = md.ttw + md.wtt + md.fordon;
       const epvAr = i => perDeso.epvFuel[i] * fl + perDeso.epvEl[i] * kBy + perDeso.epvFordon[i] * ip;   // t per fordonskilometer för nya bilar (B)
+      if (y >= ACK[0] && y <= ACK[1]) {
+        for (let i = 0; i < n; i++) tillTrafik[i] += perDeso.cph[i] * P.bilFaktor * perDeso.km[i] * epvAr(i);
+        tillEnergiBta += P.atempNy * P.energiNy * efMixNy / 1000;
+      }
       if (P.exploatering) areas.forEach((x, k) => {
         const dur = x.e - x.s, build = (y >= x.s && y < x.e) ? 1 / dur : 0, done = clamp01((y - x.s) / dur);
         for (const d of x.delar) {
@@ -478,7 +495,34 @@
       mobDelar.push(md); flotta.push({year: y, bransle: fl, bilprod: ip, laddel: kM});
     });
     const fakt = years.map(y => ({year: y, ...faktorer(P, y), bygg: Object.fromEntries(Object.keys(BYGG.referens).map(t => [t, byggFaktor(P, t, y)]))}));
-    return {P, years, comp, pop, newPop, areas: areaRes, energyBase: eb, perDeso, bKey, faktorer: fakt, mobDelar, flotta};
+    return {P, years, comp, pop, newPop, areas: areaRes, energyBase: eb, perDeso, bKey, faktorer: fakt, mobDelar, flotta,
+      tillkommande: tillkommande(S, P, areas, kol, tillTrafik, tillEnergiBta)};
+  }
+
+  /* Lokaliseringskartan: klimatpåverkan per tillkommande bostad respektive arbetsplats i varje DeSO, t CO2e 2030–2050.
+       trafik  = Σ år bilar per hushåll(DeSO) × bilFaktor × km per bil(DeSO) × t per fordonskilometer(år)   (bara bostäder)
+       bygg    = BTA per enhet × klimatfaktor(typ, 2030) / 1000
+       mark    = ha per enhet (1/täthet) × hårdgörandel × Σ andel(klass) × (kolförråd(klass) − bebyggd) × 44/12
+       energi  = BTA per enhet × Σ år Atemp-andel × kWh/m² × emissionsfaktor(år) / 1000   (ingår i summan bara när energin är vald)
+     Marktäcket per DeSO är ÖP-områdenas marktäcke i DeSO:n (viktat med yta); DeSO utan ÖP-område räknas som redan bebyggd mark. */
+  function tillkommande(S, P, areas, kol, trafik, energiBta) {
+    const n = S.n, y0 = ACK[0], medEnergi = aktiva(P).includes('energi');
+    const lucHa = new Float64Array(n), haMark = new Float64Array(n), aker = new Float64Array(n);
+    if (P.nyMark === 'op') for (const x of areas) for (const d of x.delar) { haMark[d.i] += d.ha; lucHa[d.i] += d.luc; aker[d.i] += d.mark.aker || 0; }
+    const lucPerHa = i => P.nyMark === 'op' ? (haMark[i] > 0 ? lucHa[i] / haMark[i] : 0) : P.hardgorandel * Math.max(0, (kol[P.nyMark] || 0) - kol.bebyggd) * C_TO_CO2;
+    const smahus = P.nyTyp === 'smahus', btaB = smahus ? P.btaSmahus : P.btaBostad, tathetB = smahus ? P.tathetSmahus : P.tathetFbh;
+    const byggB = btaB * byggFaktor(P, 'bostad', y0) * (smahus ? P.byggSmahusFaktor : 1) / 1000;
+    const kontor = P.nyArbTyp === 'kontor', btaA = kontor ? P.btaArbBlandad : P.btaArbVerks, byggA = btaA * byggFaktor(P, kontor ? 'lokal' : 'hall', y0) / 1000;
+    const mk = (parts) => { const out = {}; for (const k of Object.keys(parts)) out[k] = new Float64Array(n); return out; };
+    const bostad = mk({trafik: 1, bygg: 1, mark: 1, energi: 1, total: 1}), arbetsplats = mk({trafik: 1, bygg: 1, mark: 1, energi: 1, total: 1});
+    for (let i = 0; i < n; i++) {
+      const luc = lucPerHa(i);
+      bostad.trafik[i] = trafik[i]; bostad.bygg[i] = byggB; bostad.mark[i] = luc / tathetB; bostad.energi[i] = btaB * energiBta;
+      arbetsplats.trafik[i] = 0; arbetsplats.bygg[i] = byggA; arbetsplats.mark[i] = luc / P.tathetArb; arbetsplats.energi[i] = btaA * energiBta;
+      for (const t of [bostad, arbetsplats]) t.total[i] = t.trafik[i] + t.bygg[i] + t.mark[i] + (medEnergi ? t.energi[i] : 0);
+    }
+    const akerAndel = S.ids.map((_, i) => haMark[i] > 0 ? aker[i] / haMark[i] : 0);
+    return {bostad, arbetsplats, akerAndel, medEnergi, ar: ACK, typ: P.nyTyp, arbTyp: P.nyArbTyp, mark: P.nyMark};
   }
 
   /* Hämta värden för valt år ('ack' = summa 2030–2050) som objekt per DeSO. Summan (total, exploatering) tar bara med de
@@ -493,11 +537,27 @@
       for (const c of COMPONENTS) { let v = 0; for (const yi of sel) v += R.comp[c][yi][i]; r[c] = v; if (akt.includes(c)) tot += v; }
       r.total = tot; r.exploatering = r.bygg + r.mark + r.nymob + (medEnergi ? r.nydrift : 0);
       const yi = sel[sel.length - 1]; r.bef = R.pop[yi][i]; r.nyaInv = R.newPop[yi][i];
+      const T = R.tillkommande; r.ny_bostad = T.bostad.total[i]; r.ny_arbetsplats = T.arbetsplats.total[i];
       rows.push(r);
     }
+    flaggor(rows, R.tillkommande);
     const city = {land_ha: rows.reduce((s, r) => s + r.land_ha, 0), bef: rows.reduce((s, r) => s + r.bef, 0), nyaInv: rows.reduce((s, r) => s + r.nyaInv, 0)};
     for (const c of [...COMPONENTS, 'total', 'exploatering']) city[c] = rows.reduce((s, r) => s + r[c], 0);
     return {rows, city, years: sel.length, aktiva: akt};
+  }
+
+  /* Flaggor för lokaliseringskartan per DeSO: T = trafiken per ny bostad över 1,25 × medianen bland DeSO, M = åkermark eller
+     annat kolförråd tas i anspråk (markposten > 0). Flaggan säger vad handläggaren bör utreda vidare; gränsen 1,25 är ett modellval. */
+  const FLAGG_T = 1.25;
+  function flaggor(rows, T) {
+    const v = rows.map(r => T.bostad.trafik[r.i]).sort((a, b) => a - b), med = v.length ? v[Math.floor(v.length / 2)] : 0;
+    for (const r of rows) {
+      const f = [];
+      if (T.bostad.trafik[r.i] > FLAGG_T * med) f.push('T');
+      if (T.bostad.mark[r.i] > 0) f.push('M');
+      r.nyFlagg = f;
+    }
+    return med;
   }
 
   /* Stadens värden per år. total följer energiVal; totalAlla tar alltid med alla komponenter (stadens redovisning). */
@@ -510,6 +570,7 @@
   function metric(row, key, unit) {
     const v = key === 'total' ? row.total : row[key];
     if (v == null) return null;
+    if (key.startsWith('ny_')) return v;   // lokaliseringskartan: alltid t per tillkommande enhet, 2030–2050
     if (unit === 't') return v;
     if (unit === 't_ha') return row.land_ha > 0 ? v / row.land_ha : null;
     if (unit === 'kg_ha') return row.land_ha > 0 ? v * 1000 / row.land_ha : null;
@@ -519,6 +580,6 @@
 
   return {VERSION, BASE_YEAR, END_YEAR, YEARS, ACK, COMPONENTS, ENERGI, aktiva, LABELS, SHORT, DEFAULTS, LIMITS, ENUMS, BYGG, P75_PROXY, SIG_LV, SYS_LV, UNC,
     PERIODER, UTV, EL_ALT, BECCS, TAKT, indexAr, faktorer,
-    params, prepare, compute, view, cityByYear, metric, fleet, flottaIndex, bilprodIndex, byggFaktor, energyBase, energyItems, simulateEnergy, uncertaintyKey, ramp,
+    params, prepare, compute, view, cityByYear, metric, fleet, flaggor, FLAGG_T, flottaIndex, bilprodIndex, byggFaktor, energyBase, energyItems, simulateEnergy, uncertaintyKey, ramp,
     calibration, GROUP_NAMES, energyYearFactor, energyInterval};
 });
