@@ -252,7 +252,9 @@
     if (st.flik === 'budget') innehall = parisKort() + div('motbudget') + div('personbudget') + (res.andelar.hela ? '' : div('gruppbudget')) + div('persontid') + div('temperatur') + div('ackbudget') + '<p class="small">' + budgetText(B) + '</p>';
     if (st.flik === 'tabeller') innehall = tabeller(ctx, B, res);
     if (st.flik === 'kallor') innehall = kallor(B);
-    return kontroller(ctx, B) + nyckeltal(ctx, res) + flikar + innehall;
+    const energiNotis = ctx.utanEnergi && st.kat.includes('Energi')
+      ? '<div class="notice info">Sidomenyn visar summan utan energi i byggnader. Här ingår kategorin Energi så länge den är vald; klicka bort den för samma avgränsning som på kartan.</div>' : '';
+    return kontroller(ctx, B) + energiNotis + nyckeltal(ctx, res) + flikar + innehall;
   }
 
   function parisKort() {

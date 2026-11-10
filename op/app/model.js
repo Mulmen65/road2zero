@@ -6,11 +6,16 @@
   else root.MalmoOP = factory();
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-  const VERSION = '1.3.0';
+  const VERSION = '1.4.0';
   const BASE_YEAR = 2024, END_YEAR = 2050;
   const YEARS = [2024, 2030, 2035, 2040, 2045, 2050];
   const ACK = [2030, 2050];
   const COMPONENTS = ['energi', 'mobilitet', 'bygg', 'mark', 'nydrift', 'nymob'];
+  /* Energi i byggnader (befintliga och nya) kan väljas bort ur summan och kartan (energiVal 'utan', lokaliseringskartan):
+     utsläppen från el och fjärrvärme beror på byggnadsbeståndet och energisystemet, inte på var i staden man bygger.
+     Komponenterna beräknas och visas ändå var för sig. Elbilarnas laddel ligger kvar i mobiliteten (bilens drivmedel). */
+  const ENERGI = ['energi', 'nydrift'];
+  const aktiva = P => P.energiVal === 'utan' ? COMPONENTS.filter(c => !ENERGI.includes(c)) : COMPONENTS.slice();
   const LABELS = {
     energi: 'Energi i befintliga byggnader', mobilitet: 'Mobilitet i befintlig stad',
     bygg: 'Nybyggnation (A1–A5)', mark: 'Förändrad markanvändning',
@@ -56,6 +61,7 @@
 
   const DEFAULTS = {
     perspektiv: 'A',            // A: trafik inom området, B: hushållens bilar (Vägvis 2.3.1)
+    energiVal: 'med',           // 'med' (standard): energi i byggnader ingår i summan; 'utan': lokaliseringskartan, energin visas bara för sig
     bLage: 'local',             // Vägvis modell B: 'local' (standard) eller 'gtfs' (DeSO-skattning med GTFS)
     ar: 2050,
     // Energi i befintliga byggnader
@@ -115,7 +121,7 @@
     atempNy: [0.3, 1.2], energiNy: [0, 500], elandelNy: [0, 1], personerPerBostad: [0, 10], bilFaktor: [0, 5],
     andelKmInomMalmo: [0, 1], hardgorandel: [0, 1], kolAker: [0, 1000], kolOppen: [0, 1000], kolSkog: [0, 1000], kolBebyggd: [0, 1000]
   };
-  const ENUMS = {elVal: ['boverket', 'iea', 'egen'], perspektiv: ['A', 'B'], bLage: ['local', 'gtfs'], atempLage: ['osm', 'fast'], elLage: ['kvot', 'fast'],
+  const ENUMS = {elVal: ['boverket', 'iea', 'egen'], perspektiv: ['A', 'B'], energiVal: ['med', 'utan'], bLage: ['local', 'gtfs'], atempLage: ['osm', 'fast'], elLage: ['kvot', 'fast'],
     bestand: ['hela', 'deklarerade'], kalibrering: ['sektor', 'total', 'ingen'],
     klimatBygg: ['referens', 'gransvarde2030', 'bana', 'trappa', 'insteg', 'fardplan', 'egen'], markOkand: ['bebyggd', 'oppen', 'aker'],
     beccs: ['nej', 'ja']};
@@ -438,26 +444,30 @@
     return {P, years, comp, pop, newPop, areas: areaRes, energyBase: eb, perDeso, bKey, faktorer: fakt};
   }
 
-  /* Hämta värden för valt år ('ack' = summa 2030–2050) som objekt per DeSO. */
+  /* Hämta värden för valt år ('ack' = summa 2030–2050) som objekt per DeSO. Summan (total, exploatering) tar bara med de
+     aktiva komponenterna (energiVal); varje komponent redovisas alltid. */
   function view(S, R, ar) {
-    const n = S.n, sel = ar === 'ack' ? R.years.map((y, i) => [y, i]).filter(([y]) => y >= ACK[0] && y <= ACK[1]).map(x => x[1]) : [R.years.indexOf(Number(ar))];
+    const n = S.n, akt = aktiva(R.P), medEnergi = akt.includes('energi'), sel = ar === 'ack' ? R.years.map((y, i) => [y, i]).filter(([y]) => y >= ACK[0] && y <= ACK[1]).map(x => x[1]) : [R.years.indexOf(Number(ar))];
     if (sel.some(i => i < 0)) throw new Error('Okänt år: ' + ar);
     const rows = [];
     for (let i = 0; i < n; i++) {
       const r = {id: S.ids[i], i, land_ha: S.landHa[i]};
       let tot = 0;
-      for (const c of COMPONENTS) { let v = 0; for (const yi of sel) v += R.comp[c][yi][i]; r[c] = v; tot += v; }
-      r.total = tot; r.exploatering = r.bygg + r.mark + r.nydrift + r.nymob;
+      for (const c of COMPONENTS) { let v = 0; for (const yi of sel) v += R.comp[c][yi][i]; r[c] = v; if (akt.includes(c)) tot += v; }
+      r.total = tot; r.exploatering = r.bygg + r.mark + r.nymob + (medEnergi ? r.nydrift : 0);
       const yi = sel[sel.length - 1]; r.bef = R.pop[yi][i]; r.nyaInv = R.newPop[yi][i];
       rows.push(r);
     }
     const city = {land_ha: rows.reduce((s, r) => s + r.land_ha, 0), bef: rows.reduce((s, r) => s + r.bef, 0), nyaInv: rows.reduce((s, r) => s + r.nyaInv, 0)};
     for (const c of [...COMPONENTS, 'total', 'exploatering']) city[c] = rows.reduce((s, r) => s + r[c], 0);
-    return {rows, city, years: sel.length};
+    return {rows, city, years: sel.length, aktiva: akt};
   }
 
+  /* Stadens värden per år. total följer energiVal; totalAlla tar alltid med alla komponenter (stadens redovisning). */
   function cityByYear(R) {
-    return R.years.map((y, yi) => { const o = {year: y}; for (const c of COMPONENTS) o[c] = R.comp[c][yi].reduce((a, b) => a + b, 0); o.total = COMPONENTS.reduce((s, c) => s + o[c], 0); o.bef = R.pop[yi].reduce((a, b) => a + b, 0); return o; });
+    const akt = aktiva(R.P);
+    return R.years.map((y, yi) => { const o = {year: y}; for (const c of COMPONENTS) o[c] = R.comp[c][yi].reduce((a, b) => a + b, 0);
+      o.total = akt.reduce((s, c) => s + o[c], 0); o.totalAlla = COMPONENTS.reduce((s, c) => s + o[c], 0); o.bef = R.pop[yi].reduce((a, b) => a + b, 0); return o; });
   }
 
   function metric(row, key, unit) {
@@ -470,7 +480,7 @@
     throw new Error('Okänd enhet');
   }
 
-  return {VERSION, BASE_YEAR, END_YEAR, YEARS, ACK, COMPONENTS, LABELS, SHORT, DEFAULTS, LIMITS, ENUMS, BYGG, P75_PROXY, SIG_LV, SYS_LV, UNC,
+  return {VERSION, BASE_YEAR, END_YEAR, YEARS, ACK, COMPONENTS, ENERGI, aktiva, LABELS, SHORT, DEFAULTS, LIMITS, ENUMS, BYGG, P75_PROXY, SIG_LV, SYS_LV, UNC,
     PERIODER, UTV, EL_ALT, BECCS, TAKT, indexAr, faktorer,
     params, prepare, compute, view, cityByYear, metric, fleet, byggFaktor, energyBase, energyItems, simulateEnergy, uncertaintyKey, ramp,
     calibration, GROUP_NAMES, energyYearFactor, energyInterval};

@@ -168,6 +168,9 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   Klimatavtrycket följer sidomenyn (A eller B, `mobDelar`); bokföringens vägtrafik på Miljöbarometerns nivå; GPC valbart Miljöbarometern,
   klimatkontraktets transport (SMED, standard) eller hela klimatkontraktet. Källfaktorer ur underlaget (`kallfaktorer` i `berakna`):
   källans nivå samma år delat med modellens eller Miljöbarometerns; utvecklingen följer modellen. Sidorna 03 och 04 räknar som förut.
+  Energi i byggnader valbar (0.16.0, `energiVal` 'med' (standard) | 'utan'): `aktiva(P)` i `model.js` styr vilka komponenter som ingår i
+  `view().total`, `exploatering` och `cityByYear().total`; `totalAlla` tar alltid med alla. Komponenterna beräknas alltid. Lokaliseringskartan
+  visas utan energi (användarens förslag till Malmö stad); laddelen ligger kvar i mobiliteten; sidorna 03–05 tar alltid med energin.
 
 ## Kända osäkerheter
 

@@ -212,6 +212,26 @@ test('Varje utbyggnadsområde fördelas fullt ut på DeSO', () => {
   for (const a of D.expl.omraden) near(a.delar.reduce((s, d) => s + d.andel, 0), 1, 1e-4, a.namn);
 });
 
+test('Kontrollsiffror med standardantaganden (perspektiv A, el Boverket): 560,1 kt 2024, 566,6 kt 2050', () => {
+  const R = M.compute(S, {});
+  near(M.view(S, R, 2024).city.total / 1000, 560.1, 2e-4); near(M.view(S, R, 2050).city.total / 1000, 566.6, 2e-4);
+});
+
+test('Energi i byggnader valbar: utan energi = summan minus energi och nya byggnaders energi; komponenterna oförändrade', () => {
+  const Rm = M.compute(S, {}), Ru = M.compute(S, {energiVal: 'utan'});
+  assert.deepStrictEqual(M.aktiva(Ru.P), ['mobilitet', 'bygg', 'mark', 'nymob']); assert.deepStrictEqual(M.aktiva(Rm.P), M.COMPONENTS);
+  for (const ar of [...M.YEARS, 'ack']) {
+    const vm = M.view(S, Rm, ar), vu = M.view(S, Ru, ar);
+    for (const c of M.COMPONENTS) near(vu.city[c], vm.city[c], 1e-9, ar + ' ' + c);
+    near(vu.city.total, vm.city.total - vm.city.energi - vm.city.nydrift, 1e-9, 'total ' + ar);
+    near(vu.city.exploatering, vm.city.exploatering - vm.city.nydrift, 1e-9, 'exploatering ' + ar);
+    for (let i = 0; i < S.n; i += 17) near(vu.rows[i].total, vu.rows[i].mobilitet + vu.rows[i].bygg + vu.rows[i].mark + vu.rows[i].nymob, 1e-9, 'rad ' + i);
+  }
+  const bm = M.cityByYear(Rm), bu = M.cityByYear(Ru);
+  bu.forEach((r, k) => { near(r.total, bm[k].total - bm[k].energi - bm[k].nydrift, 1e-9, 'år ' + r.year); near(r.totalAlla, bm[k].total, 1e-9); });
+  assert.strictEqual(M.params({energiVal: 'x'}).energiVal, 'med');
+});
+
 test('Deklarationernas DeSO-vikter summerar till 1', () => {
   const E = D.energi.kolumner;
   for (let i = 0; i < E.id.length; i++) if (E.alloc[i].length) near(E.alloc[i].reduce((s, [, w]) => s + w, 0), 1, 1e-3, 'id ' + E.id[i]);

@@ -574,7 +574,7 @@
       (g.lika ? kort('Gemensamt för alla tre', kt(g.t, 0) + '<small> kt CO₂e</small>', esc(g.kallor.join(', ')) + ': ' + J.metoder.map(m => pct(g.t, m.total) + ' av ' + AV[m.id]).join(', ').replace(/, ([^,]*)$/, ' och $1'), true)
         : kort('Vägtrafikens avgaser i alla tre', kt(g.t, 0) + '–' + kt(g.max, 0) + '<small> kt CO₂e</small>', 'Samma utsläppskälla, olika datakällor: ' + J.metoder.map(m => AV[m.id] + ' ' + kt(g.perMetod[m.id], 0) + ' kt (' + esc(kortKalla(J.kallor.find(k => k.id === 'avgaser').kalla[m.id])) + ')').join(', ').replace(/, ([^,]*)$/, ' och $1'), true)) + '</section>';
     if (ctx.P.perspektiv === 'B' && ctx.Rvald && !J.medB) {
-      const b = ctx.M.cityByYear(ctx.Rvald).filter(r => r.year >= J.fran && r.year <= J.till).reduce((s, r) => s + r.total, 0);
+      const b = ctx.M.cityByYear(ctx.Rvald).filter(r => r.year >= J.fran && r.year <= J.till).reduce((s, r) => s + r.totalAlla, 0);
       h += '<div class="notice info">Sidomenyn visar perspektiv B, hushållens bilar. Här räknas klimatavtrycket med perspektiv A, trafiken på stadens vägar, så att avgaserna avser samma trafik i alla tre räknesätten. Med perspektiv B är klimatavtrycket ' + kt(b, 0) + ' kt ' + per + '.</div>';
     }
     h += '<article class="card r2zr-paris"><h2>Samma stad, samma antaganden, tre svar</h2><p>Räknesätten bygger på samma beräkning av ' + esc(B.stad || 'staden') + ' med samma antaganden. De skiljer sig i <b>systemgränsen</b>, alltså vilka utsläpp som räknas och var. ' +
