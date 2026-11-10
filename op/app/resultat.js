@@ -187,7 +187,7 @@
     const temps = [...new Set(B.budget.map(r => r.temperatur))], ar = ctx.rows.map(r => r.year);
     const opt = (v, l, val) => '<option value="' + esc(v) + '"' + (String(v) === String(val) ? ' selected' : '') + '>' + esc(l) + '</option>';
     return '<article class="card r2zr-urval"><div class="r2zr-rad"><div><div class="r2zr-etikett">Klimatkategorier i diagram och tabeller</div><div class="r2zr-piller">' +
-      KATEGORIER.map(k => '<button class="r2zr-pill' + (st.kat.includes(k) ? ' on' : '') + '" data-r2zr-kat="' + esc(k) + '"><i style="background:' + B.farg[k] + '"></i>' + esc(k) + '</button>').join('') +
+      KATEGORIER.map(k => { const av = ctx.utanEnergi && k === 'Energi'; return '<button class="r2zr-pill' + (st.kat.includes(k) && !av ? ' on' : '') + (av ? ' off' : '') + '" data-r2zr-kat="' + esc(k) + '"' + (av ? ' disabled title="Bortvald i sidomenyn (Utan energi i byggnader)"' : '') + '><i style="background:' + B.farg[k] + '"></i>' + esc(k) + (av ? ' · bortvald' : '') + '</button>'; }).join('') +
       '</div></div><div><div class="r2zr-etikett">Ingår</div><div class="r2zr-piller">' +
       [['befintlig', 'Befintlig stad'], ['ny', 'Exploateringen 2030–2050']].map(([g, l]) => '<button class="r2zr-pill' + (st.grupper.includes(g) ? ' on' : '') + '" data-r2zr-grupp="' + g + '">' + l + '</button>').join('') +
       '</div></div></div><div class="r2zr-rad r2zr-val">' +
@@ -195,7 +195,7 @@
       '<label class="field">till<select data-r2zr="p1">' + ar.map(y => opt(y, y, st.period[1])).join('') + '</select></label>' +
       '<label class="field">Temperaturgräns<select data-r2zr="temp">' + temps.map(t => opt(t, t + ' °C', st.temp)).join('') + '</select></label>' +
       '<label class="field">Sannolikhet att hålla gränsen<select data-r2zr="sann">' + SANNOLIKHETER.map(p => opt(p, p + ' %', st.sann)).join('') + '</select></label>' +
-      '</div>' + tilldelningRad(B) + '<p class="small">Mobiliteten följer perspektivet i sidomenyn (' + esc(ctx.mobLabel) + '). Klimatbudgeten gäller från 2026; år före 2026 visas men får ingen budgetandel och räknas inte in i jämförelsen med budgeten. ' +
+      '</div>' + tilldelningRad(B, urval(ctx)) + '<p class="small">Mobiliteten följer perspektivet i sidomenyn (' + esc(ctx.mobLabel) + ')' + (ctx.flottaLabel ? ', med fordonsflottans klimatfaktor enligt ' + esc(ctx.flottaLabel) : '') + (ctx.elLabel ? ' och elfaktorn ' + esc(ctx.elLabel) : '') + '. Klimatbudgeten gäller från 2026; år före 2026 visas men får ingen budgetandel och räknas inte in i jämförelsen med budgeten. ' +
       'Klimatavtrycket ställs mot stadens territoriella bokföring och GHG Protocol for Cities under <button type="button" class="link-btn" data-go="jamfor">Jämför räknesätten</button>.</p></article>';
   }
 
@@ -207,9 +207,9 @@
     return 'Nybyggnationen och marken får ' + nf(st.byggandel, 1) + ' % av investeringarnas andel (eget värde' + (d ? '; standard ' + pct(d.n) + ' %' : '') + ')';
   }
 
-  function tilldelningRad(B) {
+  function tilldelningRad(B, u) {
     const opt = (v, l) => '<option value="' + esc(v) + '"' + (st.tilldelning === v ? ' selected' : '') + '>' + esc(l) + '</option>';
-    const a = andelar(B, st), fakt = budgetFaktor(B, st), pct = x => nf(100 * x, 1);
+    const a = andelar(B, u), fakt = budgetFaktor(B, u), pct = x => nf(100 * x, 1);
     const val = TILLDELNINGAR.filter(t => t === 'egen' || t === 'hela' || standardAndelar(B, t)).map(t => t === 'egen' ? opt(t, 'Egna andelar') : t === 'hela' ? opt(t, 'Hela budgeten') : opt(t, t + ' ' + standardAndelar(B, t).rad.ar)).join('');
     const falt = BUDGETGRUPPER.map(g => '<label class="field">' + esc(g.namn) + ', % av budgeten<input class="input" type="number" min="0" max="100" step="0.1" data-r2zr-andel="' + g.id + '" value="' + (a.hela ? 100 : Number((100 * a[g.id]).toFixed(1))) + '"' + (a.hela ? ' disabled' : '') + '></label>').join('') +
       (st.tilldelning === 'egen' || a.hela ? '' : '<label class="field">Nybyggnationens andel av investeringarna, %<input class="input" type="number" min="0" max="100" step="0.1" data-r2zr-byggandel="1" value="' + byggandelVisad(B) + '"></label>');
@@ -217,7 +217,7 @@
     if (a.hela) text = 'Hela budgeten per person jämförs med de valda kategorierna, som om de vore stadens enda utsläpp.';
     else {
       const sk = standardAndelar(B, st.tilldelning === 'egen' ? 'Malmö' : st.tilldelning);
-      const vald = BUDGETGRUPPER.filter(g => g.kat.some(k => st.kat.includes(k)));
+      const vald = BUDGETGRUPPER.filter(g => g.kat.some(k => u.kat.includes(k)));
       text = 'Urvalet får <b>' + pct(fakt) + ' %</b> av budgeten per person: ' + vald.map(g => { const kat = g.kat.map(k => k.toLowerCase()).join(' och '); return esc(g.namn.toLowerCase()) + ' ' + pct(a[g.id]) + ' %' + (kat === g.namn.toLowerCase() ? '' : ' (' + kat + ')'); }).join(', ') + '. ' +
         (st.tilldelning === 'egen' ? 'Egna andelar.' : 'Andelarna är dagens utsläpp per person för boende (energi, vatten och hyra) och transport utan flyg i hushållens konsumtion enligt Konsumtionskompassen (' + esc(st.tilldelning) + ' ' + sk.rad.ar + ') och för investeringarna (SEI, 2026), delat med hela fotavtrycket per person: ' + nf(sk.totalKg / 1000, 2) + ' t, varav hushållen ' + nf(sk.rad.hushall_kg / 1000, 2) + ' t, offentlig konsumtion ' + nf(sk.rad.offentlig_kg / 1000, 2) + ' t och investeringar ' + nf(sk.rad.investeringar_kg / 1000, 2) + ' t. ' + byggandelText(B) + '.') +
         ' Resten av budgeten går till det som Road2Zero-OP inte räknar: mat, varor, flygresor, offentlig konsumtion och övriga investeringar.';
@@ -238,11 +238,21 @@
       '</section>';
   }
 
+  /* Urvalet som faktiskt räknas: sidomenyns val Utan energi i byggnader tar bort kategorin Energi, oavsett vad som är valt här. */
+  function urval(ctx) { if (!st) st = urvalStart(); return ctx && ctx.utanEnergi ? {...st, kat: st.kat.filter(k => k !== 'Energi')} : st; }
+  /* Sammanfattning för Översikten: samma nyckeltal som på sidan, med sidans urval. */
+  function sammanfattning(ctx, B) {
+    const u = urval(ctx); if (!u.kat.length || !u.grupper.length) return null;
+    const res = berakna(ctx.rows, B, u), ar = ctx.rows.map(r => r.year);
+    return {res, urval: u, ar: [ar[0], ar[ar.length - 1]], ggr: res.snitt != null && res.snittBudget ? res.snitt / res.snittBudget : null,
+      text: u.kat.join(', ') + ' · ' + (u.grupper.length === 2 ? 'befintlig stad och exploateringen' : u.grupper[0] === 'ny' ? 'bara exploateringen' : 'bara befintlig stad') +
+        ' · snitt ' + u.period[0] + '–' + u.period[1] + ' · ' + u.temp + ' °C, ' + u.sann + ' % · ' + (res.andelar.hela ? 'hela budgeten' : nf(100 * res.faktor, 1) + ' % av budgeten (' + (u.tilldelning === 'egen' ? 'egna andelar' : u.tilldelning) + ')')};
+  }
   function html(ctx, B) {
-    if (!st) st = urvalStart();
+    const u = urval(ctx);
     if (typeof Plotly === 'undefined') return '<div class="notice error">Diagrambiblioteket kunde inte läsas in.</div>';
-    if (!st.kat.length || !st.grupper.length) return kontroller(ctx, B) + '<div class="notice">Välj minst en klimatkategori och om befintlig stad eller exploateringen ska ingå.</div>';
-    const res = berakna(ctx.rows, B, st);
+    if (!u.kat.length || !u.grupper.length) return kontroller(ctx, B) + '<div class="notice">Välj minst en klimatkategori och om befintlig stad eller exploateringen ska ingå.</div>';
+    const res = berakna(ctx.rows, B, u);
     const flikar = '<div class="toggle r2zr-flikar">' + FLIKAR.map(([id, l]) => '<button data-r2zr-flik="' + id + '" class="' + (st.flik === id ? 'active' : '') + '">' + l + '</button>').join('') + '</div>';
     const div = id => '<div class="card r2zr-fig" id="r2zr-' + id + '"></div>';
     let innehall = '';
@@ -252,9 +262,9 @@
     if (st.flik === 'budget') innehall = parisKort() + div('motbudget') + div('personbudget') + (res.andelar.hela ? '' : div('gruppbudget')) + div('persontid') + div('temperatur') + div('ackbudget') + '<p class="small">' + budgetText(B) + '</p>';
     if (st.flik === 'tabeller') innehall = tabeller(ctx, B, res);
     if (st.flik === 'kallor') innehall = kallor(B);
-    const energiNotis = ctx.utanEnergi && st.kat.includes('Energi')
-      ? '<div class="notice info">Sidomenyn visar summan utan energi i byggnader. Här ingår kategorin Energi så länge den är vald; klicka bort den för samma avgränsning som på kartan.</div>' : '';
-    return kontroller(ctx, B) + energiNotis + nyckeltal(ctx, res) + flikar + innehall;
+    const energiNotis = ctx.utanEnergi
+      ? '<div class="notice info">Sidomenyn är inställd på <b>Utan energi i byggnader</b>: kategorin Energi är borttagen ur alla siffror här, precis som på kartan och i Översikten. Välj <b>Med energi i byggnader</b> i sidomenyn för att ta med den.</div>' : '';
+    return (ctx.kontext || '') + kontroller(ctx, B) + energiNotis + nyckeltal(ctx, res) + flikar + innehall;
   }
 
   function parisKort() {
@@ -269,14 +279,15 @@
 
   /* ---------- diagram ---------- */
   function rita(ctx, B) {
-    if (typeof Plotly === 'undefined' || !st || !st.kat.length || !st.grupper.length) return;
-    const res = berakna(ctx.rows, B, st), F = B.farg, kat = st.kat, ar = res.tab.map(r => r.ar);
+    const u = urval(ctx);
+    if (typeof Plotly === 'undefined' || !u.kat.length || !u.grupper.length) return;
+    const res = berakna(ctx.rows, B, u), F = B.farg, kat = u.kat, ar = res.tab.map(r => r.ar);
     const plot = (id, data, lay) => {
       const el = document.getElementById('r2zr-' + id); if (!el) return;
       el.style.height = (lay.height || 420) + 'px';       // fast höjd: Plotly fyller bredden och behåller höjden när den mäter om
       Plotly.newPlot(el, data, lay, CONF);
     };
-    const und = ar[0] + '–' + ar[ar.length - 1] + ' · ' + urvalText();
+    const und = ar[0] + '–' + ar[ar.length - 1] + ' · ' + urvalText(u);
     if (st.flik === 'oversikt') {
       const tot = kat.map(k => [k, res.tab.reduce((s, r) => s + r[k], 0)]).filter(x => Math.abs(x[1]) > 0).sort((a, b) => a[1] - b[1]);
       const pos = tot.filter(x => x[1] > 0).reduce((s, x) => s + x[1], 0);
@@ -377,7 +388,7 @@
         {x: 1.5, yref: 'paper', y: 1.02, text: 'Parisavtalets 1,5 °C', showarrow: false, yanchor: 'bottom', font: {color: PETROL, size: 11}},
         {x: 2.0, yref: 'paper', y: 1.02, text: 'väl under 2 °C', showarrow: false, yanchor: 'bottom', xanchor: 'right', font: {color: PETROL, size: 11}}];
       const sp = gron(SANNOLIKHETER.length).map((farg, i) => { const p = SANNOLIKHETER[i], valt = p === Number(st.sann);
-        return {type: 'scatter', mode: 'lines+markers', x: tx, y: temps.map(t => budgetSnitt(ctx.rows, B, st, t, p)), name: p + ' %', line: {color: farg, width: valt ? 3 : 1.8},
+        return {type: 'scatter', mode: 'lines+markers', x: tx, y: temps.map(t => budgetSnitt(ctx.rows, B, u, t, p)), name: p + ' %', line: {color: farg, width: valt ? 3 : 1.8},
           marker: {size: valt ? 8 : 6, color: farg, line: {color: SURF, width: 1}}, hovertemplate: p + ' % sannolikhet, %{x:.1f} °C: %{y:,.2f} t per person och år<extra></extra>'}; });
       sp.push({type: 'scatter', mode: 'markers', x: [Number(st.temp.replace(',', '.'))], y: [res.snittBudget], name: 'Valt', showlegend: false, hoverinfo: 'skip', marker: {size: 15, color: 'rgba(0,0,0,0)', line: {color: INK, width: 2}}});
       plot('temperatur', sp, l);
@@ -390,14 +401,14 @@
         hovertemplate: '%{x}: %{y:,.0f} kt<extra></extra>'}], l);
     }
   }
-  function urvalText() {
-    const g = st.grupper.length === 2 ? 'hela staden' : st.grupper[0] === 'ny' ? 'exploateringen' : 'befintlig stad';
-    return g + (st.kat.length === KATEGORIER.length ? '' : ' · ' + st.kat.length + ' av ' + KATEGORIER.length + ' kategorier');
+  function urvalText(u) {
+    const g = u.grupper.length === 2 ? 'hela staden' : u.grupper[0] === 'ny' ? 'exploateringen' : 'befintlig stad';
+    return g + (u.kat.length === KATEGORIER.length ? '' : ' · ' + u.kat.length + ' av ' + KATEGORIER.length + ' kategorier');
   }
 
   /* ---------- tabeller och export ---------- */
   function tabeller(ctx, B, res) {
-    const kat = KATEGORIER.filter(k => st.kat.includes(k)), tot = k => res.tab.reduce((s, r) => s + r[k], 0), brutto = kat.reduce((s, k) => s + Math.max(0, tot(k)), 0);
+    const kat = KATEGORIER.filter(k => urval(ctx).kat.includes(k)), tot = k => res.tab.reduce((s, r) => s + r[k], 0), brutto = kat.reduce((s, k) => s + Math.max(0, tot(k)), 0);
     const personar = res.tab.reduce((s, r) => s + r.inv, 0);
     let h = '<article class="card"><h2>Per klimatkategori</h2><div class="table-wrap"><table><thead><tr><th>Klimatkategori</th><th class="numeric">t CO₂e</th><th class="numeric">Andel</th><th class="numeric">t per person och år, hela perioden</th><th class="numeric">t per person och år, snitt ' + (res.snittAr || []).join('–') + '</th></tr></thead><tbody>' +
       kat.map(k => '<tr><td>' + esc(k) + '</td><td class="numeric">' + nf(tot(k)) + '</td><td class="numeric">' + nf(brutto ? tot(k) / brutto * 100 : null) + ' %</td><td class="numeric">' + nf(personar ? tot(k) / personar : null, 3) + '</td><td class="numeric">' + nf(res.snittKat[k], 3) + '</td></tr>').join('') +
@@ -413,7 +424,7 @@
     return h;
   }
   function csv(ctx, B) {
-    const res = berakna(ctx.rows, B, st), kat = KATEGORIER.filter(k => st.kat.includes(k)), d = x => x == null ? '' : String(Math.round(x * 1000) / 1000).replace('.', ',');
+    const u = urval(ctx), res = berakna(ctx.rows, B, u), kat = KATEGORIER.filter(k => u.kat.includes(k)), d = x => x == null ? '' : String(Math.round(x * 1000) / 1000).replace('.', ',');
     return '﻿' + ['ar', ...kat, 'summa', 'invanare', 't_per_person', 'budgetandel_per_person (' + (res.andelar.hela ? 'hela budgeten' : nf(100 * res.faktor, 1) + ' % av budgeten') + ')', 'stadens_budget_t', 'ackumulerat_fran_2026_t', 'budget_ackumulerad_t'].join(';') + '\n' +
       res.tab.map(r => [r.ar, ...kat.map(k => d(r[k])), d(r.summa), d(r.inv), d(r.perPerson), r.ar >= BUDGETSTART ? d(r.andel) : '', r.ar >= BUDGETSTART ? d(r.budget) : '', d(r.nettoKum), r.ar >= BUDGETSTART ? d(r.budgetKum) : ''].join(';')).join('\n');
   }
@@ -469,5 +480,5 @@
     if (typeof Plotly !== 'undefined') { requestAnimationFrame(omMat); setTimeout(omMat, 250); }
   }
 
-  return {DELPOSTER, KATEGORIER, BUDGETSTART, BUDGETGRUPPER, TILLDELNINGAR, bana, andelPerPerson, globalGt, nybyggnadsdelar, standardByggandel, standardAndelar, andelar, budgetFaktor, perAr, berakna, budgetSnitt, html, bind, csv};
+  return {DELPOSTER, KATEGORIER, BUDGETSTART, BUDGETGRUPPER, TILLDELNINGAR, bana, andelPerPerson, globalGt, nybyggnadsdelar, standardByggandel, standardAndelar, andelar, budgetFaktor, perAr, berakna, budgetSnitt, html, bind, csv, urval, sammanfattning};
 });

@@ -37,6 +37,21 @@ const unitLabelBase = u => isAck()
   ? ({t: 't CO₂e 2030–2050', t_ha: 't CO₂e per ha, 2030–2050', kg_ha: 'kg CO₂e per ha, 2030–2050', t_inv: 't CO₂e per invånare, 2030–2050'}[u])
   : ({t: 't CO₂e per år', t_ha: 't CO₂e per ha och år', kg_ha: 'kg CO₂e per ha och år', t_inv: 't CO₂e per invånare och år'}[u]);
 const mobLabel = () => P.perspektiv === 'A' ? 'A · Trafik inom området' : 'B · Hushållens bilar';
+const FLOTTA_LABEL = {nv2026: 'beslutade styrmedel (Naturvårdsverket 2026)', oforandrad: 'oförändrad flotta', egen: 'egen bana'};
+const flottaLabel = () => FLOTTA_LABEL[P.flottaVal] || P.flottaVal;
+const elLabel = () => (M.EL_ALT[P.elVal] ? M.EL_ALT[P.elVal].namn : P.elVal) + ' ' + nf(P.efEl * 1000, 0) + ' g/kWh';
+/* Vad visas nu? Samma rad överst på Översikt, Resultat & klimatbudget och Karta & områden, så att siffrorna går att känna igen mellan sidorna. */
+function kontextRad(extra) {
+  const post = (l, v) => '<span class="ctx-item"><small>' + l + '</small>' + v + '</span>';
+  return '<div class="ctx-bar"><span class="ctx-title">Visas nu</span>' +
+    post('Projekt', esc(PJ.plan || PJ.namn || PJ.id)) +
+    post('Trafik', esc(mobLabel())) +
+    post('Energi i byggnader', utanEnergi() ? '<b>Utan</b> · lokaliseringskartan' : 'Med') +
+    post('Fordonsflotta', esc(flottaLabel())) +
+    post('El', esc(elLabel())) +
+    (extra || '') +
+    '<button class="secondary ctx-btn" data-view="parameters">Ändra antaganden</button></div>';
+}
 const changed = () => Object.keys(M.DEFAULTS).some(k => k !== 'ar' && k !== 'perspektiv' && k !== 'energiVal' && P[k] !== M.DEFAULTS[k]);
 const metricLabel = key => key === 'total' ? totalLabel() : METRICS.find(m => m[0] === key)[1];
 
@@ -210,12 +225,14 @@ function overview() {
   let h = notice('<strong>Screening för översiktlig planering:</strong> Energi i befintliga byggnader bygger på ' + nf(q.beraknade_deklarationer) + ' energideklarationer, kopplade till DeSO via Malmö stads adresstjänst' +
     (P.bestand === 'hela' && bs ? ', och på ' + nf(stockCount.reduce((a, b) => a + b, 0)) + ' byggnader utan deklaration vars energi skattas från deklarerade byggnader av samma typ' : '') + '. Atemp och energibärare saknas i underlaget och <em>skattas</em>' +
     (eb.kalibrering !== 'ingen' ? '; ytorna kalibreras mot SCB:s fjärrvärmestatistik 2024' : '') + ' (se Data & kvalitet). Mobilitet kommer från Vägvis 2.3.1. Exploateringen följer ÖP 2023:s utbyggnadsområden med Fokus 1 byggt ' + P.f1Start + '–' + (P.f1Slut - 1) + ' och Fokus 2 ' + P.f2Start + '–' + (P.f2Slut - 1) + '.', 'info');
+  h = kontextRad(post('År', esc(yearLabel(P.ar)))) + h;
   h += '<section class="kpis four"><article class="card kpi-main"><div class="kpi-label">' + (utanEnergi() ? 'Klimatavtryck utan energi i byggnader' : 'Klimatavtryck') + ' · ' + yearLabel(P.ar) + '</div><div class="kpi-value">' + kt(c.total) + ' <span class="unit">kt CO₂e' + (isAck() ? '' : ' per år') + '</span></div><div class="kpi-foot">' + (utanEnergi() ? 'Mobilitet (' + esc(mobLabel()) + ') och exploatering enligt ÖP 2023 utan byggnadernas energi' : 'Energi i befintliga byggnader, mobilitet (' + esc(mobLabel()) + ') och exploatering enligt ÖP 2023') + (delta != null && P.ar !== 2024 ? ' · <span class="' + (delta > 0 ? 'delta-up' : 'delta-down') + '">' + (delta > 0 ? '+' : '') + nf(delta * 100, 1) + ' % mot 2024</span>' : '') + '</div></article>' +
     '<article class="card"><div class="kpi-label">Per invånare</div><div class="kpi-value">' + nf(c.total / c.bef / (isAck() ? 21 : 1), 2) + ' <span class="unit">t CO₂e/år</span></div><div class="kpi-foot">' + nf(c.bef) + ' invånare' + (c.nyaInv > 0 ? ', varav ' + nf(c.nyaInv) + ' i nya bostäder' : '') + (isAck() ? ' (2050). Medel över 21 år.' : '') + '</div></article>' +
     '<article class="card"><div class="kpi-label">Per hektar</div><div class="kpi-value">' + nf(c.total / c.land_ha / (isAck() ? 21 : 1), 1) + ' <span class="unit">t CO₂e/ha·år</span></div><div class="kpi-foot">' + nf(c.land_ha) + ' ha land, havsytor ej medräknade</div></article>' +
     '<article class="card"><div class="kpi-label">Exploateringens del</div><div class="kpi-value">' + kt(c.exploatering) + ' <span class="unit">kt</span></div><div class="kpi-foot">' + nf(100 * c.exploatering / Math.max(1, c.total), 1) + ' % av summan · nybyggnation, mark' + (utanEnergi() ? '' : ', nya byggnaders energi') + ' och ny mobilitet</div></article></section>';
   h += '<section class="grid2">' + partsCard(c, 'Klimatavtryckets delar · ' + yearLabel(P.ar), isAck() ? 'Summa för åren 2030–2050, ton CO₂e.' : 'Ton CO₂e under kalenderåret. Hela Malmö, summa av 209 DeSO.') +
     '<article class="card"><h2>Utveckling 2024–2050</h2><p class="card-sub">Hela Malmö, kt CO₂e per år. Klicka på en stapel för att välja år.</p>' + stackChart('chart-years', chartRows.map(r => ({...r, key: r.year, tipTitle: 'Malmö ' + r.year})), M.aktiva(P), {sel: P.ar, aria: 'Klimatavtryck per år och komponent', legendRow: sel || null, onClick: r => setP({ar: r.year})}) + '</article></section>';
+  h += resultatSpegel();
   h += uncertaintyCard();
   h += '<article class="card"><h2>Underlag och täckning</h2><p class="card-sub">Hur stor del av underlaget som faktiskt ligger på kartan.</p><div class="coverage">' +
     '<div class="stat"><b>' + nf(q.kartlagda) + '</b><span>av ' + nf(q.beraknade_deklarationer) + ' beräkningsbara energideklarationer kartlagda (' + nf(100 * q.kartlagda / q.beraknade_deklarationer, 1) + ' %)' + (P.bestand === 'hela' && bs ? ' · ' + nf(stockCount.reduce((a, b) => a + b, 0)) + ' odeklarerade byggnader skattade' : ' · odeklarerade byggnader ingår inte') + '</span></div>' +
@@ -225,6 +242,23 @@ function overview() {
     '<p class="summaryline">Summorna är <strong>inte</strong> en fullständig inventering av Malmös utsläpp. ' + (P.bestand === 'hela' ? 'Byggnader utan energideklaration ingår som skattningar. ' : 'Byggnader utan energideklaration (främst många småhus) ingår inte i valt läge. ') + 'Industriprocesser, sjöfart, flyg och konsumtion ingår inte. Mobilitet A och B är olika perspektiv och adderas aldrig till varandra.</p>' +
     '<div class="button-row"><button class="secondary" data-view="map">Utforska DeSO på kartan →</button><button class="secondary" data-view="parameters">Ändra antaganden →</button><button class="secondary" data-view="data">Se datakvalitet →</button></div></article>';
   return h;
+}
+
+const post = (l, v) => '<span class="ctx-item"><small>' + l + '</small>' + v + '</span>';
+/* Översikten speglar Resultat & klimatbudget: samma nyckeltal, samma urval (kategorier, period, temperatur, sannolikhet, tilldelning). */
+function resultatSpegel() {
+  if (!window.R2ZResultat || !R2Z) return '';
+  const sm = window.R2ZResultat.sammanfattning(resultsCtx(), R2Z);
+  if (!sm) return '<article class="card"><h2>Resultat & klimatbudget</h2><p class="card-sub">Inga kategorier valda på resultatsidan.</p></article>';
+  const r = sm.res, kort = (l, v, f) => '<div class="card"><div class="kpi-label">' + l + '</div><div class="kpi-value">' + v + '</div><div class="kpi-foot">' + f + '</div></div>';
+  return '<article class="card"><div class="row wrap"><div><h2>Resultat & klimatbudget</h2><p class="card-sub">Samma siffror som på sidan Resultat & klimatbudget, med dess urval: ' + esc(sm.text) + '.</p></div>' +
+    '<button class="secondary" data-view="results">Öppna Resultat & klimatbudget →</button></div><section class="r2zr-kpis spegel">' +
+    kort('Summa ' + sm.ar[0] + '–' + sm.ar[1], nf(r.summa / 1000, 0) + '<small> kt CO₂e</small>', 'De valda kategorierna, ' + nf(r.summaBudgetperiod / 1000) + ' kt från 2026') +
+    kort('Snitt ' + (r.snittAr ? r.snittAr[0] + '–' + r.snittAr[1] : '–'), nf(r.snitt, 2) + '<small> t per person och år</small>', 'Budgetandel samma år: ' + nf(r.snittBudget, 2) + ' t') +
+    kort('Mot budgeten', sm.ggr == null ? '–' : nf(sm.ggr, 1) + '<small> gånger</small>', sm.urval.temp + ' °C, ' + sm.urval.sann + ' % sannolikhet' + (r.andelar.hela ? ', hela budgeten' : ', ' + nf(100 * r.faktor, 1) + ' % av budgeten')) +
+    kort('Stadens budget 2026–' + sm.ar[1], nf(r.stadBudget / 1000, 1) + '<small> kt CO₂e</small>', 'Lika per person, faktiska invånare år för år') +
+    kort('Budgeten förbrukad', r.slut ? String(r.slut) : 'Inte före ' + sm.ar[1], 'Första året de ackumulerade utsläppen från 2026 är större än budgeten') +
+    '</section></article>';
 }
 
 function uncertaintyCard() {
@@ -257,13 +291,33 @@ function classes(vals) {
   return br.filter((b, i) => i === 0 || b > br[i - 1]);
 }
 function colorFor(x, br) { if (x == null || !(x > 0) || !br.length) return '#e3e8e4'; let k = 0; while (k < br.length - 2 && x > br[k + 1]) k++; const n = Math.max(1, br.length - 1); return rampColor((k + .5) / n); }
+/* Vad kartan visar, i klartext under valen: nyckeltal, enhet, år och vad talet betyder. */
+const METRIC_TEXT = {
+  total: 'Summan av komponenterna i sidomenyns val',
+  energi: 'Energi i befintliga byggnader ur energideklarationer (el och fjärrvärme × emissionsfaktor det valda året).',
+  mobilitet: 'Trafiken i befintlig stad enligt Vägvis: perspektiv A = all trafik på vägarna i DeSO:n, B = de boendes bilar.',
+  bygg: 'Nybyggnation i ÖP:s utbyggnadsområden (A1–A5), bokförd det år byggnaden blir klar och fördelad på de DeSO området ligger i.',
+  mark: 'Förändrad markanvändning när ÖP:s utbyggnadsområden bebyggs: kolförrådet före minus bebyggd mark.',
+  nydrift: 'Nya byggnaders energi i utbyggnadsområdena.',
+  nymob: 'Nya invånares bilar i utbyggnadsområdena, med värd-DeSO:ns bilinnehav och körsträcka.',
+  ny_bostad: 'Klimatpåverkan som en ny bostad skulle orsaka om den byggdes i DeSO:n: trafik, nybyggnation, mark' + ', summerat 2030–2050. Oberoende av årsvalet.',
+  ny_arbetsplats: 'Klimatpåverkan som en ny arbetsplats skulle orsaka i DeSO:n: nybyggnation och mark (trafiken ingår inte ännu), summerat 2030–2050. Oberoende av årsvalet.'
+};
+function kartaText() {
+  const k = st.metric, aktiva = M.aktiva(P).map(c => metricLabel(c)).join(', ');
+  let t = k === 'total' ? 'Summan av ' + aktiva + (utanEnergi() ? ' (energi i byggnader är bortvald i sidomenyn)' : '') + '.' : METRIC_TEXT[k] || '';
+  if (k === 'ny_bostad') t = t.replace('mark', 'mark' + (utanEnergi() ? '' : ' och energi'));
+  if (k === 'ny_arbetsplats' && !utanEnergi()) t = t.replace('nybyggnation och mark', 'nybyggnation, mark och energi');
+  const varn = utanEnergi() && (k === 'energi' || k === 'nydrift') ? ' <b>Obs:</b> energin ingår inte i summan i sidomenyns val; här visas den för sig.' : '';
+  return '<p class="map-what"><b>Kartan visar:</b> ' + esc(metricLabel(k)) + ' · ' + esc(unitLabel(st.unit)) + (isNy() ? '' : ' · ' + esc(yearLabel(P.ar))) + ' · ' + esc(mobLabel()) + '. ' + t + varn + '</p>';
+}
 function mapView() {
   const v = cur();
   const opts = METRICS.map(([k]) => '<option value="' + k + '"' + (st.metric === k ? ' selected' : '') + '>' + metricLabel(k) + '</option>').join('');
   const units = ['t', 't_ha', 'kg_ha', 't_inv'].map(u => '<option value="' + u + '"' + (st.unit === u ? ' selected' : '') + '>' + unitLabelBase(u) + '</option>').join('');
-  let h = '<article class="card"><div class="map-toolbar2"><label class="inline">Nyckeltal <select id="metric">' + opts + '</select></label><label class="inline">Enhet <select id="unit"' + (isNy() ? ' disabled title="Lokalisering visas alltid per tillkommande enhet"' : '') + '>' + units + '</select></label><span class="pill">' + esc(mobLabel()) + ' · ' + yearLabel(P.ar) + '</span></div>' +
+  let h = kontextRad(post('År', esc(yearLabel(P.ar))) + post('Nyckeltal', esc(metricLabel(st.metric)))) + '<article class="card"><div class="map-toolbar2"><label class="inline">Nyckeltal <select id="metric">' + opts + '</select></label><label class="inline">Enhet <select id="unit"' + (isNy() ? ' disabled title="Lokalisering visas alltid per tillkommande enhet"' : '') + '>' + units + '</select></label><span class="pill">' + esc(mobLabel()) + ' · ' + yearLabel(P.ar) + '</span></div>' +
     '<div class="map-checks"><label><input type="checkbox" id="map-osm"' + (st.osm ? ' checked' : '') + '> OpenStreetMap</label><label><input type="checkbox" id="map-dev"' + (st.dev ? ' checked' : '') + '> Utbyggnadsområden ÖP 2023</label><button class="map-fit secondary small-btn" id="map-fit">Hela kommunen</button></div>' +
-    '<div class="map-layout"><div><div class="map-surface" id="map-surface"></div><p class="small" id="map-status"></p></div><aside class="area-detail" id="area-detail"></aside></div></article>';
+    kartaText() + '<div class="map-layout"><div><div class="map-surface" id="map-surface"></div><p class="small" id="map-status"></p></div><aside class="area-detail" id="area-detail"></aside></div></article>';
   h += '<article class="card"><div class="row wrap"><div><h2>Alla DeSO</h2><p class="card-sub">' + esc(unitLabel(st.unit)) + ' · ' + yearLabel(P.ar) + '. Klicka på en rad för att visa området; klicka på en kolumnrubrik för att sortera.</p></div><input class="input" id="table-filter" placeholder="Sök DeSO-kod eller område" value="' + esc(st.filter) + '" style="max-width:320px"></div><div class="table-wrap area-table" id="deso-table"></div></article>';
   return h;
 }
@@ -741,7 +795,7 @@ function stadView(vy) {
   if (!window.R2ZStad || !BOKF) return notice('Projektet saknar underlag för stadens klimatredovisning (data/klimatbokforing.json).', 'error');
   try { return window.R2ZStad.html(stadCtx(), BOKF, vy); } catch (e) { return notice('Stadens redovisning kunde inte räknas: ' + esc(e.message), 'error'); }
 }
-function resultsCtx() { return {rows: M.cityByYear(R), mobLabel: mobLabel(), utanEnergi: utanEnergi()}; }
+function resultsCtx() { return {rows: M.cityByYear(R), mobLabel: mobLabel(), utanEnergi: utanEnergi(), flottaLabel: flottaLabel(), elLabel: elLabel(), kontext: kontextRad()}; }
 function resultsView() {
   if (!window.R2ZResultat || !R2Z) return notice('Resultatvyn saknar sitt underlag (klimatbudget och diagrambibliotek).', 'error');
   return window.R2ZResultat.html(resultsCtx(), R2Z);

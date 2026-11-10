@@ -147,3 +147,13 @@ td.iv{color:var(--muted)}
 .r2zs-tab tr.r2zs-whyrow td{white-space:normal;font-weight:400;color:#3d4a45;font-size:12px;line-height:1.55;padding-top:2px;padding-bottom:14px;max-width:1100px}
 .r2zs-tab tr.r2zs-whyrow:hover{background:none}
 .r2zs-nyckel{font-size:11px;font-weight:650;letter-spacing:.04em;color:#7d939d}
+
+/* Visas nu: gemensam rad på Översikt, Resultat & klimatbudget och Karta & områden */
+.ctx-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--dark);border-radius:10px;padding:10px 16px;margin:0 0 16px;font-size:13px}
+.ctx-title{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dark);font-weight:700;margin-right:4px}
+.ctx-item{display:inline-flex;flex-direction:column;line-height:1.25}
+.ctx-item small{font-size:10.5px;color:var(--muted);letter-spacing:.03em;text-transform:uppercase}
+.ctx-btn{margin-left:auto;padding:6px 12px;font-size:12px}
+.map-what{margin:8px 0 10px;padding:9px 12px;background:var(--pale);border-radius:8px;font-size:13px;line-height:1.45}
+.r2zr-pill.off{opacity:.55;text-decoration:line-through;cursor:not-allowed}
+.r2zr-kpis.spegel{margin-top:12px}

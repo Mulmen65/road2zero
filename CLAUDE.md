@@ -179,6 +179,8 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   2030–2050 (trafik, bygg, mark, energi; energin i summan bara med `energiVal` 'med'); kartans nyckeltal `ny_bostad` och `ny_arbetsplats`
   (alltid per enhet, enhetsvalet avstängt), flaggor T och M (`flaggor()`, `FLAGG_T` 1,25). Parametrar `nyTyp`, `btaSmahus`, `byggSmahusFaktor`,
   `tathetFbh`, `tathetSmahus`, `nyArbTyp`, `tathetArb`, `nyMark` ('op' = ÖP-områdenas marktäcke i DeSO:n, annars bebyggd). Arbetsplatstrafik saknas ännu.
+  Samma resultat på tre sidor (0.16.3): `kontextRad()` i `app.js` (raden Visas nu) på Översikt, Resultat och Karta; `resultat.js` räknar med
+  `urval(ctx)` som tar bort Energi när `ctx.utanEnergi`; `sammanfattning(ctx, B)` ger Översiktens spegelkort; `kartaText()` förklarar kartans nyckeltal.
 
 ## Kända osäkerheter
 
