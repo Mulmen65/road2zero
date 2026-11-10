@@ -175,6 +175,10 @@ Streamlit läser inte om moduler utanför appens mapp (`gemensamt/`, `road2zero/
   laddel och tillverkning ur Vägvis underlag. Bränslekedjan följer `UTV.flotta_nv2026` (Naturvårdsverket 2026, tabell 4, inrikes transporter
   med beslutade styrmedel, delat med trafikarbetet +0,87 %/år enligt Trafikverket 2026; 2046–2050 som 2041–2045), laddelen elvalet och
   tillverkningen `UTV.bilprod` (global el, IEA). 'oforandrad' och 'egen' skalar hela livscykelfaktorn som i 1.3. Standard 2050: 180,0 kt (A).
+  Lokaliseringskartan (0.16.2, `R.tillkommande`, `tillkommande()` i `model.js`): per DeSO klimatpåverkan per ny bostad och arbetsplats
+  2030–2050 (trafik, bygg, mark, energi; energin i summan bara med `energiVal` 'med'); kartans nyckeltal `ny_bostad` och `ny_arbetsplats`
+  (alltid per enhet, enhetsvalet avstängt), flaggor T och M (`flaggor()`, `FLAGG_T` 1,25). Parametrar `nyTyp`, `btaSmahus`, `byggSmahusFaktor`,
+  `tathetFbh`, `tathetSmahus`, `nyArbTyp`, `tathetArb`, `nyMark` ('op' = ÖP-områdenas marktäcke i DeSO:n, annars bebyggd). Arbetsplatstrafik saknas ännu.
 
 ## Kända osäkerheter
 

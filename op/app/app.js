@@ -345,7 +345,7 @@ function detail() {
   const p = props[id], mA = D.mob.A[id], mB = D.mob[R.bKey][id], eb = R.energyBase, i = S.index[id];
   const mob = P.perspektiv === 'A' ? mA : mB, I = EI(), ivM = st.metric === 'energi' ? energyIvUnit(r, st.unit) : null;
   el.innerHTML = '<div class="ad-head"><span class="ad-kicker">DeSO ' + esc(id) + ' · RegSO ' + esc(p.regso) + '</span><h3>' + esc(areaName(id)) + '</h3></div>' +
-    '<div class="ad-hero"><b>' + sig(val) + '</b><span>' + esc(unitLabel(st.unit)) + '</span><small>' + esc(metricLabel(st.metric)) + ' · ' + yearLabel(P.ar) + (st.metric === 'energi' ? ' · 95 %: ' + (ivM ? ivTxt(ivM[0], ivM[1], sig) : ivPending()) : '') + '</small></div>' +
+    '<div class="ad-hero"><b>' + sig(val) + '</b><span>' + esc(unitLabel(st.unit)) + '</span><small>' + esc(metricLabel(st.metric)) + (isNy() ? '' : ' · ' + yearLabel(P.ar)) + (st.metric === 'energi' ? ' · 95 %: ' + (ivM ? ivTxt(ivM[0], ivM[1], sig) : ivPending()) : '') + '</small></div>' +
     '<div class="ad-rank">Plats ' + rank + ' av ' + sorted.length + '<small>1 = högst värde i Malmö</small><i><em style="left:' + (100 * (1 - (rank - 1) / Math.max(1, sorted.length - 1))).toFixed(1) + '%"></em></i></div>' +
     '<dl class="ad-facts"><div><dt>Totalt</dt><dd>' + nf(r.total) + ' t<small>' + (isAck() ? '2030–2050' : 'per år') + '</small></dd></div><div><dt>Yta utan hav</dt><dd>' + nf(r.land_ha, 1) + ' ha</dd></div>' +
     '<div><dt>Invånare</dt><dd>' + nf(r.bef) + (r.nyaInv > 0 ? '<small>varav ' + nf(r.nyaInv) + ' nya</small>' : '<small>2024</small>') + '</dd></div><div><dt>Energi befintliga</dt><dd>' + nf(r.energi) + ' t<small class="ad-intervall">95 %: ' + (I ? ivTxt(I.lo(i), I.hi(i)) + ' t' : ivPending()) + '</small></dd></div>' +
